@@ -2,61 +2,11 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BsGrid1X2 } from "react-icons/bs";
-import { FaRegFileLines } from "react-icons/fa6";
-import { FaUsers } from "react-icons/fa";
-import { IoStatsChartOutline, IoChevronDown, IoChevronForward } from "react-icons/io5";
-import { GrTable } from "react-icons/gr";
+import { IoChevronDown, IoChevronForward } from "react-icons/io5";
 import { SidebarProps } from "@/types/ui-props";
 import { Button } from "../ui/button";
 import { LuAlignJustify } from "react-icons/lu";
-
-// Definisi menu
-const navLinks = [
-  {
-    title: "Dashboard",
-    links: [
-      {
-        name: "Overview",
-        href: '/workspace/overview',
-        icon: BsGrid1X2,
-      },
-    ],
-  },
-  {
-    title: "Contoh",
-    links: [
-      {
-        name: "Reports",
-        icon: IoStatsChartOutline,
-        children: [
-          { name: "Monthly", href: "/users" },
-          { name: "Weekly", href: "/users/add" },
-        ],
-      },
-      {
-        name: "Table",
-        href: "/workspace/table",
-        icon: GrTable,
-      },
-    ],
-  },
-  {
-    title: "Management",
-    links: [
-      {
-        name: "Users",
-        href: "/users",
-        icon: FaUsers,
-      },
-      {
-        name: "Documents",
-        href: "/documents",
-        icon: FaRegFileLines,
-      },
-    ],
-  },
-];
+import { navLinks } from "@/constants/navlink";
 
 export const Sidebar: React.FC<SidebarProps> = ({
   sidebarShow,

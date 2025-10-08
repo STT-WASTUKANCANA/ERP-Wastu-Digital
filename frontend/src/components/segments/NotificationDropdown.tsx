@@ -63,7 +63,6 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
                                         ))}
                                 </div>
 
-                                {/* Content */}
                                 <div className="min-h-[300px] space-y-4">
                                         <div className="flex justify-between items-center">
                                                 <div className="flex gap-4 cursor-pointer">

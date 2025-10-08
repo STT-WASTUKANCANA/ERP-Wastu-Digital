@@ -1,6 +1,6 @@
 "use client";
 import { TopbarProps } from "@/types/ui-props";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { FaRegBell } from "react-icons/fa";
 import { LuAlignJustify } from "react-icons/lu";
 import { Button } from "../ui/button";
@@ -15,13 +15,28 @@ export const Topbar: React.FC<TopbarProps> = ({
         notificationDropdownShow,
         setNotificationDropdownShow,
 }) => {
+        const [isMobile, setIsMobile] = useState(false);
+
+        useEffect(() => {
+                const handleResize = () => setIsMobile(window.innerWidth < 1024);
+                handleResize();
+                window.addEventListener("resize", handleResize);
+                return () => window.removeEventListener("resize", handleResize);
+        }, []);
+
+        const paddingLeft = !isMobile ? (sidebarShow ? 300 : 90) : 16;
         const topbarClass = scroll > 0
-                ? "bg-background mx-4 px-4 w-[calc(100%-2rem)] rounded-b-2xl"
-                : "bg-accent px-6 w-full";
+                ? "bg-background rounded-b-2xl"
+                : "bg-accent";
 
         return (
                 <div
-                        className={`fixed top-0 h-[50px] flex justify-between items-center transition-all overflow-hidden z-0 py-8 ${topbarClass} ${sidebarShow ? "lg:pl-[300px]" : "lg:pl-23"}`}
+                        className={`fixed top-0 h-[50px] w-full flex justify-between items-center transition-all overflow-hidden z-0 py-8 ${topbarClass}`}
+                        style={{
+                                paddingLeft: paddingLeft,
+                                paddingRight: 32,
+                                transition: "padding 0.3s ease, background-color 0.3s ease",
+                        }}
                 >
                         <div className="flex items-center gap-4">
                                 <Button
@@ -29,7 +44,7 @@ export const Topbar: React.FC<TopbarProps> = ({
                                                 setSidebarShow(!sidebarShow);
                                                 e.stopPropagation();
                                         }}
-                                        className={`text-foreground lg:hidden`}
+                                        className="text-foreground lg:hidden"
                                 >
                                         <LuAlignJustify className="text-2xl" />
                                 </Button>
@@ -42,7 +57,7 @@ export const Topbar: React.FC<TopbarProps> = ({
                                         size="w-[30px] h-[30px]"
                                         rounded="rounded-full"
                                         color="bg-accent"
-                                        className="relative flex justify-center items-center p-2 text-foreground"
+                                        className="relative flex justify-center items-center p-2 text-foreground cursor-pointer"
                                         onClick={() => {
                                                 setNotificationDropdownShow(!notificationDropdownShow);
                                                 setProfileDropdownShow(false);
