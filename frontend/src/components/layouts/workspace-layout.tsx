@@ -17,14 +17,14 @@ export const WorkSpaceLayout = ({ children }: WorkspaceLayoutProps) => {
         const [notificationDropdownShow, setNotificationDropdownShow] = useState(false);
 
         return (
-                <div className="relative grid lg:grid-cols-[70px_1fr] min-h-[200vh]">
+                <div className="relative">
                         <div className={`flex flex-col relative`} onClick={() => {
-                                if (sidebarShow) {
-                                        setSidebarShow(false);
+                                if (window.innerWidth < 1024) {
+                                        setSidebarShow(!sidebarShow);
                                 }
                         }}>
                                 {sidebarShow && (
-                                        <div className="absolute inset-0 bg-black/40 z-10"></div>
+                                        <div className="absolute inset-0 bg-black/40 z-10 lg:hidden"></div>
                                 )}
                                 <Topbar
                                         scroll={scrollY}
@@ -45,9 +45,11 @@ export const WorkSpaceLayout = ({ children }: WorkspaceLayoutProps) => {
                                         />
                                 )}
                                 <main
-                                        className={`p-4 flex-1 bg-accent`}
+                                        className={`
+                                                p-4 bg-accent min-h-screen transition-all duration-300
+                                                ${sidebarShow ? "lg:ml-[280px]" : "lg:ml-16"}
+                                        `}
                                         onClick={() => {
-                                                setSidebarShow(false);
                                                 setProfileDropdownShow(false);
                                                 setNotificationDropdownShow(false);
                                         }}

@@ -7,7 +7,6 @@ export interface InputProps
         className?: string;
         border?: string;
 }
-
 export interface ButtonProps {
         route?: string;
         children: ReactNode;
@@ -19,13 +18,10 @@ export interface ButtonProps {
         type?: "button" | "submit" | "reset";
         onClick?: MouseEventHandler<HTMLButtonElement>;
 }
-
 export interface PatternLogoProps {
         className?: string;
         style?: CSSProperties;
 }
-
-
 export type DropdownProps = {
   position: string;
   padding?: string;
@@ -35,13 +31,10 @@ export type DropdownProps = {
   size?: string;
   children?: React.ReactNode;
 };
-
 export type NotificationDropdownProps = {
   notificationDropdownShow: boolean;
   setNotificationDropdownShow: React.Dispatch<React.SetStateAction<boolean>>;
 }
-
-
 export type TopbarProps = {
   scroll: number;
   sidebarShow: boolean;
@@ -51,8 +44,13 @@ export type TopbarProps = {
   notificationDropdownShow: boolean;
   setNotificationDropdownShow: React.Dispatch<React.SetStateAction<boolean>>;
 };
-
 export interface SidebarProps {
   sidebarShow: boolean;
   setSidebarShow: React.Dispatch<React.SetStateAction<boolean>>;
+}
+export type CardProps = {
+        title: string
+        value: string | number
+        percent: number
+        icon: React.ElementType
 }

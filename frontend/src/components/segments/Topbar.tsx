@@ -20,7 +20,7 @@ export const Topbar: React.FC<TopbarProps> = ({
 
         return (
                 <div
-                        className={`fixed top-0 h-[50px] flex justify-between items-center transition-all overflow-hidden z-0 py-8 ${topbarClass}`}
+                        className={`fixed top-0 h-[50px] flex justify-between items-center transition-all overflow-hidden z-0 py-8 ${topbarClass} ${sidebarShow ? "lg:pl-[300px]" : "lg:pl-23"}`}
                 >
                         <div className="flex items-center gap-4">
                                 <Button
@@ -28,7 +28,7 @@ export const Topbar: React.FC<TopbarProps> = ({
                                                 setSidebarShow(!sidebarShow);
                                                 e.stopPropagation();
                                         }}
-                                        className="text-foreground"
+                                        className={`text-foreground lg:hidden`}
                                 >
                                         <LuAlignJustify className="text-2xl" />
                                 </Button>
