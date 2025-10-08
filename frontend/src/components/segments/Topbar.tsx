@@ -4,6 +4,7 @@ import React from "react";
 import { FaRegBell } from "react-icons/fa";
 import { LuAlignJustify } from "react-icons/lu";
 import { Button } from "../ui/button";
+import { Breadcumbs } from "../ui/breadcumbs";
 
 export const Topbar: React.FC<TopbarProps> = ({
         scroll,
@@ -33,7 +34,7 @@ export const Topbar: React.FC<TopbarProps> = ({
                                         <LuAlignJustify className="text-2xl" />
                                 </Button>
 
-                                
+                                <Breadcumbs />
                         </div>
 
                         <div className="flex items-center gap-1">

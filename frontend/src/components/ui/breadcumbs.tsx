@@ -1,21 +1,27 @@
 import { usePathname } from 'next/navigation';
-import React from 'react'
+import React from 'react';
 
 export const Breadcumbs = () => {
         const pathname = usePathname();
         const segments = pathname.split("/").filter(Boolean);
-        
-        const formatSegment = (segment: string) => segment.charAt(0).toUpperCase() + segment.slice(1).replace("-", " ");
-        
+        const lastSegment = segments[segments.length - 1] || "Home";
+
+        const formatSegment = (segment: string) =>
+                segment.charAt(0).toUpperCase() + segment.slice(1).replace("-", " ");
+
         return (
-                <nav className="text-sm text-gray-500" aria-label="Breadcrumb">
-                        <ol className="list-none p-0 inline-flex">
+                <nav aria-label="Breadcrumb">
+                        <h4 className="text-foreground text-md flex lg:hidden">
+                                {formatSegment(lastSegment)}
+                        </h4>
+
+                        <ol className="list-none p-0 hidden lg:flex text-sm text-gray-500">
                                 {segments.map((segment, idx) => (
                                         <li key={idx} className="flex items-center">
                                                 {idx === 0 ? (
                                                         <span className="text-gray-700">{formatSegment(segment)}</span>
                                                 ) : idx === segments.length - 1 ? (
-                                                        <span className="text-gray-700">{formatSegment(segment)}</span>
+                                                        <span className="text-foreground">{formatSegment(segment)}</span>
                                                 ) : (
                                                         <a
                                                                 href={"/" + segments.slice(0, idx + 1).join("/")}
@@ -30,5 +36,5 @@ export const Breadcumbs = () => {
                                 ))}
                         </ol>
                 </nav>
-        )
-}
+        );
+};
