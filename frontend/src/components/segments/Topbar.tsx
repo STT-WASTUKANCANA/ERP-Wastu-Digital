@@ -4,6 +4,7 @@ import React from "react";
 import { FaRegBell } from "react-icons/fa";
 import { LuAlignJustify } from "react-icons/lu";
 import { Button } from "../ui/button";
+import { usePathname } from "next/navigation";
 
 export const Topbar: React.FC<TopbarProps> = ({
         scroll,
@@ -14,9 +15,14 @@ export const Topbar: React.FC<TopbarProps> = ({
         notificationDropdownShow,
         setNotificationDropdownShow,
 }) => {
+        const pathname = usePathname();
+        const segments = pathname.split("/").filter(Boolean);
+
         const topbarClass = scroll > 0
                 ? "bg-background mx-4 px-4 w-[calc(100%-2rem)] rounded-b-2xl"
                 : "bg-accent px-6 w-full";
+
+        const formatSegment = (segment: string) => segment.charAt(0).toUpperCase() + segment.slice(1).replace("-", " ");
 
         return (
                 <div
@@ -33,7 +39,28 @@ export const Topbar: React.FC<TopbarProps> = ({
                                         <LuAlignJustify className="text-2xl" />
                                 </Button>
 
-                                <h4 className="text-foreground text-md">Dashboard</h4>
+                                <nav className="text-sm text-gray-500" aria-label="Breadcrumb">
+                                        <ol className="list-none p-0 inline-flex">
+                                                {segments.map((segment, idx) => (
+                                                        <li key={idx} className="flex items-center">
+                                                                {idx === segments.length - 1 ? (
+                                                                        <span className="text-gray-700">{formatSegment(segment)}</span>
+                                                                ) : (
+                                                                        <>
+                                                                                <a
+                                                                                        href={"/" + segments.slice(0, idx + 1).join("/")}
+                                                                                        className="text-gray-400 hover:text-gray-700"
+                                                                                >
+                                                                                        {formatSegment(segment)}
+                                                                                </a>
+                                                                                <span className="mx-2">/</span>
+                                                                        </>
+                                                                )}
+                                                        </li>
+                                                ))}
+                                        </ol>
+                                </nav>
+
                         </div>
 
                         <div className="flex items-center gap-1">
