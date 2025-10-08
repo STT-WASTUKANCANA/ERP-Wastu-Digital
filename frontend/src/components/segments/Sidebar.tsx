@@ -119,9 +119,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {navLinks.map((section, idx) => (
           <div key={idx} className="space-y-2">
             {sidebarShow && (
-              <span className="block text-secondary text-xs uppercase tracking-wide">
+              <span className="block text-secondary text-xs uppercase tracking-wide sm">
                 {section.title}
               </span>
+            )}
+            {!sidebarShow && idx !== 0 && (
+              <hr className="border-t border-secondary my-2" />
             )}
 
             {section.links.map((link, linkIdx) => {
