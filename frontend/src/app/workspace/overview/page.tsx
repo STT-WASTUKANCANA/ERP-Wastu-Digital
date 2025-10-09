@@ -2,6 +2,7 @@ import { WorkSpaceLayout } from '@/components/layouts/workspace-layout'
 import { Card } from '@/components/ui/card'
 import React from 'react'
 import { BsInbox, BsSend } from 'react-icons/bs'
+import { LuUsers } from 'react-icons/lu'
 
 const page = () => {
   return (
@@ -18,6 +19,11 @@ const page = () => {
           value="1.250"
           percent={12.5}
           icon={BsSend}
+        />
+        <Card
+          title="Users"
+          value="20"
+          icon={LuUsers}
         />
       </div>
     </WorkSpaceLayout>

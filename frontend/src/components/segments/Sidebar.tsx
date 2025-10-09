@@ -89,7 +89,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <div key={linkIdx}>
                     <button
                       onClick={() => toggleDropdown(link.name)}
-                      className={`w-full h-11 px-3 rounded-md flex items-center justify-between text-sm font-medium transition
+                      className={`w-full h-11 px-3 rounded-md flex items-center justify-between text-sm font-medium transition cursor-pointer
                     ${hasActiveChild
                           ? "text-primary bg-primary/20"
                           : "text-foreground/70 hover:text-primary hover:bg-primary/10"

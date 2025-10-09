@@ -51,6 +51,6 @@ export interface SidebarProps {
 export type CardProps = {
         title: string
         value: string | number
-        percent: number
+        percent?: number
         icon: React.ElementType
 }

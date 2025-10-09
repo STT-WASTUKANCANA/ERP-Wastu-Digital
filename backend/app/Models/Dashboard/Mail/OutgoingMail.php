@@ -13,6 +13,6 @@ class OutgoingMail extends Model
     protected $dates = ['deleted_at'];
     public function mail_category()
     {
-        return $this->belongsTo(MailCategories::class, 'category_id');
+        return $this->belongsTo(MailCategory::class, 'category_id');
     }
 }

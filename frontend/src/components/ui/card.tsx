@@ -5,8 +5,8 @@ import { Button } from './button'
 import { CardProps } from '@/types/ui-props'
 
 export const Card: React.FC<CardProps> = ({ title, value, percent, icon: Icon }) => {
-        const isNegative = percent < 0
-        const percentValue = Math.abs(percent)
+        const isNegative = percent !== undefined && percent < 0;
+        const percentValue = percent !== undefined ? Math.abs(percent) : 0;
 
         return (
                 <div className="bg-background border border-secondary/20 p-5 rounded-2xl space-y-6">
@@ -25,19 +25,19 @@ export const Card: React.FC<CardProps> = ({ title, value, percent, icon: Icon })
                         <div className="flex items-end justify-between">
                                 <span className="text-4xl leading-none">{value}</span>
 
-                                <div className="flex flex-col items-end gap-1">
-                                        <div
-                                                className={`flex items-center gap-1 px-2 py-0.5 rounded-md text-sm font-medium ${isNegative
-                                                                ? 'bg-danger/10 text-danger'
-                                                                : 'bg-success/10 text-success'
-                                                        }`}
-                                        >
-                                                <span>{percentValue}%</span>
-                                                {isNegative ? <CgArrowBottomLeft /> : <CgArrowTopRight />}
+                                {percent !== undefined && (
+                                        <div className="flex flex-col items-end gap-1">
+                                                <div
+                                                        className={`flex items-center gap-1 px-2 py-0.5 rounded-md text-sm font-medium ${isNegative ? 'bg-danger/10 text-danger' : 'bg-success/10 text-success'
+                                                                }`}
+                                                >
+                                                        <span>{percentValue}%</span>
+                                                        {isNegative ? <CgArrowBottomLeft /> : <CgArrowTopRight />}
+                                                </div>
+                                                <span className="text-xs text-secondary/80">From last month</span>
                                         </div>
-                                        <span className="text-xs text-secondary/80">From last month</span>
-                                </div>
+                                )}
                         </div>
                 </div>
-        )
-}
+        );
+};

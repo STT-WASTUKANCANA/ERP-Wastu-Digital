@@ -1,23 +1,23 @@
 <?php
-
 namespace App\Models\Dashboard\Mail;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class MailCategories extends Model
+class MailCategory extends Model
 {
     use SoftDeletes;
     protected $table = 'mail_categories';
     protected $guarded = ['id'];
     protected $dates = ['deleted_at'];
 
-    public function incoming_mail() {
+    public function incoming_mails()
+    {
         return $this->hasMany(IncomingMail::class);
     }
-    
-    public function outgoing_mail() {
+
+    public function outgoing_mails()
+    {
         return $this->hasMany(OutgoingMail::class);
     }
-
 }

@@ -1,5 +1,4 @@
 import { BsGrid1X2, BsInbox, BsSend } from "react-icons/bs";
-import { FaRegFileLines } from "react-icons/fa6";
 import { GoTable } from "react-icons/go";
 import { IoDocumentTextOutline } from "react-icons/io5";
 import { LuUsers } from "react-icons/lu";
@@ -21,12 +20,12 @@ export const navLinks = [
                 links: [
                         {
                                 name: "Incoming Mail",
-                                href: "/mail/incoming",
+                                href: "/workspace/mail/incoming",
                                 icon: BsInbox,
                         },
                         {
                                 name: "Outgoing Mail",
-                                href: "/mail/outgoing",
+                                href: "/workspace/mail/outgoing",
                                 icon: BsSend,
                         },
                 ],

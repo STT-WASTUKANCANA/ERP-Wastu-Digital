@@ -63,15 +63,25 @@ class AuthController extends Controller
 
     protected function respondWithCookie($token)
     {
+        $json = [
+            'message' => 'Signin successful',
+        ];
+
+        if (app()->environment('local')) { 
+            $json['token'] = $token;
+            $json['token_type'] = 'bearer';
+            $json['expires_in'] = Auth::guard('api')->factory()->getTTL() * 60;
+        }
+
         return response()
-            ->json(['message' => 'Login successful'])
+            ->json($json)
             ->cookie(
                 'access_token',
                 $token,
                 Auth::guard('api')->factory()->getTTL(),
                 '/',
                 null,
-                true,
+                app()->environment('production'), // secure=true di production
                 true,
                 'Strict'
             );
