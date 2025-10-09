@@ -40,7 +40,16 @@ class IncomingController extends Controller
 
     public function show($id)
     {
-        $mail = $this->service->find($id);
+        $decodedId = decodeId($id);
+
+        if (!$decodedId) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Invalid mail ID',
+            ], 404);
+        }
+
+        $mail = $this->service->find($decodedId);
 
         if (!$mail) {
             return response()->json([
@@ -57,7 +66,16 @@ class IncomingController extends Controller
 
     public function update(IncomingRequest $request, $id)
     {
-        $mail = $this->service->update($id, $request->validated());
+        $decodedId = decodeId($id);
+
+        if (!$decodedId) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Invalid mail ID',
+            ], 404);
+        }
+
+        $mail = $this->service->update($decodedId, $request->validated());
 
         if (!$mail) {
             return response()->json([
@@ -75,7 +93,16 @@ class IncomingController extends Controller
 
     public function destroy($id)
     {
-        $deleted = $this->service->delete($id);
+        $decodedId = decodeId($id);
+
+        if (!$decodedId) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Invalid mail ID',
+            ], 404);
+        }
+
+        $deleted = $this->service->delete($decodedId);
 
         if (!$deleted) {
             return response()->json([
