@@ -29,8 +29,8 @@ return [
     'connections' => [
 
         'main' => [
-            'salt' => 'cakwe-mang-bolot',
-            'length' => 8,
+            'salt' => env('HASHIDS_SALT', 'default-salt'),
+            'length' => (int) env('HASHIDS_LENGTH', 8),
             // 'alphabet' => 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
         ],
 
