@@ -1,6 +1,7 @@
 "use client";
+
 import { TopbarProps } from "@/types/ui-props";
-import React, { useState, useEffect } from "react";
+import React from "react"; // Hapus useState dan useEffect
 import { FaRegBell } from "react-icons/fa";
 import { LuAlignJustify } from "react-icons/lu";
 import { Button } from "../ui/button";
@@ -15,28 +16,18 @@ export const Topbar: React.FC<TopbarProps> = ({
         notificationDropdownShow,
         setNotificationDropdownShow,
 }) => {
-        const [isMobile, setIsMobile] = useState(false);
+        const topbarClass = scroll > 0 ? "bg-background rounded-b-2xl" : "bg-accent";
 
-        useEffect(() => {
-                const handleResize = () => setIsMobile(window.innerWidth < 1024);
-                handleResize();
-                window.addEventListener("resize", handleResize);
-                return () => window.removeEventListener("resize", handleResize);
-        }, []);
-
-        const paddingLeft = !isMobile ? (sidebarShow ? 300 : 90) : 16;
-        const topbarClass = scroll > 0
-                ? "bg-background rounded-b-2xl"
-                : "bg-accent";
+        const desktopPaddingClass = sidebarShow ? "lg:pl-[300px]" : "lg:pl-[90px]";
 
         return (
                 <div
-                        className={`fixed top-0 h-[50px] w-full flex justify-between items-center transition-all overflow-hidden z-0 py-8 ${topbarClass}`}
-                        style={{
-                                paddingLeft: paddingLeft,
-                                paddingRight: 32,
-                                transition: "padding 0.3s ease, background-color 0.3s ease",
-                        }}
+                        className={`
+                                fixed top-0 h-[50px] w-full flex justify-between items-center 
+                                overflow-hidden z-0 py-8 px-4 pr-8 transition-all duration-300
+                                ${topbarClass}
+                                ${desktopPaddingClass}
+                        `}
                 >
                         <div className="flex items-center gap-4">
                                 <Button
@@ -44,11 +35,10 @@ export const Topbar: React.FC<TopbarProps> = ({
                                                 setSidebarShow(!sidebarShow);
                                                 e.stopPropagation();
                                         }}
-                                        className="text-foreground lg:hidden"
+                                        className="text-foreground lg:hidden cursor-pointer"
                                 >
                                         <LuAlignJustify className="text-2xl" />
                                 </Button>
-
                                 <Breadcumbs />
                         </div>
 

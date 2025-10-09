@@ -3,17 +3,24 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { IoChevronDown, IoChevronForward } from "react-icons/io5";
-import { SidebarProps } from "@/types/ui-props";
 import { Button } from "../ui/button";
 import { LuAlignJustify } from "react-icons/lu";
 import { navLinks } from "@/constants/navlink";
 
+export interface SidebarProps {
+  sidebarShow: boolean;
+  setSidebarShow: (value: boolean) => void;
+  isPinned: boolean;
+  setIsPinned: (value: boolean) => void;
+}
+
 export const Sidebar: React.FC<SidebarProps> = ({
   sidebarShow,
   setSidebarShow,
+  isPinned,
+  setIsPinned,
 }) => {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-  const [isPinned, setIsPinned] = useState(false);
   const pathname = usePathname();
 
   const toggleDropdown = (name: string) => {
@@ -32,14 +39,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
   };
 
-
   return (
     <div
       className={`
-        fixed top-0 left-0 h-screen bg-background z-50 space-y-8
-        transform transition-all duration-300
-        ${sidebarShow ? "w-[280px] p-5 translate-x-0" : "w-16 lg:w-16 lg:p-3 -translate-x-full lg:translate-x-0"}
-      `}
+                fixed top-0 left-0 h-screen bg-background z-50 space-y-8
+                transform transition-all duration-300
+                ${sidebarShow ? "w-[280px] p-5 translate-x-0" : "w-16 lg:w-16 lg:p-3 -translate-x-full lg:translate-x-0"}
+            `}
       onMouseEnter={() => {
         if (!isPinned && window.innerWidth >= 1024) {
           setSidebarShow(true);
@@ -51,7 +57,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
         }
       }}
     >
-
       <div className={`flex justify-between items-center`}>
         <div className={`w-10 h-10 bg-foreground rounded-full transition-all duration-300 ${!sidebarShow ? "mx-auto" : ""}`}></div>
         <Button
@@ -89,8 +94,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <div key={linkIdx}>
                     <button
                       onClick={() => toggleDropdown(link.name)}
-                      className={`w-full h-11 px-3 rounded-md flex items-center justify-between text-sm font-medium transition cursor-pointer
-                    ${hasActiveChild
+                      className={`w-full h-11 px-3 rounded-md flex items-center justify-between text-sm font-medium transition cursor-pointer ${hasActiveChild
                           ? "text-primary bg-primary/20"
                           : "text-foreground/70 hover:text-primary hover:bg-primary/10"
                         }`}
@@ -99,7 +103,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         <Icon className="w-4 h-4" />
                         {sidebarShow && link.name}
                       </span>
-                      {sidebarShow && (isOpen ? <IoChevronDown className="w-4 h-4" /> : <IoChevronForward className="w-4 h-4" />)}
+                      {sidebarShow &&
+                        (isOpen ? <IoChevronDown className="w-4 h-4" /> : <IoChevronForward className="w-4 h-4" />)}
                     </button>
 
                     {isOpen && sidebarShow && (
@@ -108,8 +113,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                           <Link
                             key={cIdx}
                             href={child.href}
-                            className={`relative flex items-center gap-2 h-10 p-3 rounded-md text-sm transition
-                          ${pathname === child.href
+                            className={`relative flex items-center gap-2 h-10 p-3 rounded-md text-sm transition ${pathname === child.href
                                 ? "text-foreground bg-primary/20"
                                 : "text-foreground/60 hover:text-foreground hover:bg-primary/10"
                               }`}
@@ -128,8 +132,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <Link
                   key={linkIdx}
                   href={link.href || "#"}
-                  className={`h-11 px-3 rounded-md flex items-center gap-3 text-sm font-medium transition
-                ${pathname === link.href
+                  className={`h-11 px-3 rounded-md flex items-center gap-3 text-sm font-medium transition ${pathname === link.href
                       ? "text-primary bg-primary/20"
                       : "text-foreground/60 hover:text-primary hover:bg-primary/10"
                     }`}

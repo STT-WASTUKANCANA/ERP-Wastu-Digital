@@ -48,6 +48,7 @@ export interface SidebarProps {
   sidebarShow: boolean;
   setSidebarShow: React.Dispatch<React.SetStateAction<boolean>>;
 }
+
 export type CardProps = {
         title: string
         value: string | number
