@@ -3,6 +3,7 @@
 namespace App\Models\Dashboard\Mail;
 
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -12,14 +13,26 @@ class IncomingMail extends Model
     protected $table = 'incoming_mails';
     protected $guarded = ['id'];
     protected $casts = ['date' => 'datetime'];
-
     public function mail_category()
     {
         return $this->belongsTo(MailCategory::class, 'category_id');
     }
-    
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+    public static function getTotalForCurrentMonth(): int
+    {
+        $start = Carbon::now()->startOfMonth();
+        $end = Carbon::now()->endOfMonth();
+
+        return self::whereBetween('created_at', [$start, $end])->count();
+    }
+    public static function getTotalForPreviousMonth(): int
+    {
+        $start = Carbon::now()->subMonth()->startOfMonth();
+        $end = Carbon::now()->subMonth()->endOfMonth();
+
+        return self::whereBetween('created_at', [$start, $end])->count();
     }
 }

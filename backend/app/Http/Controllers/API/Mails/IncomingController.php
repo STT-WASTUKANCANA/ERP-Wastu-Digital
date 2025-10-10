@@ -116,4 +116,15 @@ class IncomingController extends Controller
             'message' => 'Incoming mail deleted successfully',
         ]);
     }
+
+    public function summary()
+    {
+        $stats = $this->service->getMonthlySummary();
+
+        return response()->json([
+            'status'  => true,
+            'message' => 'Incoming mail summary retrieved successfully',
+            'data'    => $stats,
+        ]);
+    }
 }
