@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\API\Mails;
+namespace App\Http\Controllers\Api\Mails;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;

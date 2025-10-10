@@ -95,8 +95,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     <button
                       onClick={() => toggleDropdown(link.name)}
                       className={`w-full h-11 px-3 rounded-md flex items-center justify-between text-sm font-medium transition cursor-pointer ${hasActiveChild
-                          ? "text-primary bg-primary/20"
-                          : "text-foreground/70 hover:text-primary hover:bg-primary/10"
+                        ? "text-primary bg-primary/20"
+                        : "text-foreground/70 hover:text-primary hover:bg-primary/10"
                         }`}
                     >
                       <span className="flex items-center gap-3">
@@ -114,8 +114,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                             key={cIdx}
                             href={child.href}
                             className={`relative flex items-center gap-2 h-10 p-3 rounded-md text-sm transition ${pathname === child.href
-                                ? "text-foreground bg-primary/20"
-                                : "text-foreground/60 hover:text-foreground hover:bg-primary/10"
+                              ? "text-foreground bg-primary/20"
+                              : "text-foreground/60 hover:text-foreground hover:bg-primary/10"
                               }`}
                           >
                             <span className="w-1.5 h-1.5 rounded-full bg-foreground/50"></span>
@@ -133,8 +133,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   key={linkIdx}
                   href={link.href || "#"}
                   className={`h-11 px-3 rounded-md flex items-center gap-3 text-sm font-medium transition ${pathname === link.href
-                      ? "text-primary bg-primary/20"
-                      : "text-foreground/60 hover:text-primary hover:bg-primary/10"
+                    ? "text-primary bg-primary/20"
+                    : "text-foreground/60 hover:text-primary hover:bg-primary/10"
                     }`}
                 >
                   {Icon && <Icon className="w-4 h-4" />}

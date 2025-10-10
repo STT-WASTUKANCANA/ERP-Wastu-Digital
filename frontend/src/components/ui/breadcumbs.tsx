@@ -19,7 +19,7 @@ export const Breadcumbs = () => {
                                 {segments.map((segment, idx) => (
                                         <li key={idx} className="flex items-center">
                                                 {idx === 0 ? (
-                                                        <div className="text-gray-700">{formatSegment(segment)}</div>
+                                                        <div className="text-gray-400">{formatSegment(segment)}</div>
                                                 ) : idx === segments.length - 1 ? (
                                                         <span className="text-foreground">{formatSegment(segment)}</span>
                                                 ) : (

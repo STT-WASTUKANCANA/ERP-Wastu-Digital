@@ -3,33 +3,35 @@ import React, { useEffect, useState } from "react";
 import { NotificationDropdown } from "../segments/NotificationDropdown";
 import { ProfileDropdown } from "../segments/ProfileDropdown";
 import { useScrollY } from "@/hooks/utils/useScrollY";
-import { Topbar } from "../segments/Topbar";
 import { Sidebar } from "../segments/Sidebar";
+import { Topbar } from "../segments/Topbar";
 
 type WorkspaceLayoutProps = {
         children?: React.ReactNode;
 };
 
 export const WorkSpaceLayout = ({ children }: WorkspaceLayoutProps) => {
-        const [sidebarShow, setSidebarShow] = useState(() => {
-                if (typeof window !== "undefined") {
-                        const saved = localStorage.getItem("sidebarShow");
-                        return saved === "true";
-                }
-                return false;
-        });
-
-        const [isPinned, setIsPinned] = useState(() => {
-                if (typeof window !== "undefined") {
-                        const saved = localStorage.getItem("sidebarPinned");
-                        return saved === "true";
-                }
-                return false;
-        });
+        const [sidebarShow, setSidebarShow] = useState(true);
+        const [isPinned, setIsPinned] = useState(false);
 
         const scrollY = useScrollY();
         const [profileDropdownShow, setProfileDropdownShow] = useState(false);
         const [notificationDropdownShow, setNotificationDropdownShow] = useState(false);
+
+        useEffect(() => {
+                const handleInitialSidebar = () => {
+                        const width = window.innerWidth;
+                        if (width >= 1024) {
+                                setSidebarShow(true);
+                                setIsPinned(true);
+                        } else {
+                                setSidebarShow(false);
+                                setIsPinned(false);
+                        }
+                };
+
+                handleInitialSidebar();
+        }, []);
 
         useEffect(() => {
                 localStorage.setItem("sidebarShow", sidebarShow.toString());
@@ -42,16 +44,12 @@ export const WorkSpaceLayout = ({ children }: WorkspaceLayoutProps) => {
         return (
                 <div className="relative">
                         <div
-                                className={`flex flex-col relative`}
+                                className="flex flex-col relative"
                                 onClick={() => {
-                                        if (window.innerWidth < 1024) {
-                                                setSidebarShow(false);
-                                        }
+                                        if (window.innerWidth < 1024) setSidebarShow(false);
                                 }}
                         >
-                                {sidebarShow && (
-                                        <div className="absolute inset-0 bg-black/40 z-10 lg:hidden"></div>
-                                )}
+                                {sidebarShow && <div className="absolute inset-0 bg-black/40 z-30 lg:hidden"></div>}
                                 <Topbar
                                         scroll={scrollY}
                                         sidebarShow={sidebarShow}
@@ -70,9 +68,9 @@ export const WorkSpaceLayout = ({ children }: WorkspaceLayoutProps) => {
                                 )}
                                 <main
                                         className={`
-                        p-4 bg-accent min-h-screen transition-all duration-300
-                        ${sidebarShow ? "lg:ml-[280px]" : "lg:ml-16"}
-                    `}
+                                                p-6 bg-accent min-h-screen transition-all duration-300
+                                                ${sidebarShow ? "lg:ml-[280px]" : "lg:ml-16"}
+                                        `}
                                         onClick={() => {
                                                 setProfileDropdownShow(false);
                                                 setNotificationDropdownShow(false);

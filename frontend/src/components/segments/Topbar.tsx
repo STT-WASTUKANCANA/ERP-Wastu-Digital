@@ -1,7 +1,5 @@
-"use client";
-
 import { TopbarProps } from "@/types/ui-props";
-import React from "react"; // Hapus useState dan useEffect
+import React from "react";
 import { FaRegBell } from "react-icons/fa";
 import { LuAlignJustify } from "react-icons/lu";
 import { Button } from "../ui/button";
