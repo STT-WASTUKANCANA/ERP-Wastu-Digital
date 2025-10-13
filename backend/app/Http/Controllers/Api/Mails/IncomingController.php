@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Mails\IncomingRequest;
 use App\Http\Resources\Api\Mails\IncomingResource;
 use App\Services\Api\Mails\IncomingService;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class IncomingController extends Controller
 {
@@ -18,113 +20,96 @@ class IncomingController extends Controller
 
     public function index()
     {
-        $data = $this->service->all();
-
-        return response()->json([
-            'status'  => true,
-            'message' => 'Incoming mails retrieved successfully',
-            'data'    => IncomingResource::collection($data),
-        ]);
+        try {
+            $data = $this->service->all();
+            Log::info('Mail:index', ['count' => count($data)]);
+            return response()->json(['status' => true, 'data' => IncomingResource::collection($data)]);
+        } catch (Throwable $e) {
+            Log::error('Mail:index', ['msg' => $e->getMessage()]);
+            return response()->json(['status' => false], 500);
+        }
     }
 
     public function store(IncomingRequest $request)
     {
-        $mail = $this->service->create($request->validated());
-
-        return response()->json([
-            'status'  => true,
-            'message' => 'Incoming mail created successfully',
-            'data'    => new IncomingResource($mail),
-        ], 201);
+        try {
+            $mail = $this->service->create($request->validated());
+            Log::info('Mail:store', ['id' => $mail->id]);
+            return response()->json(['status' => true, 'data' => new IncomingResource($mail)], 201);
+        } catch (Throwable $e) {
+            Log::error('Mail:store', ['msg' => $e->getMessage()]);
+            return response()->json(['status' => false], 500);
+        }
     }
 
     public function show($id)
     {
-        $decodedId = decodeId($id);
-
-        if (!$decodedId) {
-            return response()->json([
-                'status'  => false,
-                'message' => 'Invalid mail ID',
-            ], 404);
+        $decoded = decodeId($id);
+        if (!$decoded) {
+            Log::warning('Mail:show invalid', ['id' => $id]);
+            return response()->json(['status' => false], 404);
         }
 
-        $mail = $this->service->find($decodedId);
-
+        $mail = $this->service->find($decoded);
         if (!$mail) {
-            return response()->json([
-                'status'  => false,
-                'message' => 'Incoming mail not found',
-            ], 404);
+            Log::warning('Mail:show notfound', ['id' => $decoded]);
+            return response()->json(['status' => false], 404);
         }
 
-        return response()->json([
-            'status' => true,
-            'data'   => new IncomingResource($mail),
-        ]);
+        Log::info('Mail:show', ['id' => $decoded]);
+        return response()->json(['status' => true, 'data' => new IncomingResource($mail)]);
     }
 
     public function update(IncomingRequest $request, $id)
     {
-        $decodedId = decodeId($id);
-
-        if (!$decodedId) {
-            return response()->json([
-                'status'  => false,
-                'message' => 'Invalid mail ID',
-            ], 404);
+        $decoded = decodeId($id);
+        if (!$decoded) {
+            Log::warning('Mail:update invalid', ['id' => $id]);
+            return response()->json(['status' => false], 404);
         }
 
-        $mail = $this->service->update($decodedId, $request->validated());
+        try {
+            $mail = $this->service->update($decoded, $request->validated());
+            if (!$mail) {
+                Log::warning('Mail:update notfound', ['id' => $decoded]);
+                return response()->json(['status' => false], 404);
+            }
 
-        if (!$mail) {
-            return response()->json([
-                'status'  => false,
-                'message' => 'Incoming mail not found',
-            ], 404);
+            Log::info('Mail:update', ['id' => $decoded]);
+            return response()->json(['status' => true, 'data' => new IncomingResource($mail)]);
+        } catch (Throwable $e) {
+            Log::error('Mail:update', ['msg' => $e->getMessage()]);
+            return response()->json(['status' => false], 500);
         }
-
-        return response()->json([
-            'status'  => true,
-            'message' => 'Incoming mail updated successfully',
-            'data'    => new IncomingResource($mail),
-        ]);
     }
 
     public function destroy($id)
     {
-        $decodedId = decodeId($id);
-
-        if (!$decodedId) {
-            return response()->json([
-                'status'  => false,
-                'message' => 'Invalid mail ID',
-            ], 404);
+        $decoded = decodeId($id);
+        if (!$decoded) {
+            Log::warning('Mail:destroy invalid', ['id' => $id]);
+            return response()->json(['status' => false], 404);
         }
 
-        $deleted = $this->service->delete($decodedId);
-
+        $deleted = $this->service->delete($decoded);
         if (!$deleted) {
-            return response()->json([
-                'status'  => false,
-                'message' => 'Incoming mail not found',
-            ], 404);
+            Log::warning('Mail:destroy notfound', ['id' => $decoded]);
+            return response()->json(['status' => false], 404);
         }
 
-        return response()->json([
-            'status'  => true,
-            'message' => 'Incoming mail deleted successfully',
-        ]);
+        Log::info('Mail:destroy', ['id' => $decoded]);
+        return response()->json(['status' => true]);
     }
 
     public function summary()
     {
-        $stats = $this->service->getMonthlySummary();
-
-        return response()->json([
-            'status'  => true,
-            'message' => 'Incoming mail summary retrieved successfully',
-            'data'    => $stats,
-        ]);
+        try {
+            $stats = $this->service->getMonthlySummary();
+            Log::info('Mail:summary', $stats);
+            return response()->json(['status' => true, 'data' => $stats]);
+        } catch (Throwable $e) {
+            Log::error('Mail:summary', ['msg' => $e->getMessage()]);
+            return response()->json(['status' => false], 500);
+        }
     }
 }

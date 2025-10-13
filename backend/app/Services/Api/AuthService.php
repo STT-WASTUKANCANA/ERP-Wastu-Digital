@@ -1,63 +1,75 @@
 <?php
 
-namespace App\Services\Api;
+namespace App\Services\Api\Mails;
 
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
+use App\Models\Dashboard\Mail\IncomingMail;
 use Illuminate\Support\Facades\Log;
 
-class AuthService
+class IncomingService
 {
-        public function signup(array $data): User
+        public function all()
         {
-                Log::info('Proses signup dimulai', ['email' => $data['email']]);
-
-                $user = User::create([
-                        'name'     => $data['name'],
-                        'email'    => $data['email'],
-                        'password' => Hash::make($data['password']),
-                ]);
-
-                Log::info('User berhasil dibuat', ['id' => $user->id, 'email' => $user->email]);
-
-                return $user;
+                $data = IncomingMail::with('mail_category')->latest()->get();
+                Log::info('Mail: fetched all', ['count' => $data->count()]);
+                return $data;
         }
 
-        public function signin(array $credentials): ?string
+        public function create(array $data)
         {
-                Log::debug('Percobaan signin', ['email' => $credentials['email']]);
+                try {
+                        $mail = IncomingMail::create($data);
+                        Log::info('Mail: created', ['id' => $mail->id]);
+                        return $mail;
+                } catch (\Throwable $e) {
+                        Log::error('Mail: create failed', ['msg' => $e->getMessage()]);
+                        throw $e;
+                }
+        }
 
-                if (!$token = auth('api')->attempt($credentials)) {
-                        Log::warning('Signin gagal: kredensial salah', ['email' => $credentials['email']]);
+        public function find($id)
+        {
+                $mail = IncomingMail::with('mail_category')->find($id);
+                Log::warning('Mail: not found', ['id' => $id]) ?: Log::info('Mail: found', ['id' => $id]);
+                return $mail;
+        }
+
+        public function update($id, array $data)
+        {
+                $mail = IncomingMail::find($id);
+                if (!$mail) {
+                        Log::warning('Mail: update failed, not found', ['id' => $id]);
                         return null;
                 }
-
-                Log::info('User berhasil signin', ['email' => $credentials['email']]);
-                return $token;
+                $mail->update($data);
+                Log::info('Mail: updated', ['id' => $id]);
+                return $mail;
         }
 
-        public function signout(): void
+        public function delete($id)
         {
-                $user = auth('api')->user();
-                Log::info('User signout', ['id' => $user?->id, 'email' => $user?->email]);
-                auth('api')->logout();
+                $mail = IncomingMail::find($id);
+                if (!$mail) {
+                        Log::warning('Mail: delete failed, not found', ['id' => $id]);
+                        return false;
+                }
+                $mail->delete();
+                Log::info('Mail: deleted', ['id' => $id]);
+                return true;
         }
 
-        public function refresh(): string
+        public function getMonthlySummary(): array
         {
-                $user = auth('api')->user();
-                Log::debug('Token di-refresh', ['id' => $user?->id, 'email' => $user?->email]);
+                $curr = IncomingMail::getTotalForCurrentMonth();
+                $prev = IncomingMail::getTotalForPreviousMonth();
+                $diff = $prev > 0 ? (($curr - $prev) / $prev) * 100 : ($curr > 0 ? 100 : 0);
+                $status = $diff > 0 ? 'increase' : ($diff < 0 ? 'decrease' : 'unchanged');
 
-                $token = auth('api')->refresh();
-
-                Log::info('Token berhasil diperbarui', ['id' => $user?->id]);
-                return $token;
-        }
-
-        public function currentUser(): ?User
-        {
-                $user = auth('api')->user();
-                Log::debug('Mengambil data user saat ini', ['id' => $user?->id, 'email' => $user?->email]);
-                return $user;
+                Log::info('Mail: monthly summary', ['curr' => $curr, 'prev' => $prev, 'diff' => round($diff, 2)]);
+                return [
+                        'current_month_total' => $curr,
+                        'previous_month_total' => $prev,
+                        'percentage_change' => round($diff, 2),
+                        'status' => $status,
+                ];
         }
 }
