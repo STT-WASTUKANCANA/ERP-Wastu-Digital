@@ -1,4 +1,3 @@
-import { WorkSpaceLayout } from "@/components/layouts/workspace-layout";
 import { Card } from "@/components/ui/card";
 import { getIncomingMailSummary } from "@/lib/api/mails/incoming";
 import React from "react";
@@ -10,9 +9,7 @@ const Page = async () => {
 
   if (!response.ok) {
     return (
-      <WorkSpaceLayout>
-        <p className="text-red-500">Gagal memuat atau format data ringkasan tidak valid.</p>
-      </WorkSpaceLayout>
+      <p className="text-red-500">Gagal memuat atau format data ringkasan tidak valid.</p>
     );
   }
 
@@ -26,30 +23,28 @@ const Page = async () => {
   }
 
   const outgoingMailValue = "...";
-  const usersValue = "..."; 
+  const usersValue = "...";
 
   return (
-    <WorkSpaceLayout>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-        <Card
-          title="Incoming Mail"
-          value={incomingMailValue.toString()}
-          percent={incomingMailPercent}
-          icon={BsInbox}
-        />
-        <Card
-          title="Outgoing Mail"
-          value={122}
-          percent={0}
-          icon={BsSend}
-        />
-        <Card
-          title="Users"
-          value={0}
-          icon={LuUsers}
-        />
-      </div>
-    </WorkSpaceLayout>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+      <Card
+        title="Incoming Mail"
+        value={incomingMailValue.toString()}
+        percent={incomingMailPercent}
+        icon={BsInbox}
+      />
+      <Card
+        title="Outgoing Mail"
+        value={122}
+        percent={-20.3}
+        icon={BsSend}
+      />
+      <Card
+        title="Users"
+        value={0}
+        icon={LuUsers}
+      />
+    </div>
   );
 };
 

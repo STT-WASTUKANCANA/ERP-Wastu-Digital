@@ -4,7 +4,7 @@ namespace App\Http\Resources\Api\Mails;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class IncomingResource extends JsonResource
+class MailResource extends JsonResource
 {
     public function toArray($request)
     {
@@ -16,7 +16,13 @@ class IncomingResource extends JsonResource
             'category_name' => $this->whenLoaded('mail_category', fn() => $this->mail_category->name),
             'date'          => $this->date->format('Y-m-d'),
             'attachment'    => $this->attachment,
+
+            'institute'     => $this->when(isset($this->institute), fn() => $this->institute),
+            'address'       => $this->when(isset($this->address), fn() => $this->address),
+            'purpose'       => $this->when(isset($this->purpose), fn() => $this->purpose),
+            
             'created_at'    => $this->created_at->format('Y-m-d H:i:s'),
+
         ];
     }
 }

@@ -29,6 +29,7 @@ export type DropdownProps = {
   backgroundColor?: string;
   textColor?: string;
   size?: string;
+  border?: string;
   children?: React.ReactNode;
 };
 export type NotificationDropdownProps = {

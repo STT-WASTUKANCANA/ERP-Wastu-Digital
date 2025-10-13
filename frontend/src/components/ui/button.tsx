@@ -6,7 +6,7 @@ import * as React from "react";
 
 export const Button: React.FC<ButtonProps> = ({
         children,
-        size = "w-full",
+        size = "",
         color = "",
         className = "",
         route,

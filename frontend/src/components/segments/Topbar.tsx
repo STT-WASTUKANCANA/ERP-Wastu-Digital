@@ -14,15 +14,15 @@ export const Topbar: React.FC<TopbarProps> = ({
         notificationDropdownShow,
         setNotificationDropdownShow,
 }) => {
-        const topbarClass = scroll > 0 ? "bg-background rounded-b-2xl" : "bg-accent";
+        const topbarClass = scroll > 0 ? "bg-background rounded-b-2xl mx-4 w-[calc(100%-2rem)] lg:w-full lg:mx-0 lg:rounded-none" : "bg-accent w-full";
 
         const desktopPaddingClass = sidebarShow ? "lg:pl-[300px]" : "lg:pl-[90px]";
 
         return (
                 <div
                         className={`
-                                fixed top-0 h-[50px] w-full flex justify-between items-center 
-                                overflow-hidden z-0 py-8 px-4 pr-8 transition-all duration-300
+                                fixed top-0 h-[50px] flex justify-between items-center 
+                                overflow-hidden z-0 py-8 px-4 transition-all duration-300
                                 ${topbarClass}
                                 ${desktopPaddingClass}
                         `}

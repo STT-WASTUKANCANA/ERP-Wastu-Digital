@@ -27,7 +27,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
                         shadow="shadow-lg"
                         size={dropdownWidth}
                 >
-                        <div className="space-y-4">
+                        <div className="space-y-4 z-20">
                                 <div className="flex justify-between items-center">
                                         <h4 className="tracking-[1px] font-semibold">Notification</h4>
                                         <Button
