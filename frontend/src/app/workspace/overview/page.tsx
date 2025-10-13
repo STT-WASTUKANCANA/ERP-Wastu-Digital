@@ -1,29 +1,39 @@
 import { Card } from "@/components/ui/card";
 import { getIncomingMailSummary } from "@/lib/api/mails/incoming";
+import { getOutgoingMailSummary } from "@/lib/api/mails/outgoing";
 import React from "react";
 import { BsInbox, BsSend } from "react-icons/bs";
 import { LuUsers } from "react-icons/lu";
 
 const Page = async () => {
-  const response = await getIncomingMailSummary();
+  const incomingResponse = await getIncomingMailSummary();
+  const outgoingResponse = await getOutgoingMailSummary();
 
-  if (!response.ok) {
-    return (
-      <p className="text-red-500">Gagal memuat atau format data ringkasan tidak valid.</p>
-    );
+  if (!incomingResponse.ok || !incomingResponse.data?.data) {
+    return <p className="text-red-500">Gagal memuat data incoming mail.</p>;
+  }
+  if (!outgoingResponse.ok || !outgoingResponse.data?.data) {
+    return <p className="text-red-500">Gagal memuat data outgoing mail.</p>;
   }
 
-  const incomingMailData = response.data.data;
-
+  // Incoming mail
+  const incomingMailData = incomingResponse.data.data;
   const incomingMailValue = incomingMailData.current_month_total;
-
   let incomingMailPercent = incomingMailData.percentage_change;
-  if (incomingMailData.status !== 'increase') {
+  if (incomingMailData.status !== "increase") {
     incomingMailPercent = -incomingMailPercent;
   }
 
-  const outgoingMailValue = "...";
-  const usersValue = "...";
+  // Outgoing mail
+  const outgoingMailData = outgoingResponse.data.data;
+  const outgoingMailValue = outgoingMailData.current_month_total;
+  let outgoingMailPercent = outgoingMailData.percentage_change;
+  if (outgoingMailData.status !== "increase") {
+    outgoingMailPercent = -outgoingMailPercent;
+  }
+
+  // Users
+  const usersValue = 0;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
@@ -35,15 +45,11 @@ const Page = async () => {
       />
       <Card
         title="Outgoing Mail"
-        value={122}
-        percent={-20.3}
+        value={outgoingMailValue.toString()}
+        percent={outgoingMailPercent}
         icon={BsSend}
       />
-      <Card
-        title="Users"
-        value={0}
-        icon={LuUsers}
-      />
+      <Card title="Users" value={usersValue} icon={LuUsers} />
     </div>
   );
 };
