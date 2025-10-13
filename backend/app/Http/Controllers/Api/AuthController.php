@@ -7,7 +7,9 @@ use App\Http\Requests\Api\AuthRequest;
 use App\Http\Resources\Api\UserResource;
 use App\Services\Api\AuthService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
+use Throwable;
 
 class AuthController extends Controller
 {
@@ -20,34 +22,71 @@ class AuthController extends Controller
 
     public function signup(AuthRequest $request)
     {
-        $user = $this->authService->signup($request->validated());
+        try {
+            $user = $this->authService->signup($request->validated());
 
-        return response()->json([
-            'message' => 'User signuped successfully',
-            'user'    => new UserResource($user),
-        ], 201);
+            Log::info('User signup successfully', [
+                'email' => $user->email,
+                'ip' => request()->ip(),
+            ]);
+
+            return response()->json([
+                'message' => 'User signed up successfully',
+                'user'    => new UserResource($user),
+            ], 201);
+        } catch (Throwable $e) {
+            Log::error('Signup failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json(['error' => 'Signup failed'], 500);
+        }
     }
 
     public function signin(AuthRequest $request)
     {
-        $token = $this->authService->signin($request->only('email', 'password'));
+        $credentials = $request->only('email', 'password');
+        $token = $this->authService->signin($credentials);
 
         if (!$token) {
+            Log::warning('Unauthorized signin attempt', [
+                'email' => $credentials['email'] ?? null,
+                'ip' => request()->ip(),
+            ]);
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        // simpan token di HttpOnly cookie
+        Log::info('User signed in successfully', [
+            'email' => $credentials['email'],
+            'ip' => request()->ip(),
+        ]);
+
         return $this->respondWithCookie($token);
     }
 
     public function profile()
     {
-        return new UserResource($this->authService->currentUser());
+        $user = $this->authService->currentUser();
+
+        Log::info('Profile accessed', [
+            'email' => $user?->email,
+            'ip' => request()->ip(),
+        ]);
+
+        return new UserResource($user);
     }
 
     public function signout()
     {
+        $user = $this->authService->currentUser();
+
         $this->authService->signout();
+
+        Log::info('User signed out', [
+            'email' => $user?->email,
+            'ip' => request()->ip(),
+        ]);
 
         return response()
             ->json(['message' => 'Successfully logged out'])
@@ -56,9 +95,23 @@ class AuthController extends Controller
 
     public function refresh()
     {
-        $token = $this->authService->refresh();
+        try {
+            $token = $this->authService->refresh();
 
-        return $this->respondWithCookie($token);
+            Log::info('Token refreshed successfully', [
+                'email' => auth('api')->user()?->email,
+                'ip' => request()->ip(),
+            ]);
+
+            return $this->respondWithCookie($token);
+        } catch (Throwable $e) {
+            Log::error('Token refresh failed', [
+                'error' => $e->getMessage(),
+                'ip' => request()->ip(),
+            ]);
+
+            return response()->json(['error' => 'Token refresh failed'], 500);
+        }
     }
 
     protected function respondWithCookie($token)
@@ -67,7 +120,7 @@ class AuthController extends Controller
             'message' => 'Signin successful',
         ];
 
-        if (app()->environment('local')) { 
+        if (app()->environment('local')) {
             $json['token'] = $token;
             $json['token_type'] = 'bearer';
             $json['expires_in'] = Auth::guard('api')->factory()->getTTL() * 60;
@@ -81,7 +134,7 @@ class AuthController extends Controller
                 Auth::guard('api')->factory()->getTTL(),
                 '/',
                 null,
-                app()->environment('production'), // secure=true di production
+                app()->environment('production'),
                 true,
                 'Strict'
             );
