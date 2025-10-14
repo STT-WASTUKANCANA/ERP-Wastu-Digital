@@ -33,7 +33,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/components/segments/Topbar.tsx.backup"
+    "src/components/layout/Topbar.tsx.backup"
   ],
   "exclude": [
     "node_modules"

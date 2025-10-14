@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { NotificationDropdown } from "@/components/segments/NotificationDropdown";
-import { ProfileDropdown } from "@/components/segments/ProfileDropdown";
+import { NotificationDropdown } from "@/components/layout/NotificationDropdown";
+import { ProfileDropdown } from "@/components/layout/ProfileDropdown";
 import { useScrollY } from "@/hooks/utils/useScrollY";
-import { Sidebar } from "@/components/segments/Sidebar";
-import { Topbar } from "@/components/segments/Topbar";
+import { Sidebar } from "@/components/layout/Sidebar";
+import { Topbar } from "@/components/layout/Topbar";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
         const [sidebarShow, setSidebarShow] = useState(false);
@@ -73,7 +73,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                 </main>
                         </div>
 
-                        <Sidebar        
+                        <Sidebar
                                 sidebarShow={sidebarShow}
                                 setSidebarShow={setSidebarShow}
                                 isPinned={isPinned}
