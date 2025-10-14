@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { NotificationDropdown } from "@/components/layout/NotificationDropdown";
-import { ProfileDropdown } from "@/components/layout/ProfileDropdown";
+import { NotificationDropdown } from "@/components/shared/NotificationDropdown";
+import { ProfileDropdown } from "@/components/shared/ProfileDropdown";
 import { useScrollY } from "@/hooks/utils/useScrollY";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Topbar } from "@/components/layout/Topbar";
