@@ -7,7 +7,7 @@ export const Input: React.FC<InputProps> = ({
         placeholder,
         width = "w-full",
         className = "",
-        border = "border border-gray-300",
+        border = "border border-secondary/20",
         id,
         ...props
 }) => {

@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export async function getOutgoingMailSummary() {
+        
         if (!API_URL) {
                 throw new Error("API URL is not defined");
         }
