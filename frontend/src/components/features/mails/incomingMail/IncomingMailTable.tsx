@@ -10,9 +10,12 @@ import { OffcanvasDetail } from '@/components/shared/OffcanvasDetail';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { TableContainer } from '@/components/shared/TableContainer';
 import { ColumnDef, DataTable } from '../../../shared/Datatable';
+import { Input } from '@/components/ui/input';
+import { Modal } from '@/components/ui/modal';
 
 const IncomingMailTable = ({ incomingMails }: { incomingMails: IncomingMail[] }) => {
   const [selectedMail, setSelectedMail] = useState<IncomingMail | null>(null);
+  const [createdModal, setCreatedModal] = useState(false);
 
   const handleRowClick = (mail: IncomingMail) => {
     if (window.innerWidth < 1024) {
@@ -85,8 +88,57 @@ const IncomingMailTable = ({ incomingMails }: { incomingMails: IncomingMail[] })
           <HiOutlineUpload />
           <span>Export</span>
         </Button>
-        <Button className="bg-primary text-background text-sm cursor-pointer px-4 py-2">+</Button>
+        <Button className="bg-primary text-background text-sm cursor-pointer px-4 py-2" onClick={() => {
+          setCreatedModal(true)
+        }}>+</Button>
       </PageHeader>
+
+      {(createdModal) && (
+        <Modal
+          isOpen={createdModal}
+          onClose={() => {
+            setCreatedModal(false)
+          }}
+          title="Tambah Data Baru"
+          size="xl"
+          footer={
+            <>
+              <Button
+                onClick={() => {
+                  setCreatedModal(false)
+                }}
+                className="bg-secondary/20 text-foreground text-sm px-4 py-2"
+              >
+                Batal
+              </Button>
+              <Button
+                onClick={() => {
+                  alert('Data Disimpan!');
+                  setCreatedModal(false)
+                }}
+                className="bg-primary text-sm text-white px-4 py-2"
+              >
+                Simpan Data
+              </Button>
+            </>
+          }
+        >
+          <form className="space-y-4">
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium text-foreground/80 mb-1">
+                Nama Lengkap
+              </label>
+              <Input id="name" type="text" placeholder="Masukkan nama Anda" />
+            </div>
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-foreground/80 mb-1">
+                Alamat Email
+              </label>
+              <Input id="email" type="email" placeholder="contoh@email.com" />
+            </div>
+          </form>
+        </Modal>
+      )}
 
       <TableContainer onSearchChange={(value) => console.log('Searching for:', value)}>
         <DataTable
