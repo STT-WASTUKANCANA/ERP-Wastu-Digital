@@ -7,6 +7,7 @@ use App\Http\Requests\Api\Mails\MailRequest;
 use App\Http\Resources\Api\Mails\MailResource;
 use App\Services\Api\Mails\MailService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
@@ -40,13 +41,29 @@ class MailController extends Controller
         public function store(MailRequest $request)
         {
                 try {
+                        $validatedData = $request->validated();
+
+                        $validatedData['user_id'] = Auth::id();
+
+                        if ($request->hasFile('attachment')) {
+                                $year = date('Y');
+                                $month = date('m');
+                                $day = date('d'); 
+                                $dynamicPath = "mail/incoming/{$year}/{$month}/{$day}";
+
+                                $filePath = $request->file('attachment')->store($dynamicPath, 'public');
+
+                                $validatedData['attachment'] = $filePath;
+                        }
+
                         $type = $this->getTypeFromRoute($request);
-                        $mail = $this->service->create($request->validated(), $type);
+                        $mail = $this->service->create($validatedData, $type);
+
                         Log::info('Mail:store', ['id' => $mail->id, 'type' => $type]);
                         return response()->json(['status' => true, 'data' => new MailResource($mail)], 201);
                 } catch (Throwable $e) {
                         Log::error('Mail:store', ['msg' => $e->getMessage()]);
-                        return response()->json(['status' => false], 500);
+                        return response()->json(['status' => false, 'message' => 'Internal Server Error'], 500);
                 }
         }
 
