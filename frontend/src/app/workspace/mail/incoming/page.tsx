@@ -1,5 +1,5 @@
 
-import IncomingMailTable from '@/components/features/IncomingMailTable';
+import IncomingMailTable from '@/components/features/mails/incomingMail/IncomingMailTable';
 import { getIncomingMailList } from '@/lib/api/mails/incoming';
 
 const Page = async () => {
