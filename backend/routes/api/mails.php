@@ -1,27 +1,56 @@
 <?php
 
+use App\Http\Controllers\Api\Mails\CategoryController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Mails\MailController;
 
-Route::middleware('auth:api')->prefix('mails')->name('mails.')->group(function () {
+Route::middleware('auth:api')
+    ->prefix('mails')
+    ->name('mails.')
+    ->group(function () {
 
-    Route::prefix('incoming')->name('incoming.')->group(function() {
+        Route::controller(CategoryController::class)
+            ->prefix('categories')
+            ->name('categories.')
+            ->group(function () {
+                Route::post('/', 'store')->name('store');
+                Route::put('/{category}', 'update')->name('update');
+                Route::delete('/{category}', 'destroy')->name('destroy');
+            });
 
-        Route::get('/', [MailController::class, 'index'])->name('index');
-        Route::get('/summary', [MailController::class, 'summary'])->name('summary');
-        Route::post('/', [MailController::class, 'store'])->name('store');
-        Route::get('/{id}', [MailController::class, 'show'])->name('show');
-        Route::put('/{id}', [MailController::class, 'update'])->name('update');
-        Route::delete('/{id}', [MailController::class, 'destroy'])->name('destroy');
+        Route::prefix('incoming')
+            ->name('incoming.')
+            ->group(function () {
+
+                Route::get('/category', [CategoryController::class, 'index'])->name('category');
+
+                Route::controller(MailController::class)
+                    ->group(function () {
+
+                        Route::get('/', 'index')->name('index');
+                        Route::get('/summary', 'summary')->name('summary');
+                        Route::post('/', 'store')->name('store');
+                        Route::get('/{id}', 'show')->name('show');
+                        Route::put('/{id}', 'update')->name('update');
+                        Route::delete('/{id}', 'destroy')->name('destroy');
+                    });
+            });
+
+        Route::prefix('outgoing')
+            ->name('outgoing.')
+            ->group(function () {
+
+                Route::get('/category', [CategoryController::class, 'index'])->name('category');
+
+                Route::controller(MailController::class)
+                    ->group(function () {
+
+                        Route::get('/', 'index')->name('index');
+                        Route::get('/summary', 'summary')->name('summary');
+                        Route::post('/', 'store')->name('store');
+                        Route::get('/{id}', 'show')->name('show');
+                        Route::put('/{id}', 'update')->name('update');
+                        Route::delete('/{id}', 'destroy')->name('destroy');
+                    });
+            });
     });
-
-    Route::prefix('outgoing')->name('outgoing.')->group(function() {
-
-        Route::get('/', [MailController::class, 'index'])->name('index');
-        Route::get('/summary', [MailController::class, 'summary'])->name('summary');
-        Route::post('/', [MailController::class, 'store'])->name('store');
-        Route::get('/{id}', [MailController::class, 'show'])->name('show');
-        Route::put('/{id}', [MailController::class, 'update'])->name('update');
-        Route::delete('/{id}', [MailController::class, 'destroy'])->name('destroy');
-    });
-});
