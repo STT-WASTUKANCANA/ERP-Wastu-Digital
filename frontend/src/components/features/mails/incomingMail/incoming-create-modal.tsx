@@ -68,7 +68,6 @@ export const IncomingCreateModal = ({ isOpen, onClose }: IncomingCreateModalProp
           />
         </div>
 
-        {/* Kategori akan mengambil lebar penuh (12 dari 12) */}
         <div className="col-span-12">
           <Select
             label="Kategori Surat"

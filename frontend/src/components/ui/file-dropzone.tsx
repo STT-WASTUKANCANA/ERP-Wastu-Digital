@@ -21,13 +21,12 @@ export const FileDropzone: React.FC<FileDropzoneProps> = ({
         const [files, setFiles] = useState<File[]>([]);
 
         const onDrop = useCallback((acceptedFiles: File[], fileRejections: FileRejection[]) => {
-                // Gabungkan file baru dengan yang sudah ada, batasi sesuai maxFiles
                 const newFiles = [...files, ...acceptedFiles].slice(0, maxFiles);
                 setFiles(newFiles);
-                onFilesAccepted(newFiles); // Kirim file yang valid ke parent
+                onFilesAccepted(newFiles);
 
                 if (fileRejections.length > 0) {
-                        alert(`File '${fileRejections[0].file.name}' ditolak.`);
+                        alert(`File '${fileRejections[0].file.name}' was rejected.`);
                 }
         }, [files, maxFiles, onFilesAccepted]);
 
@@ -61,9 +60,9 @@ export const FileDropzone: React.FC<FileDropzoneProps> = ({
                                         <div className="flex flex-col items-center justify-center text-center">
                                                 <FiUploadCloud className={`w-12 h-12 mb-4 ${isDragActive ? 'text-primary' : 'text-secondary'}`} />
                                                 <p className="text-foreground/80">
-                                                        <span className="font-semibold text-primary">Klik untuk upload</span> atau seret file ke sini
+                                                        <span className="font-semibold text-primary">Click to upload</span> or drag files here
                                                 </p>
-                                                <p className="text-xs text-secondary mt-2">PDF, PNG, JPG (Maks. 1 file)</p>
+                                                <p className="text-xs text-secondary mt-2">PDF, PNG, JPG (Max. {maxFiles} file{maxFiles > 1 ? 's' : ''})</p>
                                         </div>
                                 </div>
                         ) : (
