@@ -4,18 +4,16 @@ import { useState, MouseEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { FiDownload, FiEdit, FiTrash2 } from 'react-icons/fi';
 import { HiOutlineUpload } from 'react-icons/hi';
-
 import { IncomingMail } from '@/types/mail-props';
 import { OffcanvasDetail } from '@/components/shared/offcanvas-detail';
 import { PageHeader } from '@/components/shared/page-header';
 import { TableContainer } from '@/components/shared/table-container';
 import { ColumnDef, DataTable } from '../../../shared/datatable';
-import { Input } from '@/components/ui/input';
-import { Modal } from '@/components/ui/modal';
+import { IncomingCreateModal } from './incoming-create-modal';
 
 const IncomingMailTable = ({ incomingMails }: { incomingMails: IncomingMail[] }) => {
   const [selectedMail, setSelectedMail] = useState<IncomingMail | null>(null);
-  const [createdModal, setCreatedModal] = useState(false);
+  const [isCreateModalOpen, setCreateModalOpen] = useState(false); // <-- 2. Ganti nama state agar lebih jelas
 
   const handleRowClick = (mail: IncomingMail) => {
     if (window.innerWidth < 1024) {
@@ -31,6 +29,7 @@ const IncomingMailTable = ({ incomingMails }: { incomingMails: IncomingMail[] })
   };
 
   const columns: ColumnDef<IncomingMail>[] = [
+    // ...definisi kolom Anda tetap sama, tidak perlu diubah
     {
       header: 'Mail Number',
       accessorKey: 'number',
@@ -88,57 +87,14 @@ const IncomingMailTable = ({ incomingMails }: { incomingMails: IncomingMail[] })
           <HiOutlineUpload />
           <span>Export</span>
         </Button>
-        <Button className="bg-primary text-background text-sm cursor-pointer px-4 py-2" onClick={() => {
-          setCreatedModal(true)
-        }}>+</Button>
+        <Button 
+          className="bg-primary text-background text-sm cursor-pointer px-4 py-2" 
+          onClick={() => setCreateModalOpen(true)}
+        >
+          +
+        </Button>
       </PageHeader>
 
-      {(createdModal) && (
-        <Modal
-          isOpen={createdModal}
-          onClose={() => {
-            setCreatedModal(false)
-          }}
-          title="Tambah Data Baru"
-          size="xl"
-          footer={
-            <>
-              <Button
-                onClick={() => {
-                  setCreatedModal(false)
-                }}
-                className="bg-secondary/20 text-foreground text-sm px-4 py-2"
-              >
-                Batal
-              </Button>
-              <Button
-                onClick={() => {
-                  alert('Data Disimpan!');
-                  setCreatedModal(false)
-                }}
-                className="bg-primary text-sm text-white px-4 py-2"
-              >
-                Simpan Data
-              </Button>
-            </>
-          }
-        >
-          <form className="space-y-4">
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-foreground/80 mb-1">
-                Nama Lengkap
-              </label>
-              <Input id="name" type="text" placeholder="Masukkan nama Anda" />
-            </div>
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-foreground/80 mb-1">
-                Alamat Email
-              </label>
-              <Input id="email" type="email" placeholder="contoh@email.com" />
-            </div>
-          </form>
-        </Modal>
-      )}
 
       <TableContainer onSearchChange={(value) => console.log('Searching for:', value)}>
         <DataTable
@@ -148,6 +104,11 @@ const IncomingMailTable = ({ incomingMails }: { incomingMails: IncomingMail[] })
           emptyStateMessage="No incoming mails found."
         />
       </TableContainer>
+
+      <IncomingCreateModal 
+        isOpen={isCreateModalOpen} 
+        onClose={() => setCreateModalOpen(false)} 
+      />
 
       {selectedMail && <OffcanvasDetail mail={selectedMail} onClose={handleCloseOffcanvas} />}
     </div>
