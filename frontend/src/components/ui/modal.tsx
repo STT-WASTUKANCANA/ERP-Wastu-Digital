@@ -3,7 +3,6 @@
 import React, { useEffect, useRef } from 'react';
 import { IoClose } from 'react-icons/io5';
 
-// Definisikan props untuk komponen Modal
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;

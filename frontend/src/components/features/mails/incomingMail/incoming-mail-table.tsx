@@ -6,10 +6,10 @@ import { FiDownload, FiEdit, FiTrash2 } from 'react-icons/fi';
 import { HiOutlineUpload } from 'react-icons/hi';
 
 import { IncomingMail } from '@/types/mail-props';
-import { OffcanvasDetail } from '@/components/shared/OffcanvasDetail';
-import { PageHeader } from '@/components/shared/PageHeader';
-import { TableContainer } from '@/components/shared/TableContainer';
-import { ColumnDef, DataTable } from '../../../shared/Datatable';
+import { OffcanvasDetail } from '@/components/shared/offcanvas-detail';
+import { PageHeader } from '@/components/shared/page-header';
+import { TableContainer } from '@/components/shared/table-container';
+import { ColumnDef, DataTable } from '../../../shared/datatable';
 import { Input } from '@/components/ui/input';
 import { Modal } from '@/components/ui/modal';
 
