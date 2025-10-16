@@ -6,9 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\AuthRequest;
 use App\Http\Resources\Api\UserResource;
 use App\Services\Api\AuthService;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 class AuthController extends Controller
@@ -18,6 +17,7 @@ class AuthController extends Controller
     public function __construct(AuthService $authService)
     {
         $this->authService = $authService;
+        $this->middleware('auth:api', ['except' => ['signup', 'signin']]);
     }
 
     public function signup(AuthRequest $request)
@@ -47,9 +47,9 @@ class AuthController extends Controller
     public function signin(AuthRequest $request)
     {
         $credentials = $request->only('email', 'password');
-        $token = $this->authService->signin($credentials);
+        $tokens = $this->authService->signin($credentials);
 
-        if (!$token) {
+        if (!$tokens) {
             Log::warning('Unauthorized signin attempt', [
                 'email' => $credentials['email'] ?? null,
                 'ip' => request()->ip(),
@@ -62,7 +62,7 @@ class AuthController extends Controller
             'ip' => request()->ip(),
         ]);
 
-        return $this->respondWithCookie($token);
+        return $this->respondWithTokens($tokens['access_token'], $tokens['refresh_token']);
     }
 
     public function profile()
@@ -77,12 +77,12 @@ class AuthController extends Controller
         return new UserResource($user);
     }
 
-    public function signout()
+    public function signout(Request $request)
     {
+        $refreshToken = $request->cookie('refresh_token');
+        $this->authService->signout($refreshToken);
+
         $user = $this->authService->currentUser();
-
-        $this->authService->signout();
-
         Log::info('User signed out', [
             'email' => $user?->email,
             'ip' => request()->ip(),
@@ -90,20 +90,26 @@ class AuthController extends Controller
 
         return response()
             ->json(['message' => 'Successfully logged out'])
-            ->withoutCookie('access_token');
+            ->withoutCookie('refresh_token');
     }
 
-    public function refresh()
+    public function refresh(Request $request)
     {
+        $refreshToken = $request->cookie('refresh_token');
+
         try {
-            $token = $this->authService->refresh();
+            $newAccessToken = $this->authService->refresh($refreshToken);
+
+            if (!$newAccessToken) {
+                return response()->json(['error' => 'Invalid or expired refresh token'], 401);
+            }
 
             Log::info('Token refreshed successfully', [
                 'email' => auth('api')->user()?->email,
                 'ip' => request()->ip(),
             ]);
 
-            return $this->respondWithCookie($token);
+            return $this->respondWithAccessToken($newAccessToken);
         } catch (Throwable $e) {
             Log::error('Token refresh failed', [
                 'error' => $e->getMessage(),
@@ -114,29 +120,34 @@ class AuthController extends Controller
         }
     }
 
-    protected function respondWithCookie($token)
+    protected function respondWithTokens($accessToken, $refreshToken)
     {
-        $json = [
-            'message' => 'Signin successful',
+        $response = [
+            'message'      => 'Signin successful',
+            'access_token' => $accessToken,
+            'token_type'   => 'bearer',
+            'expires_in'   => auth('api')->factory()->getTTL() * 60
         ];
 
-        if (app()->environment('local')) {
-            $json['token'] = $token;
-            $json['token_type'] = 'bearer';
-            $json['expires_in'] = Auth::guard('api')->factory()->getTTL() * 60;
-        }
+        return response()->json($response)->cookie(
+            'refresh_token',
+            $refreshToken,
+            auth('api')->factory()->getTTL() * 24 * 7, // 7 hari
+            '/',
+            null,
+            app()->environment('production'),
+            true,
+            false,
+            'Strict'
+        );
+    }
 
-        return response()
-            ->json($json)
-            ->cookie(
-                'access_token',
-                $token,
-                Auth::guard('api')->factory()->getTTL(),
-                '/',
-                null,
-                app()->environment('production'),
-                true,
-                'Strict'
-            );
+    protected function respondWithAccessToken($accessToken)
+    {
+        return response()->json([
+            'access_token' => $accessToken,
+            'token_type'   => 'bearer',
+            'expires_in'   => auth('api')->factory()->getTTL() * 60
+        ]);
     }
 }
