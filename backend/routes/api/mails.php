@@ -14,6 +14,7 @@ Route::middleware('auth:api')
             ->name('categories.')
             ->group(function () {
                 Route::post('/', 'store')->name('store');
+                Route::get('/{category}', 'show')->name('show');
                 Route::put('/{category}', 'update')->name('update');
                 Route::delete('/{category}', 'destroy')->name('destroy');
             });

@@ -14,8 +14,6 @@ class CategoryRequest extends FormRequest
 
     public function rules(): array
     {
-        $categoryId = $this->route('category');
-
         switch ($this->method()) {
             case 'POST':
                 return [
@@ -32,6 +30,8 @@ class CategoryRequest extends FormRequest
 
             case 'PUT':
             case 'PATCH':
+                $categoryId = $this->route('category');
+
                 return [
                     'name' => [
                         'sometimes',
@@ -40,7 +40,8 @@ class CategoryRequest extends FormRequest
                         'max:100',
                         Rule::unique('mail_categories')->where(function ($query) {
                             return $query->where('user_id', auth()->id());
-                        })->ignore($categoryId),
+                        })
+                            ->ignore($categoryId),
                     ],
                     'type' => 'sometimes|required|in:1,2',
                 ];

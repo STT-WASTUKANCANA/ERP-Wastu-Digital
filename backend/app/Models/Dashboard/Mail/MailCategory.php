@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models\Dashboard\Mail;
 
 use Illuminate\Database\Eloquent\Model;
@@ -9,8 +10,6 @@ class MailCategory extends Model
     use SoftDeletes;
     protected $table = 'mail_categories';
     protected $guarded = ['id'];
-    protected $dates = ['deleted_at'];
-
     public function incoming_mails()
     {
         return $this->hasMany(IncomingMail::class);
