@@ -44,7 +44,7 @@ export const IncomingCreateModal = ({ isOpen, onClose, onSuccess }: IncomingCrea
     setErrors({});
     if (!mailNumber || !mailDate || !categoryId) {
       setErrors({
-        form: ["Harap isi semua field yang wajib diisi."],
+        form: ["Please fill in all required fields."],
       });
       return;
     }
@@ -65,7 +65,7 @@ export const IncomingCreateModal = ({ isOpen, onClose, onSuccess }: IncomingCrea
       setErrors(result.data.errors);
     } else {
       setErrors({
-        form: ["Gagal menyimpan data. Silakan coba lagi."],
+        form: ["Failed to save data. Please try again."],
       });
     }
 
@@ -85,7 +85,7 @@ export const IncomingCreateModal = ({ isOpen, onClose, onSuccess }: IncomingCrea
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
-      title="Tambah Surat Masuk Baru"
+      title="Add New Incoming Mail"
       size="xl"
       footer={
         <>
@@ -94,14 +94,14 @@ export const IncomingCreateModal = ({ isOpen, onClose, onSuccess }: IncomingCrea
             className="bg-secondary/20 text-foreground text-sm px-4 py-2"
             disabled={isSaving}
           >
-            Batal
+            Cancel
           </Button>
           <Button
             onClick={handleSave}
             className="bg-primary text-sm text-white px-4 py-2"
             disabled={isSaving}
           >
-            {isSaving ? "Menyimpan..." : "Simpan"}
+            {isSaving ? "Saving..." : "Save"}
           </Button>
         </>
       }
@@ -117,10 +117,10 @@ export const IncomingCreateModal = ({ isOpen, onClose, onSuccess }: IncomingCrea
 
         <div className="md:col-span-6">
           <Input
-            label="Nomor Surat"
+            label="Mail Number"
             id="mail-number"
             type="text"
-            placeholder="Contoh: IM-001/RT/2025"
+            placeholder="Example: IM-001/RT/2025"
             value={mailNumber}
             onChange={(e) => setMailNumber(e.target.value)}
           />
@@ -135,7 +135,7 @@ export const IncomingCreateModal = ({ isOpen, onClose, onSuccess }: IncomingCrea
 
         <div className="md:col-span-6">
           <Input
-            label="Tanggal Surat"
+            label="Mail Date"
             id="mail-date"
             type="date"
             value={mailDate}
@@ -152,10 +152,10 @@ export const IncomingCreateModal = ({ isOpen, onClose, onSuccess }: IncomingCrea
 
         <div className="col-span-12">
           <Select
-            label="Kategori Surat"
+            label="Mail Category"
             id="mail-category"
             options={categories}
-            placeholder={isLoading ? "Memuat..." : "Pilih Kategori"}
+            placeholder={isLoading ? "Loading..." : "Select Category"}
             value={categoryId}
             onChange={(e) => setCategoryId(e.target.value)}
             disabled={isLoading}
@@ -171,7 +171,7 @@ export const IncomingCreateModal = ({ isOpen, onClose, onSuccess }: IncomingCrea
 
         <div className="col-span-12">
           <FileDropzone
-            label="Lampiran (File)"
+            label="Attachment (File)"
             onFilesAccepted={(files) => setAttachment(files)}
           />
           {errors.attachment && (

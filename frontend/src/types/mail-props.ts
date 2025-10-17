@@ -1,8 +1,8 @@
 export interface MailCategory {
-  id: number;
-  name: string;
-  type: string;
-  type_name: string;
+        id: number;
+        name: string;
+        type: string;
+        type_name: string;
 }
 export type IncomingMail = {
         id: string;
@@ -14,13 +14,19 @@ export type IncomingMail = {
         attachment: string;
 };
 export interface IncomingCreateModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSuccess: () => void;
+        isOpen: boolean;
+        onClose: () => void;
+        onSuccess: () => void;
 }
 
 export interface IncomingMailTableProps {
-  incomingMails: IncomingMail[];
-  onMailCreated: () => void;
-  isLoading: boolean;
+        incomingMails: IncomingMail[];
+        onMailCreated: () => void;
+        isLoading: boolean;
+}
+
+export interface IncomingOffcanvasDetailProps {
+  mail: IncomingMail;
+  onClose: () => void;
+  onAction: (e: React.MouseEvent, action: string, mailId: string) => void | Promise<void>;
 }
