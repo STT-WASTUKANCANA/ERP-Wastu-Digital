@@ -110,7 +110,7 @@ export default function SigninForm() {
             </Link>
           </div>
 
-          <Button type="submit" color="bg-primary" disabled={loading} className="w-full py-3 text-background">
+          <Button type="submit" color="bg-primary" disabled={loading} className="w-full py-3 text-background cursor-pointer">
             {loading ? "Signing in..." : "Sign In"}
           </Button>
         </form>

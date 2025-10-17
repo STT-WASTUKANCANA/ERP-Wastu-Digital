@@ -89,7 +89,8 @@ class AuthController extends Controller
 
         return response()
             ->json(['message' => 'Successfully logged out'])
-            ->withoutCookie('refresh_token');
+            ->withoutCookie('refresh_token')
+            ->withoutCookie('access_token');
     }
 
     public function refresh(Request $request)
@@ -128,17 +129,29 @@ class AuthController extends Controller
             'expires_in'   => auth('api')->factory()->getTTL() * 60
         ];
 
-        return response()->json($response)->cookie(
-            'refresh_token',
-            $refreshToken,
-            auth('api')->factory()->getTTL() * 24 * 7, // 7 hari
-            '/',
-            null,
-            app()->environment('production'),
-            true,
-            false,
-            'Strict'
-        );
+        return response()->json($response)
+            ->cookie(
+                'refresh_token',
+                $refreshToken,
+                config('jwt.refresh_ttl', 20160),
+                '/',
+                null,
+                app()->environment('production'),
+                true,
+                false,
+                'Strict'
+            )
+            ->cookie(
+                'access_token',
+                $accessToken,
+                auth('api')->factory()->getTTL() * 60,
+                '/',
+                null,
+                app()->environment('production'),
+                true,
+                false,
+                'Strict'
+            );
     }
 
     protected function respondWithAccessToken($accessToken)
@@ -147,6 +160,16 @@ class AuthController extends Controller
             'access_token' => $accessToken,
             'token_type'   => 'bearer',
             'expires_in'   => auth('api')->factory()->getTTL() * 60
-        ]);
+        ])->cookie(
+            'access_token',
+            $accessToken,
+            auth('api')->factory()->getTTL() * 60,
+            '/',
+            null,
+            app()->environment('production'),
+            true,
+            false,
+            'Strict'
+        );
     }
 }

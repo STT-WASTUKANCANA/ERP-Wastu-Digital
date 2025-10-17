@@ -43,7 +43,7 @@ export const Select: React.FC<SelectProps> = ({
             appearance-none
             w-full rounded-md bg-background 
             focus:outline-none focus:ring-1 focus:ring-foreground 
-            ${border} py-2 pl-3 pr-8 
+            ${border} py-2 pl-3 pr-8 cursor-pointer
             text-sm ${className}
           `}
                                         {...props}

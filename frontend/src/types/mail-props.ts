@@ -1,4 +1,9 @@
-
+export interface MailCategory {
+  id: number;
+  name: string;
+  type: string;
+  type_name: string;
+}
 export type IncomingMail = {
         id: string;
         number: string;
@@ -6,5 +11,16 @@ export type IncomingMail = {
         user_name?: string;
         category_name: string;
         date: string;
-        attachement: string;
+        attachment: string;
 };
+export interface IncomingCreateModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess: () => void;
+}
+
+export interface IncomingMailTableProps {
+  incomingMails: IncomingMail[];
+  onMailCreated: () => void;
+  isLoading: boolean;
+}

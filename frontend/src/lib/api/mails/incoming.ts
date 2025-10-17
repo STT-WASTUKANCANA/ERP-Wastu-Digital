@@ -1,66 +1,27 @@
-'use server'
-import { cookies } from "next/headers";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+import { fetchWithAuth } from "../api";
 
 export async function getIncomingMailSummary() {
-        if (!API_URL) {
-                throw new Error("API URL is not defined");
-        }
-
-        try {
-                const cookieStore = cookies();
-                const token = cookieStore.get('access_token')?.value;
-
-                const res = await fetch(`${API_URL}/mails/incoming/summary`, {
-                        method: "GET",
-                        headers: {
-                                Accept: "application/json",
-                                'Authorization': `Bearer ${token}`,
-                        },
-                });
-
-                const data = await res.json();
-
-                // console.log("Response OK?:", res.ok);
-                // console.log("Response Status:", res.status);
-                // console.log("Response Data:", JSON.stringify(data, null, 2));
-
-                return { ok: res.ok, data };
-
-        } catch (error) {
-                console.error("Fetch failed:", error);
-                return { ok: false, data: null, error: error };
-        }
+        return await fetchWithAuth('/mails/incoming/summary', { method: "GET" });
 }
 
 export async function getIncomingMailList() {
-        if (!API_URL) {
-                throw new Error("API URL is not defined");
-        }
+        return await fetchWithAuth('/mails/incoming', { method: "GET" });
+}
 
-        try {
-                const cookieStore = cookies();
-                const token = cookieStore.get('access_token')?.value;
+export async function getMailCategories() {
+        return await fetchWithAuth('/mails/incoming/category', { method: "GET" });
+}
 
-                const res = await fetch(`${API_URL}/mails/incoming`, {
-                        method: "GET",
-                        headers: {
-                                Accept: "application/json",
-                                'Authorization': `Bearer ${token}`,
-                        },
-                });
+export async function createIncomingMail(payload: FormData) {
 
-                const data = await res.json();
+        return await fetchWithAuth('/mails/incoming', {
+                method: "POST",
+                body: payload,
+        });
+}
 
-                console.log("Response OK?:", res.ok);
-                console.log("Response Status:", res.status);
-                console.log("Response Data:", JSON.stringify(data, null, 2));
-
-                return { ok: res.ok, data };
-
-        } catch (error) {
-                console.error("Fetch failed:", error);
-                return { ok: false, data: null, error: error };
-        }
+export async function deleteIncomingMail(id: number) {
+        return await fetchWithAuth(`/mails/incoming/${id}`, {
+                method: "DELETE",
+        });
 }

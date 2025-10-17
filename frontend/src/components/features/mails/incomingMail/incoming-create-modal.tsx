@@ -1,71 +1,153 @@
 "use client";
 
-import React, { useState } from 'react'; 
-import { Modal } from '@/components/ui/modal';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectOption } from '@/components/ui/select';
-import { FileDropzone } from '@/components/ui/file-dropzone';
+import React, { useState, useEffect } from "react";
+import { Modal } from "@/components/ui/modal";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectOption } from "@/components/ui/select";
+import { FileDropzone } from "@/components/ui/file-dropzone";
+import { createIncomingMail, getMailCategories } from "@/lib/api/mails/incoming";
+import { IncomingCreateModalProps, MailCategory } from "@/types/mail-props";
 
-interface IncomingCreateModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
+type ErrorState = Record<string, string[]>;
 
-export const IncomingCreateModal = ({ isOpen, onClose }: IncomingCreateModalProps) => {
-  // 1. Tambahkan state untuk menampung file yang di-upload
+export const IncomingCreateModal = ({ isOpen, onClose, onSuccess }: IncomingCreateModalProps) => {
+  const [mailNumber, setMailNumber] = useState("");
+  const [mailDate, setMailDate] = useState("");
+  const [categoryId, setCategoryId] = useState("");
   const [attachment, setAttachment] = useState<File[]>([]);
+  const [categories, setCategories] = useState<SelectOption[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [errors, setErrors] = useState<ErrorState>({});
 
-  const categories: SelectOption[] = [
-    { value: '1', label: 'Surat Undangan' },
-    { value: '2', label: 'Surat Pemberitahuan' },
-    { value: '3', label: 'Surat Dinas' },
-  ];
+  useEffect(() => {
+    if (!isOpen) return;
 
-  const handleSave = () => {
-    // 6. Sekarang Anda bisa akses file yang dipilih dari state
-    console.log("File yang akan disimpan:", attachment);
-    alert('Data Disimpan!');
+    const fetchCategories = async () => {
+      setIsLoading(true);
+      const res = await getMailCategories();
+      if (res.ok && Array.isArray(res.data.data)) {
+        const formattedCategories = res.data.data.map((cat: MailCategory) => ({
+          value: cat.id.toString(),
+          label: cat.name,
+        }));
+        setCategories(formattedCategories);
+      }
+      setIsLoading(false);
+    };
+
+    fetchCategories();
+  }, [isOpen]);
+
+  const handleSave = async () => {
+    setErrors({});
+    if (!mailNumber || !mailDate || !categoryId) {
+      setErrors({
+        form: ["Harap isi semua field yang wajib diisi."],
+      });
+      return;
+    }
+
+    setIsSaving(true);
+    const formData = new FormData();
+    formData.append("number", mailNumber);
+    formData.append("date", mailDate);
+    formData.append("category_id", categoryId);
+    if (attachment.length > 0) formData.append("attachment", attachment[0]);
+
+    const result = await createIncomingMail(formData);
+
+    if (result.ok) {
+      onSuccess();
+      handleClose();
+    } else if (result.data?.errors) {
+      setErrors(result.data.errors);
+    } else {
+      setErrors({
+        form: ["Gagal menyimpan data. Silakan coba lagi."],
+      });
+    }
+
+    setIsSaving(false);
+  };
+
+  const handleClose = () => {
+    setErrors({});
+    setMailNumber("");
+    setMailDate("");
+    setCategoryId("");
+    setAttachment([]);
     onClose();
   };
 
   return (
     <Modal
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={handleClose}
       title="Tambah Surat Masuk Baru"
       size="xl"
       footer={
         <>
-          <Button onClick={onClose} className="bg-secondary/20 text-foreground text-sm px-4 py-2">
+          <Button
+            onClick={handleClose}
+            className="bg-secondary/20 text-foreground text-sm px-4 py-2"
+            disabled={isSaving}
+          >
             Batal
           </Button>
-          <Button onClick={handleSave} className="bg-primary text-sm text-white px-4 py-2">
-            Simpan Data
+          <Button
+            onClick={handleSave}
+            className="bg-primary text-sm text-white px-4 py-2"
+            disabled={isSaving}
+          >
+            {isSaving ? "Menyimpan..." : "Simpan"}
           </Button>
         </>
       }
     >
-      {/* 2. Terapkan layout grid pada form (12 kolom di layar medium ke atas) */}
       <form className="grid grid-cols-1 md:grid-cols-12 gap-4">
+        {errors.form && (
+          <div className="col-span-12 text-sm text-red-600">
+            {errors.form.map((msg, i) => (
+              <p key={i}>{msg}</p>
+            ))}
+          </div>
+        )}
 
-        {/* 3. Atur kolom untuk input pertama (6 dari 12) */}
         <div className="md:col-span-6">
           <Input
             label="Nomor Surat"
             id="mail-number"
             type="text"
-            placeholder="Contoh: SM-001/RT/2025"
+            placeholder="Contoh: IM-001/RT/2025"
+            value={mailNumber}
+            onChange={(e) => setMailNumber(e.target.value)}
           />
+          {errors.number && (
+            <div className="mt-1 text-sm text-red-600">
+              {errors.number.map((error, index) => (
+                <p key={index}>{error}</p>
+              ))}
+            </div>
+          )}
         </div>
 
-        {/* 4. Atur kolom untuk input kedua (6 dari 12) */}
         <div className="md:col-span-6">
           <Input
             label="Tanggal Surat"
             id="mail-date"
             type="date"
+            value={mailDate}
+            onChange={(e) => setMailDate(e.target.value)}
           />
+          {errors.date && (
+            <div className="mt-1 text-sm text-red-600">
+              {errors.date.map((error, index) => (
+                <p key={index}>{error}</p>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="col-span-12">
@@ -73,9 +155,18 @@ export const IncomingCreateModal = ({ isOpen, onClose }: IncomingCreateModalProp
             label="Kategori Surat"
             id="mail-category"
             options={categories}
-            placeholder="-- Pilih Kategori --"
-            defaultValue=""
+            placeholder={isLoading ? "Memuat..." : "Pilih Kategori"}
+            value={categoryId}
+            onChange={(e) => setCategoryId(e.target.value)}
+            disabled={isLoading}
           />
+          {errors.category_id && (
+            <div className="mt-1 text-sm text-red-600">
+              {errors.category_id.map((error, index) => (
+                <p key={index}>{error}</p>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="col-span-12">
@@ -83,8 +174,14 @@ export const IncomingCreateModal = ({ isOpen, onClose }: IncomingCreateModalProp
             label="Lampiran (File)"
             onFilesAccepted={(files) => setAttachment(files)}
           />
+          {errors.attachment && (
+            <div className="mt-1 text-sm text-red-600">
+              {errors.attachment.map((error, index) => (
+                <p key={index}>{error}</p>
+              ))}
+            </div>
+          )}
         </div>
-
       </form>
     </Modal>
   );

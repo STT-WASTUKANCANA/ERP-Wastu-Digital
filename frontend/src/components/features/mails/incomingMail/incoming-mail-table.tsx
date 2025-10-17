@@ -1,19 +1,27 @@
 "use client";
 
-import { useState, MouseEvent } from 'react';
+import { useState, useMemo, MouseEvent } from 'react';
 import { Button } from '@/components/ui/button';
-import { FiDownload, FiEdit, FiTrash2 } from 'react-icons/fi';
 import { HiOutlineUpload } from 'react-icons/hi';
-import { IncomingMail } from '@/types/mail-props';
+import { IncomingMail, IncomingMailTableProps } from '@/types/mail-props';
 import { OffcanvasDetail } from '@/components/shared/offcanvas-detail';
 import { PageHeader } from '@/components/shared/page-header';
 import { TableContainer } from '@/components/shared/table-container';
-import { ColumnDef, DataTable } from '../../../shared/datatable';
+import { DataTable } from '../../../shared/datatable';
 import { IncomingCreateModal } from './incoming-create-modal';
+import { getIncomingMailColumns } from './column';
+import { deleteIncomingMail } from '@/lib/api/mails/incoming';
+import { Toast } from '@/components/ui/toast';
 
-const IncomingMailTable = ({ incomingMails }: { incomingMails: IncomingMail[] }) => {
+const IncomingMailTable = ({ incomingMails, onMailCreated, isLoading }: IncomingMailTableProps) => {
   const [selectedMail, setSelectedMail] = useState<IncomingMail | null>(null);
-  const [isCreateModalOpen, setCreateModalOpen] = useState(false); // <-- 2. Ganti nama state agar lebih jelas
+  const [isCreateModalOpen, setCreateModalOpen] = useState(false);
+
+  const [toast, setToast] = useState<{
+    title: string;
+    message: string;
+    variant: 'success' | 'error' | 'warning' | 'info';
+  } | null>(null);
 
   const handleRowClick = (mail: IncomingMail) => {
     if (window.innerWidth < 1024) {
@@ -23,59 +31,52 @@ const IncomingMailTable = ({ incomingMails }: { incomingMails: IncomingMail[] })
 
   const handleCloseOffcanvas = () => setSelectedMail(null);
 
-  const handleActionClick = (e: MouseEvent, action: string, mailId: string) => {
+  const handleActionClick = async (e: MouseEvent, action: string, mailId: string) => {
     e.stopPropagation();
-    console.log(`${action} clicked for mail ID: ${mailId}`);
+
+    if (action === 'Download') {
+      console.log('Downloading mail:', mailId);
+      setToast({
+        title: 'Download',
+        message: 'Fitur download belum diimplementasikan.',
+        variant: 'info',
+      });
+      return;
+    }
+
+    if (action === 'Edit') {
+      console.log('Editing mail:', mailId);
+      setToast({
+        title: 'Edit',
+        message: 'Fitur edit belum diimplementasikan.',
+        variant: 'warning',
+      });
+      return;
+    }
+
+    if (action === 'Delete') {
+      if (confirm('Yakin ingin menghapus surat ini?')) {
+        try {
+          await deleteIncomingMail(Number(mailId));
+          setToast({
+            title: 'Berhasil',
+            message: 'Surat berhasil dihapus.',
+            variant: 'success',
+          });
+          onMailCreated();
+        } catch (err) {
+          console.error(err);
+          setToast({
+            title: 'Gagal',
+            message: 'Terjadi kesalahan saat menghapus surat.',
+            variant: 'error',
+          });
+        }
+      }
+    }
   };
 
-  const columns: ColumnDef<IncomingMail>[] = [
-    // ...definisi kolom Anda tetap sama, tidak perlu diubah
-    {
-      header: 'Mail Number',
-      accessorKey: 'number',
-    },
-    {
-      header: 'Date',
-      accessorKey: 'date',
-    },
-    {
-      header: 'Category',
-      accessorKey: 'category_name',
-    },
-    {
-      header: 'User',
-      accessorKey: 'user_name',
-      cell: (row) => row.user_name || '-',
-    },
-    {
-      header: 'Actions',
-      cell: (row) => (
-        <div className="flex justify-start items-center gap-2">
-          <Button
-            rounded="rounded-md"
-            onClick={(e) => handleActionClick(e, 'Download', row.id)}
-            className="p-2 bg-background hover:bg-muted border border-secondary/20"
-          >
-            <FiDownload className="w-3.5 h-3.5 text-foreground/80" />
-          </Button>
-          <Button
-            rounded="rounded-md"
-            onClick={(e) => handleActionClick(e, 'Edit', row.id)}
-            className="p-2 bg-background hover:bg-muted border border-secondary/20"
-          >
-            <FiEdit className="w-3.5 h-3.5 text-primary" />
-          </Button>
-          <Button
-            rounded="rounded-md"
-            onClick={(e) => handleActionClick(e, 'Delete', row.id)}
-            className="p-2 bg-background hover:bg-muted border border-secondary/20"
-          >
-            <FiTrash2 className="w-3.5 h-3.5 text-red-600" />
-          </Button>
-        </div>
-      ),
-    },
-  ];
+  const columns = useMemo(() => getIncomingMailColumns(handleActionClick), []);
 
   return (
     <div className='lg:p-8'>
@@ -87,14 +88,13 @@ const IncomingMailTable = ({ incomingMails }: { incomingMails: IncomingMail[] })
           <HiOutlineUpload />
           <span>Export</span>
         </Button>
-        <Button 
-          className="bg-primary text-background text-sm cursor-pointer px-4 py-2" 
+        <Button
+          className="bg-primary text-background text-sm cursor-pointer px-4 py-2"
           onClick={() => setCreateModalOpen(true)}
         >
           +
         </Button>
       </PageHeader>
-
 
       <TableContainer onSearchChange={(value) => console.log('Searching for:', value)}>
         <DataTable
@@ -102,15 +102,28 @@ const IncomingMailTable = ({ incomingMails }: { incomingMails: IncomingMail[] })
           data={incomingMails}
           onRowClick={handleRowClick}
           emptyStateMessage="No incoming mails found."
+          isLoading={isLoading}
         />
       </TableContainer>
 
-      <IncomingCreateModal 
-        isOpen={isCreateModalOpen} 
-        onClose={() => setCreateModalOpen(false)} 
+      <IncomingCreateModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setCreateModalOpen(false)}
+        onSuccess={onMailCreated}
       />
 
       {selectedMail && <OffcanvasDetail mail={selectedMail} onClose={handleCloseOffcanvas} />}
+
+      {/* tampilkan toast kalau ada */}
+      {toast && (
+        <Toast
+          variant={toast.variant}
+          title={toast.title}
+          message={toast.message}
+          duration={3000}
+          showProgress
+        />
+      )}
     </div>
   );
 };
