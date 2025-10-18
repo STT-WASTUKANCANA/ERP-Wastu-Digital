@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\Dashboard\Mail;
+namespace App\Models\Workspace\Mails;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;

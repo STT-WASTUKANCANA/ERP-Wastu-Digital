@@ -49,7 +49,7 @@ class MailController extends Controller
                                 $year = date('Y');
                                 $month = date('m');
                                 $day = date('d');
-                                $dynamicPath = "mail/incoming/{$year}/{$month}/{$day}";
+                                $dynamicPath = "mails/incoming/{$year}/{$month}/{$day}";
 
                                 $filePath = $request->file('attachment')->store($dynamicPath, 'public');
                                 $validatedData['attachment'] = $filePath;

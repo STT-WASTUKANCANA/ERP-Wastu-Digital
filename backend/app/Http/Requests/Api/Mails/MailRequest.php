@@ -22,7 +22,8 @@ class MailRequest extends FormRequest
                     'number' => 'required|string|max:100',
                     'category_id' => 'required|exists:mail_categories,id',
                     'date' => 'required|date',
-                    'attachment' => 'nullable|file|mimes:pdf,png,jpg',
+                    'attachment' => 'required|file|mimes:pdf',
+                    'desc' => 'nullable|string',
                 ];
 
                 if ($isOutgoing) {
@@ -41,7 +42,8 @@ class MailRequest extends FormRequest
                     'number' => 'sometimes|string|max:100',
                     'category_id' => 'sometimes|exists:mail_categories,id',
                     'date' => 'sometimes|date',
-                    'attachment' => 'nullable|file|mimes:pdf,png,jpg',
+                    'attachment' => 'nullable|file|mimes:pdf',
+                    'desc' => 'nullable|string',
                 ];
 
                 if ($isOutgoing) {

@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\Mails;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Mails\CategoryRequest;
 use App\Http\Resources\Api\Mails\CategoryResource;
-use App\Models\Dashboard\Mail\MailCategory;
+use App\Models\Workspace\Mails\MailCategory;
 use App\Services\Api\Mails\CategoryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

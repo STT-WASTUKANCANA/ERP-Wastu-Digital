@@ -17,6 +17,8 @@ class MailResource extends JsonResource
             'category_name' => $this->whenLoaded('mail_category', fn() => $this->mail_category->name),
             'date'          => \Carbon\Carbon::parse($this->date)->translatedFormat('d F Y'),
             'attachment'    => $this->attachment,
+            'status'        => $this->status,
+            'follow_status' => $this->follow_status,
 
             'institute'     => $this->when(isset($this->institute), fn() => $this->institute),
             'address'       => $this->when(isset($this->address), fn() => $this->address),

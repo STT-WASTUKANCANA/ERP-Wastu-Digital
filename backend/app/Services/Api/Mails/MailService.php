@@ -2,8 +2,10 @@
 
 namespace App\Services\Api\Mails;
 
-use App\Models\Dashboard\Mail\IncomingMail;
-use App\Models\Dashboard\Mail\OutgoingMail;
+use App\Models\Workspace\Mails\IncomingMail;
+use App\Models\Workspace\Mails\MailLog;
+use App\Models\Workspace\Mails\OutgoingMail;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class MailService
@@ -23,11 +25,38 @@ class MailService
 
     public function create(array $data, int $type)
     {
-        $model = $this->getModel($type);
-        $mail = $model::create($data);
-        Log::info('Mail: created', ['id' => $mail->id, 'type' => $type]);
-        return $mail;
+        return DB::transaction(function () use ($data, $type) {
+            try {
+                $model = $this->getModel($type);
+                $mail = $model::create($data);
+
+                if ($type === 1) {
+                    MailLog::create([
+                        'user_id' => $data['user_id'],
+                        'mail_id' => $mail->id,
+                        'type'    => 1,
+                        'status'  => 1,
+                        'desc'    => $data['desc'] ?? null,
+                    ]);
+                }
+
+                Log::info('Mail: created', [
+                    'id'   => $mail->id,
+                    'type' => $type
+                ]);
+
+                return $mail;
+            } catch (\Throwable $e) {
+                Log::error('Mail: creation failed', [
+                    'error' => $e->getMessage(),
+                    'type'  => $type,
+                    'data'  => $data
+                ]);
+                throw $e;
+            }
+        });
     }
+
 
     public function find($id, int $type)
     {

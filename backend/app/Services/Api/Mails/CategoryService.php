@@ -2,7 +2,7 @@
 
 namespace App\Services\Api\Mails;
 
-use App\Models\Dashboard\Mail\MailCategory;
+use App\Models\Workspace\Mails\MailCategory;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Log;
 
