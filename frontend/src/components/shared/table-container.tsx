@@ -14,7 +14,7 @@ interface TableContainerProps {
         onFilterClick?: () => void;
         onModifyColumnClick?: () => void;
         onEntriesChange?: (value: number) => void;
-        children: React.ReactNode; // Di sinilah tabel akan dirender
+        children: React.ReactNode;
 }
 
 export const TableContainer = ({
@@ -27,7 +27,7 @@ export const TableContainer = ({
         const [toolsDropdown, setToolsDropdown] = useState(false);
 
         return (
-                <div className="relative w-full rounded-xl border border-secondary/20 p-4 lg:p-8 bg-background">
+                <div className="relative w-full rounded-lg border border-secondary/20 p-4 lg:p-8 bg-background">
                         <div className="flex justify-between items-center gap-2 mb-4 flex-row lg:flex-row-reverse">
                                 <div className="flex items-center gap-3 w-full lg:w-auto justify-start lg:justify-end">
                                         <Input

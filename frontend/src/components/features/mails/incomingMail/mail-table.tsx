@@ -4,11 +4,11 @@ import { useState, useMemo, MouseEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { HiOutlineUpload } from 'react-icons/hi';
 import { IncomingMail, IncomingMailTableProps } from '@/types/mail-props';
-import { OffcanvasDetail } from '@/components/features/mails/incomingMail/incoming-offcanvas-detail';
+import { OffcanvasDetail } from '@/components/features/mails/incomingMail/offcanvas-detail';
 import { PageHeader } from '@/components/shared/page-header';
 import { TableContainer } from '@/components/shared/table-container';
 import { DataTable } from '../../../shared/datatable';
-import { IncomingCreateModal } from './incoming-create-modal';
+import { IncomingCreateModal } from './create-modal';
 import { getIncomingMailColumns } from './column';
 import { deleteIncomingMail } from '@/lib/api/mails/incoming';
 
@@ -54,7 +54,7 @@ const IncomingMailTable = ({ incomingMails, onMailCreated, isLoading }: Incoming
   const columns = useMemo(() => getIncomingMailColumns(handleActionClick), []);
 
   return (
-    <div className='lg:p-8'>
+    <>
       <PageHeader
         title="Incoming Mails"
         description="Manage all incoming mails efficiently."
@@ -65,7 +65,7 @@ const IncomingMailTable = ({ incomingMails, onMailCreated, isLoading }: Incoming
         </Button>
         <Button
           className="bg-primary text-background text-sm cursor-pointer px-4 py-2"
-          onClick={() => setCreateModalOpen(true)}
+          route='/workspace/mail/incoming/create'
         >
           +
         </Button>
@@ -94,7 +94,7 @@ const IncomingMailTable = ({ incomingMails, onMailCreated, isLoading }: Incoming
           onAction={handleActionClick}
         />
       )}
-    </div>
+    </>
   );
 };
 

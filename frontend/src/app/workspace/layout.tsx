@@ -69,7 +69,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                                 setNotificationDropdownShow(false);
                                         }}
                                 >
-                                        <div className="mt-[60px] space-y-6">{children}</div>
+                                        <div className="mt-[60px] space-y-6 lg:p-8">{children}</div>
                                 </main>
                         </div>
 

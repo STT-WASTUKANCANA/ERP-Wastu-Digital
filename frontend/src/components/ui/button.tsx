@@ -20,6 +20,10 @@ export const Button: React.FC<ButtonProps> = ({
         const handleClick: React.MouseEventHandler<HTMLButtonElement> = (e) => {
                 if (disabled) return;
                 onClick?.(e);
+                if (route === "back") {
+                        window.history.back();
+                        return;
+                }
                 if (route) router.push(route);
         };
 
@@ -34,6 +38,7 @@ export const Button: React.FC<ButtonProps> = ({
                                 transition-all duration-150
                                 hover:opacity-90 active:scale-95
                                 disabled:opacity-50 disabled:cursor-not-allowed
+                                cursor-pointer
                         `}
                 >
                         {children}

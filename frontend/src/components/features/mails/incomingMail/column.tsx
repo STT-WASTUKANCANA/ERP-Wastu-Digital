@@ -6,13 +6,32 @@ import { FiDownload, FiEdit, FiTrash2 } from 'react-icons/fi';
 import { IncomingMail } from '@/types/mail-props';
 import { ColumnDef } from '@/types/ui-props';
 import { getStorageUrl } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
 
 type HandleActionClickFn = (e: MouseEvent, action: string, mailId: string) => void;
+
+const statusMap: Record<number, string> = {
+        1: 'Pending',
+        2: 'In Progress',
+        3: 'Done',
+};
 
 export const getIncomingMailColumns = (handleActionClick: HandleActionClickFn): ColumnDef<IncomingMail>[] => [
         {
                 header: 'Mail Number',
                 accessorKey: 'number',
+        },
+        {
+                header: 'Status',
+                accessorKey: 'status',
+                cell: (row) => {
+                        const badgeMap = {
+                                1: { label: statusMap[1], color: "bg-secondary text-white" },
+                                2: { label: statusMap[2], color: "bg-blue-100 text-blue-800" },
+                                3: { label: statusMap[3], color: "bg-green-100 text-green-800" },
+                        };
+                        return <Badge value={row.status} map={badgeMap} />;
+                },
         },
         {
                 header: 'Date',

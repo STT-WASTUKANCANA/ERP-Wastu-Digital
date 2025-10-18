@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React from 'react';
 
@@ -23,12 +24,12 @@ export const Breadcumbs = () => {
                                                 ) : idx === segments.length - 1 ? (
                                                         <span className="text-foreground">{formatSegment(segment)}</span>
                                                 ) : (
-                                                        <a
+                                                        <Link
                                                                 href={"/" + segments.slice(0, idx + 1).join("/")}
                                                                 className="text-gray-400 hover:text-gray-700"
                                                         >
                                                                 {formatSegment(segment)}
-                                                        </a>
+                                                        </Link>
                                                 )}
 
                                                 {idx < segments.length - 1 && <span className="mx-2">/</span>}

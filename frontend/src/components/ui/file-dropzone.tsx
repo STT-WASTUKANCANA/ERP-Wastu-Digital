@@ -7,6 +7,7 @@ import { Button } from './button';
 
 interface FileDropzoneProps {
         label?: string;
+        name?: string; 
         onFilesAccepted: (files: File[]) => void;
         className?: string;
         maxFiles?: number;

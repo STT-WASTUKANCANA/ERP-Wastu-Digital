@@ -91,14 +91,14 @@ export const IncomingCreateModal = ({ isOpen, onClose, onSuccess }: IncomingCrea
         <>
           <Button
             onClick={handleClose}
-            className="bg-secondary/20 text-foreground text-sm px-4 py-2"
+            className="bg-secondary/20 text-foreground text-sm px-4 py-2 cursor-pointer"
             disabled={isSaving}
           >
             Cancel
           </Button>
           <Button
             onClick={handleSave}
-            className="bg-primary text-sm text-white px-4 py-2"
+            className="bg-primary text-sm text-white px-4 py-2 cursor-pointer"
             disabled={isSaving}
           >
             {isSaving ? "Saving..." : "Save"}
@@ -108,7 +108,7 @@ export const IncomingCreateModal = ({ isOpen, onClose, onSuccess }: IncomingCrea
     >
       <form className="grid grid-cols-1 md:grid-cols-12 gap-4">
         {errors.form && (
-          <div className="col-span-12 text-sm text-red-600">
+          <div className="col-span-12 text-sm text-center text-red-600">
             {errors.form.map((msg, i) => (
               <p key={i}>{msg}</p>
             ))}

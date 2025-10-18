@@ -1,18 +1,20 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { IncomingMail } from '@/types/mail-props';
 import { getIncomingMailList } from '@/lib/api/mails/incoming';
-import IncomingMailTable from '@/components/features/mails/incomingMail/incoming-mail-table';
+import IncomingMailTable from '@/components/features/mails/incomingMail/mail-table';
 
 const IncomingMailsPage = () => {
   const [mails, setMails] = useState<IncomingMail[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const effectRan = useRef(false);
 
   const fetchMails = async () => {
     setIsLoading(true);
     const result = await getIncomingMailList();
     if (result.ok && result.data && Array.isArray(result.data.data)) {
+      console.log(result.data.data);
       setMails(result.data.data);
     } else {
       setMails([]);
@@ -21,7 +23,9 @@ const IncomingMailsPage = () => {
   };
 
   useEffect(() => {
+    if (effectRan.current) return;
     fetchMails();
+    effectRan.current = true;
   }, []);
 
   const handleMailCreated = () => {

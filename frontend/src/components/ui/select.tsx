@@ -1,12 +1,14 @@
 import * as React from "react";
-import { IoChevronDown } from 'react-icons/io5';
+import { IoChevronDown } from "react-icons/io5";
 
 export interface SelectOption {
         value: string | number;
         label: string;
+        disabled?: boolean;
 }
 
-export interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
+export interface SelectProps
+        extends React.SelectHTMLAttributes<HTMLSelectElement> {
         label?: string;
         width?: string;
         border?: string;
@@ -22,6 +24,7 @@ export const Select: React.FC<SelectProps> = ({
         className = "",
         border = "border border-secondary/20",
         id,
+        defaultValue = "",
         ...props
 }) => {
         const selectId = id || React.useId();
@@ -39,13 +42,8 @@ export const Select: React.FC<SelectProps> = ({
                         <div className="relative w-full">
                                 <select
                                         id={selectId}
-                                        className={`
-            appearance-none
-            w-full rounded-md bg-background 
-            focus:outline-none focus:ring-1 focus:ring-foreground 
-            ${border} py-2 pl-3 pr-8 cursor-pointer
-            text-sm ${className}
-          `}
+                                        defaultValue={defaultValue}
+                                        className={`appearance-none w-full rounded-md bg-background focus:outline-none focus:ring-1 focus:ring-foreground ${border} py-2 pl-3 pr-8 cursor-pointer text-sm ${className}`}
                                         {...props}
                                 >
                                         {placeholder && (
@@ -54,14 +52,16 @@ export const Select: React.FC<SelectProps> = ({
                                                 </option>
                                         )}
                                         {options.map((option) => (
-                                                <option key={option.value} value={option.value}>
+                                                <option
+                                                        key={option.value}
+                                                        value={option.value}
+                                                        disabled={option.disabled}
+                                                >
                                                         {option.label}
                                                 </option>
                                         ))}
                                 </select>
-                                <IoChevronDown
-                                        className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-secondary"
-                                />
+                                <IoChevronDown className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-secondary" />
                         </div>
                 </div>
         );

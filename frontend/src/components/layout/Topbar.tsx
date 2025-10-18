@@ -14,7 +14,7 @@ export const Topbar: React.FC<TopbarProps> = ({
         notificationDropdownShow,
         setNotificationDropdownShow,
 }) => {
-        const topbarClass = scroll > 0 ? "bg-background rounded-b-2xl mx-4 w-[calc(100%-2rem)] lg:w-full lg:mx-0 lg:rounded-none" : "bg-accent w-full";
+        const topbarClass = scroll > 0 ? "bg-background rounded-b-2xl mx-4 w-[calc(100%-2rem)] lg:w-full lg:mx-0 lg:rounded-none shadow-sm" : "bg-accent w-full";
 
         const desktopPaddingClass = sidebarShow ? "lg:pl-[300px]" : "lg:pl-[90px]";
 
