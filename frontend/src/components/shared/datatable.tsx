@@ -1,5 +1,4 @@
 "use client";
-
 import { DataTableProps } from "@/types/ui-props";
 import React from "react";
 
@@ -17,7 +16,7 @@ export const DataTable = <T extends { id: string | number }>({
                                         {columns.map((column, index) => (
                                                 <th
                                                         key={column.header}
-                                                        className={`px-4 py-3 text-left ${index >= 2 ? "hidden lg:table-cell" : ""
+                                                        className={`px-4 py-3 text-left ${!column.mobile ? "hidden lg:table-cell" : ""
                                                                 }`}
                                                 >
                                                         {column.header}
@@ -47,7 +46,7 @@ export const DataTable = <T extends { id: string | number }>({
                                                         {columns.map((column, index) => (
                                                                 <td
                                                                         key={`${row.id}-${column.header}`}
-                                                                        className={`px-4 py-3 ${index >= 2 ? "hidden lg:table-cell" : ""
+                                                                        className={`px-4 py-3 ${!column.mobile ? "hidden lg:table-cell" : ""
                                                                                 }`}
                                                                 >
                                                                         {column.cell

@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectOption } from "@/components/ui/select";
 import { FileDropzone } from "@/components/ui/file-dropzone";
 import { createIncomingMail, getMailCategories } from "@/lib/api/mails/incoming";
-import { IncomingCreateModalProps, MailCategory } from "@/types/mail-props";
+import { IncomingCreateModalProps, MailCategory } from "@/types/mails/incoming-props";
 
 type ErrorState = Record<string, string[]>;
 

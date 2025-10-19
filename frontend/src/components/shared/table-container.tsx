@@ -1,4 +1,3 @@
-// src/components/shared/TableContainer.tsx
 "use client";
 
 import { useState } from 'react';
@@ -8,14 +7,7 @@ import { Input } from '@/components/ui/input';
 import { TbColumns2, TbDotsVertical } from 'react-icons/tb';
 import { IoChevronDown } from 'react-icons/io5';
 import { GoFilter } from 'react-icons/go';
-
-interface TableContainerProps {
-        onSearchChange?: (value: string) => void;
-        onFilterClick?: () => void;
-        onModifyColumnClick?: () => void;
-        onEntriesChange?: (value: number) => void;
-        children: React.ReactNode;
-}
+import { TableContainerProps } from '@/types/ui-props';
 
 export const TableContainer = ({
         onSearchChange,

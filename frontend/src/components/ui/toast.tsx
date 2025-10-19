@@ -49,7 +49,7 @@ export const Toast: React.FC<ToastProps> = ({
         if (!visible) return null
 
         return (
-                <div className={`fixed top-5 right-4 w-[400px] rounded-xl bg-gradient-to-r ${variantStyles.gradient} shadow-2xl border border-secondary/10 overflow-hidden`}>
+                <div className={`fixed top-5 right-4 w-[400px] rounded-lg bg-gradient-to-r ${variantStyles.gradient} shadow-2xl border border-secondary/10 overflow-hidden`}>
                         <div className="flex items-start justify-between gap-3 p-6">
                                 <div className="flex items-start gap-3">
                                         <div className="w-6 h-6 flex items-center justify-center">{variantStyles.icon}</div>

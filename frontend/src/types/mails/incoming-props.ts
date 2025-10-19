@@ -31,3 +31,9 @@ export interface IncomingOffcanvasDetailProps {
   onClose: () => void;
   onAction: (e: React.MouseEvent, action: string, mailId: string) => void | Promise<void>;
 }
+
+export const statusMap: Record<number, string> = {
+        1: 'Pending',
+        2: 'In Progress',
+        3: 'Done',
+};

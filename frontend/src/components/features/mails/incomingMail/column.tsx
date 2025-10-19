@@ -3,39 +3,24 @@
 import { MouseEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { FiDownload, FiEdit, FiTrash2 } from 'react-icons/fi';
-import { IncomingMail } from '@/types/mail-props';
+import { IncomingMail, statusMap } from '@/types/mails/incoming-props';
 import { ColumnDef } from '@/types/ui-props';
 import { getStorageUrl } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
+import { BsEye } from 'react-icons/bs';
 
 type HandleActionClickFn = (e: MouseEvent, action: string, mailId: string) => void;
-
-const statusMap: Record<number, string> = {
-        1: 'Pending',
-        2: 'In Progress',
-        3: 'Done',
-};
 
 export const getIncomingMailColumns = (handleActionClick: HandleActionClickFn): ColumnDef<IncomingMail>[] => [
         {
                 header: 'Mail Number',
                 accessorKey: 'number',
-        },
-        {
-                header: 'Status',
-                accessorKey: 'status',
-                cell: (row) => {
-                        const badgeMap = {
-                                1: { label: statusMap[1], color: "bg-secondary text-white" },
-                                2: { label: statusMap[2], color: "bg-blue-100 text-blue-800" },
-                                3: { label: statusMap[3], color: "bg-green-100 text-green-800" },
-                        };
-                        return <Badge value={row.status} map={badgeMap} />;
-                },
+                mobile: true,
         },
         {
                 header: 'Date',
                 accessorKey: 'date',
+                mobile: true,
         },
         {
                 header: 'Category',
@@ -45,6 +30,19 @@ export const getIncomingMailColumns = (handleActionClick: HandleActionClickFn): 
                 header: 'User',
                 accessorKey: 'user_name',
                 cell: (row) => row.user_name,
+        },
+        {
+                header: 'Status',
+                accessorKey: 'status',
+                mobile: true,
+                cell: (row) => {
+                        const badgeMap = {
+                                1: { label: statusMap[1], color: "bg-secondary text-white" },
+                                2: { label: statusMap[2], color: "bg-blue-100 text-blue-800" },
+                                3: { label: statusMap[3], color: "bg-green-100 text-green-800" },
+                        };
+                        return <Badge value={row.status} map={badgeMap} />;
+                },
         },
         {
                 header: 'Actions',
@@ -69,6 +67,14 @@ export const getIncomingMailColumns = (handleActionClick: HandleActionClickFn): 
                                                         </Button>
                                                 </a>
                                         )}
+
+                                        <Button
+                                                rounded="rounded-md"
+                                                onClick={(e) => handleActionClick(e, 'Review', mail.id.toString())}
+                                                className="p-2 bg-background hover:bg-muted border border-secondary/20 cursor-pointer"
+                                        >
+                                                <BsEye className="w-3.5 h-3.5 text-success" />
+                                        </Button>
 
                                         <Button
                                                 rounded="rounded-md"

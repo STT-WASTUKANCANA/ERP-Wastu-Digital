@@ -3,7 +3,7 @@
 import { useState, useMemo, MouseEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { HiOutlineUpload } from 'react-icons/hi';
-import { IncomingMail, IncomingMailTableProps } from '@/types/mail-props';
+import { IncomingMail, IncomingMailTableProps } from '@/types/mails/incoming-props';
 import { OffcanvasDetail } from '@/components/features/mails/incomingMail/offcanvas-detail';
 import { PageHeader } from '@/components/shared/page-header';
 import { TableContainer } from '@/components/shared/table-container';

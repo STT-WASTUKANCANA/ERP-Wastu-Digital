@@ -1,7 +1,6 @@
 "use client";
-
 import { useState, useEffect, useRef } from 'react';
-import { IncomingMail } from '@/types/mail-props';
+import { IncomingMail } from '@/types/mails/incoming-props';
 import { getIncomingMailList } from '@/lib/api/mails/incoming';
 import IncomingMailTable from '@/components/features/mails/incomingMail/mail-table';
 

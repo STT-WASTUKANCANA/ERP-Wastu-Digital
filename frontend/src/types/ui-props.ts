@@ -1,5 +1,5 @@
 import { CSSProperties, MouseEventHandler, ReactNode } from "react";
-import { IncomingMail } from "./mail-props";
+import { IncomingMail } from "./mails/incoming-props";
 
 export interface InputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -63,6 +63,7 @@ export interface ColumnDef<T> {
   header: string;
   accessorKey?: keyof T;
   cell?: (row: T) => React.ReactNode;
+  mobile?: boolean;
 }
 
 export interface DataTableProps<T> {
@@ -71,4 +72,11 @@ export interface DataTableProps<T> {
   emptyStateMessage?: string;
   onRowClick?: (row: T) => void;
   isLoading?: boolean;
+}
+export interface TableContainerProps {
+        onSearchChange?: (value: string) => void;
+        onFilterClick?: () => void;
+        onModifyColumnClick?: () => void;
+        onEntriesChange?: (value: number) => void;
+        children: React.ReactNode;
 }

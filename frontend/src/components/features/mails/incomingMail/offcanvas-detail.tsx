@@ -1,11 +1,18 @@
 "use client";
 
 import React, { useEffect, useState, MouseEvent } from 'react';
-import { IncomingMail, IncomingOffcanvasDetailProps } from '@/types/mail-props';
+import { IncomingMail, IncomingOffcanvasDetailProps, statusMap } from '@/types/mails/incoming-props';
 import { IoClose } from "react-icons/io5";
 import { FiEdit, FiTrash2, FiDownload } from "react-icons/fi";
 import { getStorageUrl } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+
+const badgeMap = {
+        1: { label: statusMap[1], color: "bg-secondary text-white" },
+        2: { label: statusMap[2], color: "bg-blue-100 text-blue-800" },
+        3: { label: statusMap[3], color: "bg-green-100 text-green-800" },
+};
 
 export const OffcanvasDetail = ({ mail, onClose, onAction }: IncomingOffcanvasDetailProps) => {
         const [isVisible, setIsVisible] = useState(false);
@@ -63,6 +70,11 @@ export const OffcanvasDetail = ({ mail, onClose, onAction }: IncomingOffcanvasDe
                                                         <p className="text-secondary text-xs mb-1 font-medium">Enhancer</p>
                                                         <p>{mail.user_name}</p>
                                                 </div>
+                                                <div>
+                                                        <p className="text-secondary text-xs mb-1 font-medium">Status</p>
+                                                        <Badge value={mail.status} map={badgeMap} />
+                                                </div>
+
                                         </div>
                                 </main>
 
