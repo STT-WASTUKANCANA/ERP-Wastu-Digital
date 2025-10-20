@@ -37,7 +37,7 @@ class IncomingMail extends Model
     {
         return $this->belongsTo(MailCategory::class, 'category_id');
     }
-    public function mail_logs(): HasMany
+    public function mail_log(): HasMany
     {
         return $this->hasMany(MailLog::class, 'mail_id')->where('type', 1);
     }

@@ -84,20 +84,38 @@ class MailController extends Controller
         {
                 try {
                         $type = $this->getTypeFromRoute($request);
-                        $mail = $this->service->update($id, $request->validated(), $type);
+                        $mail = $this->service->find($id, $type);
 
                         if (!$mail) {
                                 Log::warning('Mail:update notfound', ['id' => $id, 'type' => $type]);
                                 return response()->json(['status' => false], 404);
                         }
 
+                        $validatedData = $request->validated();
+
+                        if ($request->hasFile('attachment')) {
+                                if ($mail->attachment) {
+                                        \Storage::disk('public')->delete($mail->attachment);
+                                }
+
+                                $year = date('Y');
+                                $month = date('m');
+                                $day = date('d');
+                                $dynamicPath = "mails/incoming/{$year}/{$month}/{$day}";
+                                $filePath = $request->file('attachment')->store($dynamicPath, 'public');
+                                $validatedData['attachment'] = $filePath;
+                        }
+
+                        $updatedMail = $this->service->update($id, $validatedData, $type);
+
                         Log::info('Mail:update', ['id' => $id, 'type' => $type]);
-                        return response()->json(['status' => true, 'data' => new MailResource($mail)]);
+                        return response()->json(['status' => true, 'data' => new MailResource($updatedMail)]);
                 } catch (Throwable $e) {
                         Log::error('Mail:update', ['msg' => $e->getMessage()]);
                         return response()->json(['status' => false], 500);
                 }
         }
+
 
         public function destroy(Request $request, $id)
         {

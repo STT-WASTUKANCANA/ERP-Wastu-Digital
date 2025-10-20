@@ -18,7 +18,7 @@ class MailService
     public function all(int $type)
     {
         $model = $this->getModel($type);
-        $data = $model::with('mail_category')->latest()->get();
+        $data = $model::with('mail_category', 'mail_log')->latest()->get();
         Log::info('Mail: fetched all', ['count' => $data->count(), 'type' => $type]);
         return $data;
     }
@@ -56,23 +56,62 @@ class MailService
             }
         });
     }
-
-
     public function find($id, int $type)
     {
         $model = $this->getModel($type);
-        return $model::with('mail_category')->find($id);
+        return $model::with('mail_category', 'mail_log')->find($id);
     }
 
     public function update($id, array $data, int $type)
     {
         $mail = $this->find($id, $type);
-        if (!$mail) return null;
-        $mail->update($data);
-        Log::info('Mail: updated', ['id' => $id, 'type' => $type]);
-        return $mail;
-    }
 
+        if (!$mail) {
+            Log::warning('Mail: update failed, mail not found', [
+                'id' => $id,
+                'type' => $type,
+                'payload' => $data
+            ]);
+            return null;
+        }
+
+        try {
+            $mail->update($data);
+
+            if ($type === 1 && isset($data['desc'])) {
+                $mailLog = $mail->mail_log()
+                    ->where('type', 1)
+                    ->where('status', $mail->status)
+                    ->first();
+
+                if ($mailLog) {
+                    $mailLog->update(['desc' => $data['desc']]);
+                    Log::info('MailLog: desc updated', [
+                        'mail_id' => $mail->id,
+                        'type' => 1,
+                        'status' => $mail->status,
+                        'desc' => $data['desc']
+                    ]);
+                }
+            }
+
+            Log::info('Mail: updated successfully', [
+                'id' => $id,
+                'type' => $type,
+                'payload' => $data
+            ]);
+
+            return $mail;
+        } catch (\Throwable $e) {
+            Log::error('Mail: update failed', [
+                'id' => $id,
+                'type' => $type,
+                'payload' => $data,
+                'error' => $e->getMessage()
+            ]);
+            throw $e;
+        }
+    }
     public function delete($id, int $type)
     {
         $mail = $this->find($id, $type);
