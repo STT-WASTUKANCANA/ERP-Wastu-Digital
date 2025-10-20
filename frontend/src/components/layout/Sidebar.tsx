@@ -86,9 +86,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
               const Icon = link.icon;
               if (link.children) {
                 const isOpen = openDropdown === link.name;
-                const hasActiveChild = link.children.some(
-                  (child) => child.href === pathname
-                );
+                const hasActiveChild = link.children?.some(
+                  (child) => pathname.startsWith(child.href)
+                ) || false;
+
 
                 return (
                   <div key={linkIdx}>
@@ -132,7 +133,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <Link
                   key={linkIdx}
                   href={link.href || "#"}
-                  className={`h-11 px-3 rounded-md flex items-center gap-3 text-sm font-medium transition ${pathname === link.href
+                  className={`h-11 px-3 rounded-md flex items-center gap-3 text-sm font-medium transition ${
+                    pathname.startsWith(link.href)
                     ? "text-primary bg-primary/20"
                     : "text-foreground/60 hover:text-primary hover:bg-primary/10"
                     }`}

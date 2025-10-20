@@ -24,7 +24,6 @@ export const Select: React.FC<SelectProps> = ({
         className = "",
         border = "border border-secondary/20",
         id,
-        defaultValue = "",
         ...props
 }) => {
         const selectId = id || React.useId();
@@ -42,7 +41,6 @@ export const Select: React.FC<SelectProps> = ({
                         <div className="relative w-full">
                                 <select
                                         id={selectId}
-                                        defaultValue={defaultValue}
                                         className={`appearance-none w-full rounded-md bg-background focus:outline-none focus:ring-1 focus:ring-foreground ${border} py-2 pl-3 pr-8 cursor-pointer text-sm ${className}`}
                                         {...props}
                                 >

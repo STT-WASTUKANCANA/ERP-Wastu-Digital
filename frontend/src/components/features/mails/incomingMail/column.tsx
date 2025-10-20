@@ -78,7 +78,7 @@ export const getIncomingMailColumns = (handleActionClick: HandleActionClickFn): 
 
                                         <Button
                                                 rounded="rounded-md"
-                                                onClick={(e) => handleActionClick(e, 'Edit', mail.id.toString())}
+                                                onClick={(e) => handleActionClick(e, 'Edit', mail.id.toString())} // <-- Cukup panggil handleActionClick
                                                 className="p-2 bg-background hover:bg-muted border border-secondary/20 cursor-pointer"
                                         >
                                                 <FiEdit className="w-3.5 h-3.5 text-primary" />

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, MouseEvent } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { HiOutlineUpload } from 'react-icons/hi';
 import { IncomingMail, IncomingMailTableProps } from '@/types/mails/incoming-props';
@@ -13,7 +14,9 @@ import { getIncomingMailColumns } from './column';
 import { deleteIncomingMail } from '@/lib/api/mails/incoming';
 
 const IncomingMailTable = ({ incomingMails, onMailCreated, isLoading }: IncomingMailTableProps) => {
+  const router = useRouter();
   const [selectedMail, setSelectedMail] = useState<IncomingMail | null>(null);
+  const [editingMailId, setEditingMailId] = useState<string | null>(null);
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
 
   const handleRowClick = (mail: IncomingMail) => {
@@ -33,7 +36,9 @@ const IncomingMailTable = ({ incomingMails, onMailCreated, isLoading }: Incoming
     }
 
     if (action === 'Edit') {
-      alert('Fitur edit belum diimplementasikan.');
+      e.preventDefault();
+      sessionStorage.setItem('editingMailId', mailId);
+      router.push('/workspace/mail/incoming/edit');
       return;
     }
 

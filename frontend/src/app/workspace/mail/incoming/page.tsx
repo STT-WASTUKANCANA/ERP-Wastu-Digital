@@ -13,7 +13,6 @@ const IncomingMailsPage = () => {
     setIsLoading(true);
     const result = await getIncomingMailList();
     if (result.ok && result.data && Array.isArray(result.data.data)) {
-      console.log(result.data.data);
       setMails(result.data.data);
     } else {
       setMails([]);

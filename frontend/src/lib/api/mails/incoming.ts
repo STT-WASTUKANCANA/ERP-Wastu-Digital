@@ -20,6 +20,20 @@ export async function createIncomingMail(payload: FormData) {
         });
 }
 
+export async function detailIncomingMail(id: number) {
+        return await fetchWithAuth(`/mails/incoming/${id}`, {
+                method: "GET",
+        });
+}
+
+export async function updateIncomingMail(payload: FormData, id: number) {
+
+        return await fetchWithAuth(`/mails/incoming/${id}`, {
+                method: "POST",
+                body: payload,
+        });
+}
+
 export async function deleteIncomingMail(id: number) {
         return await fetchWithAuth(`/mails/incoming/${id}`, {
                 method: "DELETE",
