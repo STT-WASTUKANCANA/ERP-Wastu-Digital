@@ -150,7 +150,7 @@ export default function IncomingForm({ categories, divisions, initialData, mode 
                   src={getStorageUrl(formData.attachment)}
                   type="application/pdf"
                   width="100%"
-                  height="600px"
+                  className="h-[400px] sm:h-[600px]"
                 />
               </Collapse>
             </div>
