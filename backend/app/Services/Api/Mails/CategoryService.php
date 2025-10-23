@@ -10,7 +10,7 @@ class CategoryService
 {
     public function all(?int $type = null): Collection
     {
-        $query = MailCategory::where('user_id', auth()->id());
+        $query = MailCategory::query();
 
         if ($type) {
             $query->where('type', $type);

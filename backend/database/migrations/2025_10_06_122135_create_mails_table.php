@@ -24,8 +24,17 @@ return new class extends Migration
             $table->unsignedBigInteger('category_id');
             $table->date('date');
             $table->string('attachment', 255);
+            $table->enum('status', ['1', '2', '3'])
+                ->default('1')
+                ->comment('1 = Sekum Review, 2 = Division Follow Up, 3 = Done');
+            $table->enum('follow_status', ['1', '2', '3'])
+                ->default('1')
+                ->comment('1 = Pending, 2 = Progress, 3 = Done');
+            $table->bigInteger('division_id')->nullable();
+
             $table->timestamps();
             $table->softDeletes();
+
 
             // Foreign key
             $table->foreign('user_id')
