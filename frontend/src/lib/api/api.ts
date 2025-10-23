@@ -8,6 +8,7 @@ interface FetchOptions extends RequestInit {
 }
 
 export async function fetchWithAuth(endpoint: string, options: FetchOptions = {}) {
+
         if (!API_URL) {
                 throw new Error("API URL is not defined");
         }

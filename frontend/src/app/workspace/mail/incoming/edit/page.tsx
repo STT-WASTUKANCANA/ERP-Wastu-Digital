@@ -29,9 +29,6 @@ export default function Page() {
           detailIncomingMail(Number(mailId)),
         ]);
 
-        console.log(mailRes.data?.data);
-        
-
         setCategories(categoriesRes.data?.data || []);
         setMail(mailRes.data?.data || null);
       } catch (error) {

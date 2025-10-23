@@ -1,42 +1,13 @@
-"use client";
-import { useState, useEffect, useRef } from 'react';
-import { IncomingMail } from '@/types/mails/incoming-props';
-import { getIncomingMailList } from '@/lib/api/mails/incoming';
-import IncomingMailTable from '@/components/features/mails/incomingMail/mail-table';
+import { RoleProvider } from "@/contexts/role";
+import { getUserRoleId } from "@/lib/role";
+import IncomingMailsClient from "./incoming-mails-client";
 
-const IncomingMailsPage = () => {
-  const [mails, setMails] = useState<IncomingMail[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const effectRan = useRef(false);
-
-  const fetchMails = async () => {
-    setIsLoading(true);
-    const result = await getIncomingMailList();
-    if (result.ok && result.data && Array.isArray(result.data.data)) {
-      setMails(result.data.data);
-    } else {
-      setMails([]);
-    }
-    setIsLoading(false);
-  };
-
-  useEffect(() => {
-    if (effectRan.current) return;
-    fetchMails();
-    effectRan.current = true;
-  }, []);
-
-  const handleMailCreated = () => {
-    fetchMails();
-  };
+export default function IncomingMailsPage() {
+  const roleId = getUserRoleId();
 
   return (
-    <IncomingMailTable
-      incomingMails={mails}
-      onMailCreated={handleMailCreated}
-      isLoading={isLoading}
-    />
+    <RoleProvider roleId={roleId}>
+      <IncomingMailsClient />
+    </RoleProvider>
   );
-};
-
-export default IncomingMailsPage;
+}

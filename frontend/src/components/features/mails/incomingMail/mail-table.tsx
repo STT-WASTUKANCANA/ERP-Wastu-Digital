@@ -12,12 +12,14 @@ import { DataTable } from '../../../shared/datatable';
 import { IncomingCreateModal } from './create-modal';
 import { getIncomingMailColumns } from './column';
 import { deleteIncomingMail } from '@/lib/api/mails/incoming';
+import { useRole } from '@/contexts/role';
 
 const IncomingMailTable = ({ incomingMails, onMailCreated, isLoading }: IncomingMailTableProps) => {
   const router = useRouter();
   const [selectedMail, setSelectedMail] = useState<IncomingMail | null>(null);
-  const [editingMailId, setEditingMailId] = useState<string | null>(null);
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
+
+  const { roleId } = useRole();
 
   const handleRowClick = (mail: IncomingMail) => {
     if (window.innerWidth < 1024) {
@@ -42,6 +44,13 @@ const IncomingMailTable = ({ incomingMails, onMailCreated, isLoading }: Incoming
       return;
     }
 
+    if (action === 'Review') {
+      e.preventDefault();
+      sessionStorage.setItem('reviewMailId', mailId);
+      router.push('/workspace/mail/incoming/review');
+      return;
+    }
+
     if (action === 'Delete') {
       if (confirm('Yakin ingin menghapus surat ini?')) {
         try {
@@ -56,7 +65,10 @@ const IncomingMailTable = ({ incomingMails, onMailCreated, isLoading }: Incoming
     }
   };
 
-  const columns = useMemo(() => getIncomingMailColumns(handleActionClick), []);
+  const columns = useMemo(
+    () => getIncomingMailColumns(handleActionClick, roleId),
+    [roleId]
+  );
 
   return (
     <>

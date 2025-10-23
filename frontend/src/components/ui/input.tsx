@@ -27,9 +27,9 @@ export const Input: React.FC<InputProps> = ({
                                 id={inputId}
                                 type={type}
                                 placeholder={placeholder}
-                                className={`rounded-md bg-background focus:outline-none focus:ring-1 focus:ring-foreground ${border} py-2 px-3 text-sm ${className}`}
+                                className={`rounded-md ${props.disabled ? 'bg-accent' : 'bg-background'} focus:outline-none focus:ring-1 focus:ring-foreground ${border} py-2 px-3 text-sm ${className}`}
                                 {...props}
-                                autoComplete="false"
+                                autoComplete="off"
                         />
                 </div>
         );

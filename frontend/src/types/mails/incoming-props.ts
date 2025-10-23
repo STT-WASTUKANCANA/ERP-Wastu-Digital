@@ -10,7 +10,7 @@ export type IncomingMail = {
         user_id: string;
         user_name?: string;
         category_name: string;
-        status: string;
+        status: number;
         date: string;
         attachment: string;
 };
