@@ -39,3 +39,11 @@ export async function deleteIncomingMail(id: number) {
                 method: "DELETE",
         });
 }
+
+export async function reviewIncomingMail(payload: FormData, id: number) {
+
+        return await fetchWithAuth(`/mails/incoming/review/${id}`, {
+                method: "POST",
+                body: payload,
+        });
+}

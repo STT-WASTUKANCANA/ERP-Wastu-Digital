@@ -40,6 +40,7 @@ const IncomingMailTable = ({ incomingMails, onMailCreated, isLoading }: Incoming
     if (action === 'Edit') {
       e.preventDefault();
       sessionStorage.setItem('editingMailId', mailId);
+      if (roleId) sessionStorage.setItem('roleId', roleId.toString());
       router.push('/workspace/mail/incoming/edit');
       return;
     }
@@ -80,12 +81,14 @@ const IncomingMailTable = ({ incomingMails, onMailCreated, isLoading }: Incoming
           <HiOutlineUpload />
           <span>Export</span>
         </Button>
-        <Button
-          className="bg-primary text-background text-sm cursor-pointer px-4 py-2"
-          route='/workspace/mail/incoming/create'
-        >
-          +
-        </Button>
+        {(roleId === 1) && (
+          <Button
+            className="bg-primary text-background text-sm cursor-pointer px-4 py-2"
+            route='/workspace/mail/incoming/create'
+          >
+            +
+          </Button>
+        )}
       </PageHeader>
 
       <TableContainer onSearchChange={(value) => console.log('Searching for:', value)}>
@@ -97,12 +100,6 @@ const IncomingMailTable = ({ incomingMails, onMailCreated, isLoading }: Incoming
           isLoading={isLoading}
         />
       </TableContainer>
-
-      <IncomingCreateModal
-        isOpen={isCreateModalOpen}
-        onClose={() => setCreateModalOpen(false)}
-        onSuccess={onMailCreated}
-      />
 
       {selectedMail && (
         <OffcanvasDetail

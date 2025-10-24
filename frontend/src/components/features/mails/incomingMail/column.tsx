@@ -9,7 +9,7 @@ import { getStorageUrl } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { BsEye } from 'react-icons/bs';
 
-type HandleActionClickFn = (e: MouseEvent, action: string, mailId: string) => void;
+type HandleActionClickFn = (e: MouseEvent, action: string, mailId: string, roleId?: number) => void;
 
 export const getIncomingMailColumns = (
         handleActionClick: HandleActionClickFn,
@@ -57,10 +57,11 @@ export const getIncomingMailColumns = (
                                 const fileUrl = getStorageUrl(mail.attachment);
 
                                 const canEdit = (
-                                        (roleId === 1 && mail.status === 1) ||
-                                        (roleId === 2 && mail.status === 2) ||
-                                        (roleId === 3 && mail.status === 3)
+                                        (roleId === 1 && mail.status == 1) ||
+                                        (roleId === 2 && mail.status == 2) ||
+                                        (roleId === 3 && mail.status == 3)
                                 );
+                                
 
                                 return (
                                         <div className="flex justify-start items-center gap-2">
@@ -79,7 +80,7 @@ export const getIncomingMailColumns = (
                                                         </a>
                                                 )}
 
-                                                {roleId === 2 && (
+                                                {roleId === 2 && mail.status == 1 && (
                                                         <Button
                                                                 rounded="rounded-md"
                                                                 onClick={(e) => handleActionClick(e, 'Review', mail.id.toString())}
@@ -89,10 +90,11 @@ export const getIncomingMailColumns = (
                                                         </Button>
                                                 )}
 
+
                                                 {canEdit && (
                                                         <Button
                                                                 rounded="rounded-md"
-                                                                onClick={(e) => handleActionClick(e, 'Edit', mail.id.toString())}
+                                                                onClick={(e) => handleActionClick(e, 'Edit', mail.id.toString(), roleId)}
                                                                 className="p-2 bg-background hover:bg-muted border border-secondary/20 cursor-pointer"
                                                         >
                                                                 <FiEdit className="w-3.5 h-3.5 text-primary" />

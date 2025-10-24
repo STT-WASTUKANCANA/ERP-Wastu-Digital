@@ -4,48 +4,19 @@ import { useEffect, useState } from "react";
 import { FiCornerDownLeft } from "react-icons/fi";
 import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
-import { getMailCategories, detailIncomingMail } from "@/lib/api/mails/incoming";
 import IncomingForm from "@/components/features/mails/incomingMail/incoming-form";
+import { useMailPageData } from "@/hooks/features/mail/useMailPageData";
 
 export default function Page() {
-  const [categories, setCategories] = useState([]);
-  const [mail, setMail] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const mailId = sessionStorage.getItem('editingMailId');
-
-    if (!mailId) {
-      alert("No mail selected for editing. Redirecting...");
-      window.location.href = "/workspace/mail/incoming";
-      return;
-    }
-
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        const [categoriesRes, mailRes] = await Promise.all([
-          getMailCategories(),
-          detailIncomingMail(Number(mailId)),
-        ]);
-
-        setCategories(categoriesRes.data?.data || []);
-        setMail(mailRes.data?.data || null);
-      } catch (error) {
-        console.error("Failed to fetch data:", error);
-        alert("Failed to load mail data.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
+  const { categories, mail, roleId, isLoading, divisions } = useMailPageData({
+    mailIdSessionKey: "editingMailId",
+    fetchRole: true,
+    fetchDivisions: true
+  });
 
   if (isLoading) {
     return <div>Loading mail data...</div>;
   }
-
   return (
     <div className="space-y-8 lg:px-24 xl:px-56">
       <PageHeader
@@ -62,7 +33,15 @@ export default function Page() {
         </Button>
       </PageHeader>
 
-      {mail && <IncomingForm categories={categories} initialData={mail} mode="edit" />}
+      {mail && roleId !== null && (
+        <IncomingForm
+          categories={categories}
+          initialData={mail}
+          mode="edit"
+          roleId={roleId}
+          divisions={divisions}
+        />
+      )}
     </div>
   );
 }
