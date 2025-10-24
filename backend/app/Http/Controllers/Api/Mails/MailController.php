@@ -9,6 +9,7 @@ use App\Services\Api\Mails\MailService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Throwable;
 
 class MailController extends Controller
@@ -95,7 +96,7 @@ class MailController extends Controller
 
                         if ($request->hasFile('attachment')) {
                                 if ($mail->attachment) {
-                                        \Storage::disk('public')->delete($mail->attachment);
+                                        Storage::disk('public')->delete($mail->attachment);
                                 }
 
                                 $year = date('Y');
@@ -143,5 +144,40 @@ class MailController extends Controller
                         Log::error('Mail:summary', ['msg' => $e->getMessage()]);
                         return response()->json(['status' => false], 500);
                 }
+        }
+
+        public function review(MailRequest $request, $id)
+        {
+                try {
+                        $type = $this->getTypeFromRoute($request);
+
+                        if ($type !== 1) {
+                                Log::warning('Mail:review invalid route', ['id' => $id, 'type' => $type]);
+                                return response()->json(['status' => false, 'message' => 'Not Found'], 404);
+                        }
+
+                        $validatedData = $request->validated();
+                        $validatedData['user_id'] = Auth::id();
+
+                        $reviewedMail = $this->service->reviewIncomingMail($id, $validatedData, $type);
+
+                        if (!$reviewedMail) {
+                                Log::warning('Mail:review notfound', ['id' => $id, 'type' => $type]);
+                                return response()->json(['status' => false, 'message' => 'Mail not found'], 404);
+                        }
+
+                        Log::info('Mail:review success', ['id' => $id, 'type' => $type]);
+                        return response()->json([
+                                'status' => true,
+                                'data' => new MailResource($reviewedMail)
+                        ]);
+                } catch (Throwable $e) {
+                        Log::error('Mail:review exception', ['msg' => $e->getMessage(), 'id' => $id]);
+                        return response()->json(['status' => false, 'message' => 'Internal Server Error'], 500);
+                }
+        }
+
+        public function progress() {
+                
         }
 }

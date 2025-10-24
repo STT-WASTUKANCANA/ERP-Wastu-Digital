@@ -31,6 +31,7 @@ Route::middleware('auth:api')
                         Route::get('/', 'index')->name('index');
                         Route::get('/summary', 'summary')->name('summary');
                         Route::post('/', 'store')->name('store');
+                        Route::put('/review/{id}', 'review')->name('review');
                         Route::get('/{id}', 'show')->name('show');
                         Route::put('/{id}', 'update')->name('update');
                         Route::delete('/{id}', 'destroy')->name('destroy');

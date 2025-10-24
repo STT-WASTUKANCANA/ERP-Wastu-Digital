@@ -15,10 +15,16 @@ class MailRequest extends FormRequest
     {
         $isOutgoing = $this->routeIs('api.mails.outgoing.*');
 
+        if ($this->routeIs('api.mails.incoming.review')) {
+            return [
+                'division_id' => 'nullable|exists:divisions,id', 
+                'desc' => 'nullable|string',
+            ];
+        }
+
         switch ($this->method()) {
             case 'POST':
                 $rules = [
-                    // 'user_id' => 'required|exists:users,id',
                     'number' => 'required|string|max:100',
                     'category_id' => 'required|exists:mail_categories,id',
                     'date' => 'required|date',
@@ -38,7 +44,6 @@ class MailRequest extends FormRequest
             case 'PUT':
             case 'PATCH':
                 $rules = [
-                    // 'user_id' => 'sometimes|exists:users,id',
                     'number' => 'sometimes|string|max:100',
                     'category_id' => 'sometimes|exists:mail_categories,id',
                     'date' => 'sometimes|date',

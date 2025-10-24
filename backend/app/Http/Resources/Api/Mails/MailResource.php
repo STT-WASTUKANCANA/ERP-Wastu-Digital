@@ -8,9 +8,9 @@ class MailResource extends JsonResource
 {
     public function toArray($request)
     {
-        $log = $this->mail_log
-                    ->where('status', $this->status)
-                    ->first();
+        $initialLog = $this->mail_log
+            ->where('status', 1)
+            ->first();
 
         return [
             'id'            => $this->id,
@@ -23,13 +23,16 @@ class MailResource extends JsonResource
             'attachment'    => $this->attachment,
             'status'        => $this->status,
             'follow_status' => $this->follow_status,
+            'division_id'   => $this->division_id,
 
-            'desc'          => $log->desc ?? null,
+            'desc'          => $initialLog->desc ?? null,
+
+            'mail_log'      => $this->whenLoaded('mail_log'),
 
             'institute'     => $this->when(isset($this->institute), fn() => $this->institute),
             'address'       => $this->when(isset($this->address), fn() => $this->address),
             'purpose'       => $this->when(isset($this->purpose), fn() => $this->purpose),
-            
+
             'created_at'    => $this->created_at->format('Y-m-d H:i:s'),
         ];
     }

@@ -137,4 +137,54 @@ class MailService
             'status' => $status,
         ];
     }
+    public function reviewIncomingMail($id, array $data, int $type)
+    {
+
+        $mail = $this->find($id, $type);
+
+        if (!$mail) {
+            Log::warning('MailService: review failed, mail not found', [
+                'id' => $id,
+                'type' => $type
+            ]);
+            return null;
+        }
+
+        return DB::transaction(function () use ($mail, $data, $id, $type) {
+            try {
+                $mail->update([
+                    'division_id' => $data['division_id'],
+                    'status' => 2
+                ]);
+
+                MailLog::updateOrCreate(
+                    [
+                        'mail_id' => $id,
+                        'type'    => 1,
+                        'status'  => 2,
+                    ],
+                    [
+                        'user_id' => $data['user_id'],
+                        'desc'    => $data['desc'] ?? null,
+                    ]
+                );
+
+                Log::info('MailService: reviewed successfully', [
+                    'id' => $id,
+                    'type' => $type,
+                    'user_id' => $data['user_id']
+                ]);
+
+                return $mail->load('mail_log');
+            } catch (\Throwable $e) {
+                Log::error('MailService: review transaction failed', [
+                    'id' => $id,
+                    'type' => $type,
+                    'payload' => $data,
+                    'error' => $e->getMessage()
+                ]);
+                throw $e;
+            }
+        });
+    }
 }
