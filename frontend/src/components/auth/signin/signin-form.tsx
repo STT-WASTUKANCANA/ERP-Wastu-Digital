@@ -31,7 +31,7 @@ export default function SigninForm() {
 
     if (result.ok) {
       setToastTitle("Success")
-      setToastMessage(result.data?.message || "Sign in successfully")
+      setToastMessage(result.data?.message || "Berhasil masuk")
       setToastVariant("success")
 
       setShowToast(false)
@@ -44,8 +44,8 @@ export default function SigninForm() {
       const message =
         result.data?.error?.toLowerCase().includes("unauthorized") ||
         result.data?.message?.toLowerCase().includes("unauthorized")
-          ? "Signin failed, please try again"
-          : generalError || "Something went wrong"
+          ? "Gagal masuk, silakan coba lagi."
+          : generalError || "Terjadi kesalahan, silakan coba lagi."
 
       setToastTitle("Error")
       setToastMessage(message)
@@ -60,9 +60,9 @@ export default function SigninForm() {
     <>
       <div className="space-y-12">
         <div className="space-y-2 text-center">
-          <h1 className="font-semibold">Welcome Back</h1>
+          <h1 className="font-semibold">Selamat Datang Kembali</h1>
           <h6 className="text-secondary">
-            Enter your email and password to access your account.
+            Masukkan email dan kata sandi untuk mengakses akun Anda.
           </h6>
         </div>
 
@@ -72,7 +72,7 @@ export default function SigninForm() {
               name="email"
               label="Email"
               type="email"
-              placeholder="Enter your email"
+              placeholder="Masukkan email Anda"
               required
             />
             {errors?.email && (
@@ -83,9 +83,9 @@ export default function SigninForm() {
           <div>
             <Input
               name="password"
-              label="Password"
+              label="Kata Sandi"
               type="password"
-              placeholder="Enter your password"
+              placeholder="Masukkan kata sandi Anda"
               required
             />
             {errors?.password && (
@@ -99,19 +99,19 @@ export default function SigninForm() {
                 type="checkbox"
                 className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary/20"
               />
-              <span className="text-foreground/80">Remember me</span>
+              <span className="text-foreground/80">Ingat saya</span>
             </label>
 
             <Link
               href="/forgot-password"
               className="text-primary hover:text-primary/80 transition-colors duration-150"
             >
-              Forgot password?
+              Lupa kata sandi?
             </Link>
           </div>
 
           <Button type="submit" color="bg-primary" disabled={loading} className="w-full py-3 text-background cursor-pointer">
-            {loading ? "Signing in..." : "Sign In"}
+            {loading ? "Memproses..." : "Masuk"}
           </Button>
         </form>
       </div>

@@ -110,6 +110,6 @@ const IncomingMailTable = ({ incomingMails, onMailCreated, isLoading }: Incoming
       )}
     </>
   );
-};
+};  
 
 export default IncomingMailTable;

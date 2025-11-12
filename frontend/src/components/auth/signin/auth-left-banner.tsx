@@ -13,10 +13,10 @@ export default function AuthLeftBanner() {
       <div className="z-10 space-y-8">
         <div className="space-y-4">
           <h1 className="text-background font-semibold">
-            Efficiently manage campus operations and resources.
+            Kelola operasi dan sumber daya kampus secara efisien.
           </h1>
           <h6 className="text-background/60">
-            Sign in to access the Campus ERP dashboard and streamline lecturer, staff, and administrative activities.
+            Masuk untuk mengakses dasbor ERP Kampus dan mempermudah aktivitas dosen, staf, serta administrasi.
           </h6>
         </div>
         <Image
