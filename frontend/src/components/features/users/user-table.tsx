@@ -18,7 +18,7 @@ const UserTable = ({ users, onUserUpdated, isLoading }: UserTableProps) => {
 
         if (action === "Edit") {
             sessionStorage.setItem(`editingUserId`, userId);
-            router.push("/workspace/users/edit");
+            router.push(`/workspace/master/user/edit/${userId}`);
             return;
         }
 
@@ -48,7 +48,7 @@ const UserTable = ({ users, onUserUpdated, isLoading }: UserTableProps) => {
             >
                 <Button
                     className="bg-primary text-background text-sm px-4 py-2"
-                    onClick={() => router.push("/workspace/users/create")}
+                    onClick={() => router.push("/workspace/master/user/create")}
                 >
                     +
                 </Button>

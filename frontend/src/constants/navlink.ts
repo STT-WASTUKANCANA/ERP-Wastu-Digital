@@ -37,13 +37,23 @@ export const navLinks = [
                 ],
         },
         {
-                title: "Manajemen",
+                title: "Master Data",
                 links: [
                         {
+                                name: "Divisi",
+                                href: "/workspace/master/division",
+                                icon: BsGrid1X2,
+                        },
+                        {
                                 name: "Pengguna",
-                                href: "/workspace/users",
+                                href: "/workspace/master/user",
                                 icon: LuUsers,
                         },
+                ],
+        },
+        {
+                title: "Manajemen",
+                links: [
                         {
                                 name: "Dokumen",
                                 href: "/documents",
