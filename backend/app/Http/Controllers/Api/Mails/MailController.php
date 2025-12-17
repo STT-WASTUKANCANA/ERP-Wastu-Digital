@@ -57,7 +57,12 @@ class MailController extends Controller
                         // ambil type dari route (1 = incoming, 2 = outgoing)
                         $type = $this->getTypeFromRoute($request);
 
-
+                        Log::debug('Mail:store started', [
+                                'type' => $type,
+                                'user_id' => Auth::id(),
+                                'has_attachment' => $request->hasFile('attachment'),
+                                'request_data' => $request->except(['attachment']),
+                        ]);
 
                         if ($request->hasFile('attachment')) {
                                 $year  = date('Y');
@@ -72,22 +77,39 @@ class MailController extends Controller
                                 };
 
                                 $dynamicPath = "mails/{$folder}/{$year}/{$month}/{$day}";
-                                $filePath = $request->file('attachment')->store($dynamicPath, 'public');
-
+                                
+                                $file = $request->file('attachment');
+                                Log::debug('Mail:store attachment info', [
+                                        'original_name' => $file->getClientOriginalName(),
+                                        'size' => $file->getSize(),
+                                        'mime_type' => $file->getMimeType(),
+                                        'path' => $dynamicPath,
+                                ]);
+                                
+                                $filePath = $file->store($dynamicPath, 'public');
                                 $validatedData['attachment'] = $filePath;
+                                
+                                Log::debug('Mail:store attachment saved', ['path' => $filePath]);
                         }
 
                         $mail = $this->service->create($validatedData, $type);
 
-                        Log::info('Mail:store', ['id' => $mail->id, 'type' => $type]);
+                        Log::info('Mail:store success', ['id' => $mail->id, 'type' => $type]);
 
                         return response()->json([
                                 'status' => true,
                                 'data'   => new MailResource($mail)
                         ], 201);
                 } catch (Throwable $e) {
-                        Log::error('Mail:store', ['msg' => $e->getMessage()]);
-                        return response()->json(['status' => false, 'message' => 'Internal Server Error'], 500);
+                        Log::error('Mail:store FAILED', [
+                                'message' => $e->getMessage(),
+                                'file' => $e->getFile(),
+                                'line' => $e->getLine(),
+                                'trace' => $e->getTraceAsString(),
+                                'request_data' => $request->except(['attachment']),
+                                'user_id' => Auth::id(),
+                        ]);
+                        return response()->json(['status' => false, 'message' => 'Internal Server Error: ' . $e->getMessage()], 500);
                 }
         }
 
@@ -133,11 +155,18 @@ class MailController extends Controller
 
                         $updatedMail = $this->service->update($id, $validatedData, $type);
 
-                        Log::info('Mail:update', ['id' => $id, 'type' => $type]);
+                        Log::info('Mail:update success', ['id' => $id, 'type' => $type]);
                         return response()->json(['status' => true, 'data' => new MailResource($updatedMail)]);
                 } catch (Throwable $e) {
-                        Log::error('Mail:update', ['msg' => $e->getMessage()]);
-                        return response()->json(['status' => false], 500);
+                        Log::error('Mail:update FAILED', [
+                                'id' => $id,
+                                'message' => $e->getMessage(),
+                                'file' => $e->getFile(),
+                                'line' => $e->getLine(),
+                                'trace' => $e->getTraceAsString(),
+                                'request_data' => $request->except(['attachment']),
+                        ]);
+                        return response()->json(['status' => false, 'message' => 'Update failed: ' . $e->getMessage()], 500);
                 }
         }
 

@@ -6,7 +6,7 @@ import OutgoingForm from "@/components/features/mails/outgoingMail/outgoing-form
 
 export default async function Page() {
         const res = await getMailCategories();
-        const categories = res.data?.data;
+        const categories = res.data?.data ?? [];
 
         return (
                 <div className="space-y-8 lg:px-24 xl:px-56">

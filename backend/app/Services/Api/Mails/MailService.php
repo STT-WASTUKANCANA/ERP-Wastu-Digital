@@ -156,17 +156,20 @@ class MailService
             return null;
         }
 
-        $nextStatus = [
-            1 => 2,
-            2 => 3,
-            3 => 3,
-        ][$mail->status] ?? null;
+        // Tentukan status selanjutnya berdasarkan data yang dikirim
+        $nextStatus = null;
 
+        if (array_key_exists('division_id', $data)) {
+            $nextStatus = 2; // Sekum Review / Edit Disposisi
+        } elseif (array_key_exists('follow_status', $data)) {
+            $nextStatus = 3; // Divisi Review
+        }
 
         if (!$nextStatus) {
-            Log::warning('MailService: invalid status transition', [
+            Log::warning('MailService: invalid status transition based on payload', [
                 'id' => $id,
-                'current_status' => $mail->status
+                'current_status' => $mail->status,
+                'payload_keys' => array_keys($data)
             ]);
             return null;
         }

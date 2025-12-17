@@ -2,8 +2,8 @@ import { RoleProvider } from "@/contexts/role";
 import { getUserRoleId } from "@/lib/role";
 import MailsClient from "../mails-client";
 
-export default function OutgoingMailsPage() {
-        const roleId = getUserRoleId();
+export default async function DecisionMailsPage() {
+        const roleId = await getUserRoleId();
 
         return (
                 <RoleProvider roleId={roleId}>

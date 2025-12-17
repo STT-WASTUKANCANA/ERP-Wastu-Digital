@@ -2,17 +2,18 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import { FileDropzone } from "@/components/ui/file-dropzone";
 import { Input } from "@/components/ui/input";
-import { getStorageUrl } from "@/lib/utils";
-import { Collapse } from "@/components/ui/collapse";
-import { createDecisionMail, updateDecisionMail } from "@/lib/api/mails/decision";
 import { Select } from "@/components/ui/select";
+import { createDecisionMail, updateDecisionMail } from "@/lib/api/mails/decision";
+import { FormWrapper } from "@/components/ui/form-wrapper";
+import { TextareaField } from "@/components/ui/textarea-field";
+import { PdfPreview } from "@/components/ui/pdf-preview";
+import { SubmitButton } from "@/components/ui/submit-button";
 
 interface DecisionFormProps {
   categories: any[];
-  divisions: any[];
+  divisions?: any[];
   initialData?: any;
   mode?: "create" | "edit";
   roleId?: number;
@@ -20,7 +21,6 @@ interface DecisionFormProps {
 
 export default function DecisionForm({
   categories,
-  divisions = [],
   initialData,
   mode = "create",
 }: DecisionFormProps) {
@@ -84,87 +84,69 @@ export default function DecisionForm({
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div className="bg-white p-8 rounded-lg shadow space-y-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-8">
-          <div className="col-span-2">
-            <Input
-              label="Nomor Surat"
-              name="number"
-              value={formData.number}
-              onChange={handleChange}
-              placeholder="Contoh: SK-001/IX/2025"
-            />
-          </div>
-          <div>
-            <Select
-              label="Kategori Surat"
-              name="category_id"
-              value={formData.category_id}
-              onChange={handleChange}
-              placeholder="Pilih kategori"
-              options={categories.map((cat) => ({ value: cat.id, label: cat.name }))}
-            />
-          </div>
-          <div>
-            <Input
-              label="Tanggal Surat"
-              name="date"
-              type="date"
-              value={formData.date}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="col-span-2">
-            <Input
-              label="Judul Surat"
-              name="title"
-              value={formData.title}
-              onChange={handleChange}
-              placeholder="Judul surat keputusan"
-            />
-          </div>
-          <div className="col-span-2">
-            <label className="text-sm font-medium text-foreground">Deskripsi</label>
-            <textarea
-              name="desc"
-              rows={4}
-              value={formData.desc}
-              onChange={handleChange}
-              placeholder="Isi deskripsi surat keputusan..."
-              className="mt-2 block w-full rounded-md border border-gray-300 p-2 text-sm"
-            />
-          </div>
-          {mode === "edit" && formData.attachment && (
-            <div className="col-span-2">
-              <Collapse title="Tampilkan Surat">
-                <embed
-                  src={getStorageUrl(formData.attachment)}
-                  type="application/pdf"
-                  width="100%"
-                  className="h-[400px] lg:h-[600px]"
-                />
-              </Collapse>
-            </div>
-          )}
-          <div className="col-span-2">
-            <FileDropzone
-              label={mode === "edit" ? "Upload Lampiran Baru (Opsional)" : "Lampiran (PDF)"}
-              name="attachment"
-              onFilesAccepted={(accepted) => setFiles(accepted)}
-            />
-          </div>
-          <div className="col-span-2">
-            <Button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-primary text-white px-4 py-2 rounded-md hover:brightness-90 transition"
-            >
-              {loading ? "Memproses..." : mode === "edit" ? "Update Surat" : "Submit"}
-            </Button>
-          </div>
-        </div>
+    <FormWrapper onSubmit={handleSubmit}>
+      <div className="col-span-2">
+        <Input
+          label="Nomor Surat"
+          name="number"
+          value={formData.number}
+          onChange={handleChange}
+          placeholder="Contoh: SK-001/IX/2025"
+        />
       </div>
-    </form>
+      <div>
+        <Select
+          label="Kategori Surat"
+          name="category_id"
+          value={formData.category_id}
+          onChange={handleChange}
+          placeholder="Pilih kategori"
+          options={categories.map((cat) => ({ value: cat.id, label: cat.name }))}
+        />
+      </div>
+      <div>
+        <Input
+          label="Tanggal Surat"
+          name="date"
+          type="date"
+          value={formData.date}
+          onChange={handleChange}
+        />
+      </div>
+      <div className="col-span-2">
+        <Input
+          label="Judul Surat"
+          name="title"
+          value={formData.title}
+          onChange={handleChange}
+          placeholder="Judul surat keputusan"
+        />
+      </div>
+      <TextareaField
+        label="Deskripsi"
+        name="desc"
+        value={formData.desc}
+        onChange={handleChange}
+        placeholder="Isi deskripsi surat keputusan..."
+        className="col-span-2"
+      />
+      {mode === "edit" && formData.attachment && (
+        <PdfPreview attachment={formData.attachment} className="col-span-2" />
+      )}
+      <div className="col-span-2">
+        <FileDropzone
+          label={mode === "edit" ? "Upload Lampiran Baru (Opsional)" : "Lampiran (PDF)"}
+          name="attachment"
+          onFilesAccepted={(accepted) => setFiles(accepted)}
+        />
+      </div>
+      <div className="col-span-2">
+        <SubmitButton
+          loading={loading}
+          submitText={mode === "edit" ? "Update Surat" : "Submit"}
+        />
+      </div>
+    </FormWrapper>
   );
 }
+

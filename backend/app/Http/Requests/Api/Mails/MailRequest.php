@@ -3,6 +3,8 @@
 namespace App\Http\Requests\Api\Mails;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class MailRequest extends FormRequest
 {
@@ -36,7 +38,7 @@ class MailRequest extends FormRequest
                     'number' => 'required|string|max:100',
                     'category_id' => 'required|exists:mail_categories,id',
                     'date' => 'required|date',
-                    'attachment' => 'required|file|mimes:pdf',
+                    'attachment' => 'required|file|mimes:pdf|max:10240', // max 10MB
                     'desc' => 'nullable|string',
                 ];
 
@@ -62,7 +64,7 @@ class MailRequest extends FormRequest
                     'number' => 'sometimes|string|max:100',
                     'category_id' => 'sometimes|exists:mail_categories,id',
                     'date' => 'sometimes|date',
-                    'attachment' => 'nullable|file|mimes:pdf',
+                    'attachment' => 'nullable|file|mimes:pdf|max:10240', // max 10MB
                     'desc' => 'nullable|string',
                 ];
 
@@ -86,4 +88,27 @@ class MailRequest extends FormRequest
                 return [];
         }
     }
+
+    public function messages(): array
+    {
+        return [
+            'attachment.max' => 'Ukuran file terlalu besar. Maksimal 10MB.',
+            'attachment.mimes' => 'File harus berformat PDF.',
+            'attachment.required' => 'Lampiran surat wajib diisi.',
+            'number.required' => 'Nomor surat wajib diisi.',
+            'category_id.required' => 'Kategori surat wajib dipilih.',
+            'category_id.exists' => 'Kategori surat tidak valid.',
+            'date.required' => 'Tanggal surat wajib diisi.',
+        ];
+    }
+
+    protected function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(response()->json([
+            'status' => false,
+            'message' => $validator->errors()->first(),
+            'errors' => $validator->errors()
+        ], 422));
+    }
 }
+

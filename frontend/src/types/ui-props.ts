@@ -7,6 +7,7 @@ export interface InputProps
   width?: string;
   className?: string;
   border?: string;
+  error?: string;
 }
 export interface ButtonProps {
   route?: string;

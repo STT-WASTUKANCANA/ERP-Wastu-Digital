@@ -7,17 +7,19 @@ import { Button } from './button';
 
 interface FileDropzoneProps {
         label?: string;
-        name?: string; 
+        name?: string;
         onFilesAccepted: (files: File[]) => void;
         className?: string;
         maxFiles?: number;
+        error?: string;
 }
 
 export const FileDropzone: React.FC<FileDropzoneProps> = ({
         label,
         onFilesAccepted,
         className = '',
-        maxFiles = 1
+        maxFiles = 1,
+        error
 }) => {
         const [files, setFiles] = useState<File[]>([]);
 
@@ -49,13 +51,13 @@ export const FileDropzone: React.FC<FileDropzoneProps> = ({
         };
 
         return (
-                <div className={`flex flex-col gap-4 ${className}`}>
+                <div className={`flex flex-col gap-2 ${className}`}>
                         {label && <label className="text-sm font-medium text-foreground">{label}</label>}
 
                         {files.length === 0 ? (
                                 <div
                                         {...getRootProps()}
-                                        className={`p-8 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${isDragActive ? 'border-primary bg-primary/10' : 'border-secondary/20 hover:border-primary/50'}`}
+                                        className={`p-8 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${error ? 'border-red-500' : isDragActive ? 'border-primary bg-primary/10' : 'border-secondary/20 hover:border-primary/50'}`}
                                 >
                                         <input {...getInputProps()} />
                                         <div className="flex flex-col items-center justify-center text-center">
@@ -81,6 +83,11 @@ export const FileDropzone: React.FC<FileDropzoneProps> = ({
                                         ))}
                                 </div>
                         )}
+
+                        {error && (
+                                <span className="text-xs text-red-500">{error}</span>
+                        )}
                 </div>
         );
 };
+

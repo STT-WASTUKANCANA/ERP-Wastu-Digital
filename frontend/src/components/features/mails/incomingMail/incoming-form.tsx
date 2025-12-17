@@ -2,7 +2,6 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import { FileDropzone } from "@/components/ui/file-dropzone";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
@@ -12,12 +11,13 @@ import {
   updateIncomingMail,
   divisionReviewIncomingMail
 } from "@/lib/api/mails/incoming";
-import { getStorageUrl } from "@/lib/utils";
-import { Collapse } from "@/components/ui/collapse";
+import { TextareaField } from "@/components/ui/textarea-field";
+import { PdfPreview } from "@/components/ui/pdf-preview";
+import { SubmitButton } from "@/components/ui/submit-button";
 
 interface IncomingFormProps {
   categories: any[];
-  divisions: any[];
+  divisions?: any[];
   initialData?: any;
   mode?: "create" | "edit" | "review" | "division_review";
   roleId?: number;
@@ -33,6 +33,7 @@ export default function IncomingForm({
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
+  const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [formData, setFormData] = useState({
     number: "",
     category_id: "",
@@ -60,7 +61,7 @@ export default function IncomingForm({
         desc: initialData.desc || "",
         attachment: initialData.attachment || "",
         status: initialData.status || 0,
-        division_id: initialData.division_id || "",
+        division_id: initialData.division_id ? String(initialData.division_id) : "",
         sekum_desc: initialData.sekum_desc || "",
         division_desc: initialData.division_desc || "",
         follow_status: initialData.follow_status || "",
@@ -88,61 +89,71 @@ export default function IncomingForm({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
+    setErrors({});
 
-    data = new FormData();
+    try {
+      data = new FormData();
 
-    const isReviewProcess =
-      mode === "review" || (mode === "edit" && formData.status == 2);
-
-    const isDivisionReview = mode === "division_review";
-
-    if (isReviewProcess) {
-      data.append("division_id", formData.division_id);
-      data.append("desc", formData.sekum_desc);
-      data.append("_method", "PUT");
-    } else if (isDivisionReview) {
-      data.append("follow_status", formData.follow_status);
-      data.append("division_desc", formData.division_desc);
-      data.append("_method", "PUT");
-    } else {
-      const { attachment, division_id, sekum_desc, division_desc, follow_status, ...rest } =
-        formData;
-
-      Object.entries(rest).forEach(([key, value]) =>
-        data.append(key, String(value))
-      );
-
-      if (files.length > 0) {
-        data.append("attachment", files[0]);
-      }
-
-      if (mode === "edit") {
+      if (mode === "review") {
+        data.append("division_id", formData.division_id);
+        data.append("desc", formData.sekum_desc);
         data.append("_method", "PUT");
+      } else if (mode === "division_review") {
+        data.append("follow_status", formData.follow_status);
+        data.append("division_desc", formData.division_desc);
+        data.append("_method", "PUT");
+      } else {
+        const { attachment, division_id, sekum_desc, division_desc, follow_status, ...rest } =
+          formData;
+
+        Object.entries(rest).forEach(([key, value]) =>
+          data.append(key, String(value))
+        );
+
+        if (files.length > 0) {
+          data.append("attachment", files[0]);
+        }
+
+        if (mode === "edit") {
+          data.append("_method", "PUT");
+        }
       }
+
+      const actionToCall = {
+        create: actions.create,
+        edit: actions.edit,
+        review: actions.review,
+        division_review: actions.division_review,
+      }[mode];
+
+      const res = await actionToCall?.();
+
+      if (res?.ok) {
+        const messages = {
+          create: "Surat berhasil dibuat.",
+          edit: "Surat berhasil dirubah.",
+          review: "Surat berhasil ditinjau.",
+          division_review: "Status berhasil diperbarui.",
+        };
+        alert(messages[mode]);
+        router.push("/workspace/mail/incoming");
+      } else {
+        console.error("API Error:", res);
+        if (res?.data?.errors) {
+          setErrors(res.data.errors);
+        }
+        alert(`Operasi gagal: ${res?.data?.message || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error("Form submission error:", error);
+      alert(`Terjadi kesalahan: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setLoading(false);
     }
-
-    let actionToCall;
-
-    if (isDivisionReview) actionToCall = actions.division_review;
-    else if (isReviewProcess) actionToCall = actions.review;
-    else if (mode === "edit") actionToCall = actions.edit;
-    else actionToCall = actions.create;
-
-    const res = await actionToCall?.();
-
-    if (res.ok) {
-      let message = "Surat berhasil dibuat.";
-      if (isReviewProcess) message = "Surat berhasil ditinjau.";
-      else if (isDivisionReview) message = "Status berhasil diperbarui.";
-      else if (mode === "edit") message = "Surat berhasil dirubah.";
-      alert(message);
-      router.push("/workspace/mail/incoming");
-    } else {
-      alert("Operasi gagal.");
-    }
-
-    setLoading(false);
   };
+  const isFieldDisabled = mode === "review" || mode === "division_review";
+  const showMainFormSubmit = mode === "create" || mode === "edit";
+  const showAttachmentPreview = (mode === "edit" || mode === "review" || mode === "division_review") && formData.attachment;
 
   return (
     <form onSubmit={handleSubmit}>
@@ -157,11 +168,8 @@ export default function IncomingForm({
               value={formData.number}
               onChange={handleChange}
               placeholder="Contoh: IM-001/STT/2025"
-              disabled={
-                mode === "review" ||
-                mode === "division_review" ||
-                (mode === "edit" && formData.status == 2)
-              }
+              disabled={isFieldDisabled}
+              error={errors.number?.[0]}
             />
           </div>
 
@@ -177,11 +185,8 @@ export default function IncomingForm({
                 value: cat.id,
                 label: cat.name,
               }))}
-              disabled={
-                mode === "review" ||
-                mode === "division_review" ||
-                (mode === "edit" && formData.status == 2)
-              }
+              disabled={isFieldDisabled}
+              error={errors.category_id?.[0]}
             />
           </div>
 
@@ -193,134 +198,84 @@ export default function IncomingForm({
               type="date"
               value={formData.date}
               onChange={handleChange}
-              disabled={
-                mode === "review" ||
-                mode === "division_review" ||
-                (mode === "edit" && formData.status == 2)
-              }
+              disabled={isFieldDisabled}
+              error={errors.date?.[0]}
             />
           </div>
 
-          <div className="col-span-2">
-            <label className="text-sm font-medium text-foreground">
-              Deskripsi
-            </label>
-            <textarea
-              id="desc"
-              name="desc"
-              rows={4}
-              value={formData.desc}
-              onChange={handleChange}
-              placeholder="Tulis deskripsi surat..."
-              className={`mt-4 block w-full rounded-md border border-gray-300 p-2 text-sm ${mode === "division_review" || mode === "review" ? "bg-accent" : "bg-background"
-                  }`}
-              disabled={
-                mode === "review" ||
-                mode === "division_review" ||
-                (mode === "edit" && formData.status == 2)
-              }
-            />
-          </div>
+          <TextareaField
+            label="Deskripsi"
+            id="desc"
+            name="desc"
+            value={formData.desc}
+            onChange={handleChange}
+            placeholder="Tulis deskripsi surat..."
+            disabled={isFieldDisabled}
+            className="col-span-2"
+          />
 
-          {(mode === "edit" || mode === "review" || mode === "division_review") &&
-            formData.attachment && (
-              <div className="col-span-2">
-                <Collapse title="Tampilkan Surat">
-                  <embed
-                    src={getStorageUrl(formData.attachment)}
-                    type="application/pdf"
-                    width="100%"
-                    className="h-[400px] lg:h-[600px]"
-                  />
-                </Collapse>
-              </div>
-            )}
+          {showAttachmentPreview && (
+            <PdfPreview attachment={formData.attachment} className="col-span-2" />
+          )}
 
-          {(mode === "create" ||
-            (mode === "edit" && formData.status != 2)) && (
-              <div className="col-span-2">
-                <FileDropzone
-                  label={
-                    mode === "edit"
-                      ? "Upload Lampiran Baru (Opsional, akan menggantikan yang lama)"
-                      : "Lampiran Surat"
-                  }
-                  name="attachment"
-                  onFilesAccepted={(accepted) => setFiles(accepted)}
-                />
-              </div>
-            )}
+          {showMainFormSubmit && (
+            <div className="col-span-2">
+              <FileDropzone
+                label={
+                  mode === "edit"
+                    ? "Upload Lampiran Baru (Opsional, akan menggantikan yang lama)"
+                    : "Lampiran Surat"
+                }
+                name="attachment"
+                onFilesAccepted={(accepted) => setFiles(accepted)}
+                error={errors.attachment?.[0]}
+              />
+            </div>
+          )}
 
-          {(mode === "create" ||
-            (mode === "edit" && formData.status != 2)) && (
-              <div className="col-span-2">
-                <Button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full bg-primary text-white px-4 py-2 rounded-md hover:brightness-90 transition"
-                >
-                  {loading
-                    ? "Memproses..."
-                    : mode === "edit"
-                      ? "Update Surat"
-                      : "Kirim Surat"}
-                </Button>
-              </div>
-            )}
+          {showMainFormSubmit && (
+            <div className="col-span-2">
+              <SubmitButton
+                loading={loading}
+                submitText={mode === "edit" ? "Update Surat" : "Kirim Surat"}
+              />
+            </div>
+          )}
         </div>
       </div>
 
-      {(mode === "review" ||
-        mode === "division_review" ||
-        (formData.status == 2 && roleId == 2)) && (
-          <div className="bg-white p-8 rounded-lg shadow space-y-8 mt-4">
-            {mode === "review" && (
-              <div className="col-span-2">
-                <Select
-                  label="Bagikan ke Bagian"
-                  id="division_id"
-                  name="division_id"
-                  onChange={handleChange}
-                  value={formData.division_id}
-                  placeholder="Pilih bagian"
-                  options={divisions.map((division) => ({
-                    value: division.id,
-                    label: division.name,
-                  }))}
-                />
-              </div>
-            )}
-
-            <div className="col-span-2">
-              <label className="text-sm font-medium text-foreground">
-                Catatan Sekretaris Umum
-              </label>
-              <textarea
-                id="sekum_desc"
-                name="sekum_desc"
-                rows={4}
-                value={formData.sekum_desc}
-                onChange={handleChange}
-                placeholder="Tulis catatan atau instruksi..."
-                className={`mt-4 block w-full rounded-md border border-gray-300 p-2 text-sm  ${mode === "division_review" ? "bg-accent" : "bg-background"
-                  }`}
-                disabled={mode === "division_review"}
-              />
-            </div>
-
-            {mode === "review" && (
-              <div className="col-span-2">
-                <Button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full bg-primary text-white px-4 py-2 rounded-md hover:brightness-90 transition"
-                >
-                  {loading ? "Memproses..." : "Simpan"}
-                </Button>
-              </div>
-            )}
+      {mode === "review" && (
+        <div className="bg-white p-8 rounded-lg shadow space-y-8 mt-4">
+          <div className="col-span-2">
+            <Select
+              label="Bagikan ke Bagian"
+              id="division_id"
+              name="division_id"
+              onChange={handleChange}
+              value={formData.division_id}
+              placeholder="Pilih bagian"
+              options={divisions.map((division) => ({
+                value: String(division.id),
+                label: division.name,
+              }))}
+            />
           </div>
-        )}
+
+          <TextareaField
+            label="Catatan Sekretaris Umum"
+            id="sekum_desc"
+            name="sekum_desc"
+            value={formData.sekum_desc}
+            onChange={handleChange}
+            placeholder="Tulis catatan atau instruksi..."
+            className="col-span-2"
+          />
+
+          <div className="col-span-2">
+            <SubmitButton loading={loading} submitText="Simpan" />
+          </div>
+        </div>
+      )}
 
       {mode === "division_review" && (
         <div className="bg-white p-8 rounded-lg shadow space-y-8 mt-4">
@@ -340,32 +295,22 @@ export default function IncomingForm({
             />
           </div>
 
-          <div className="col-span-2">
-            <label className="text-sm font-medium text-foreground">
-              Deskripsi Bidang
-            </label>
-            <textarea
-              id="division_desc"
-              name="division_desc"
-              rows={4}
-              value={formData.division_desc}
-              onChange={handleChange}
-              placeholder="Tulis deskripsi..."
-              className="mt-4 block w-full rounded-md border border-gray-300 p-2 text-sm"
-            />
-          </div>
+          <TextareaField
+            label="Deskripsi Bidang"
+            id="division_desc"
+            name="division_desc"
+            value={formData.division_desc}
+            onChange={handleChange}
+            placeholder="Tulis deskripsi..."
+            className="col-span-2"
+          />
 
           <div className="col-span-2">
-            <Button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-primary text-white px-4 py-2 rounded-md hover:brightness-90 transition"
-            >
-              {loading ? "Memproses..." : "Simpan"}
-            </Button>
+            <SubmitButton loading={loading} submitText="Simpan" />
           </div>
         </div>
       )}
     </form>
   );
 }
+

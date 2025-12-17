@@ -14,6 +14,7 @@ export interface SelectProps
         border?: string;
         options: SelectOption[];
         placeholder?: string;
+        error?: string;
 }
 
 export const Select: React.FC<SelectProps> = ({
@@ -24,12 +25,13 @@ export const Select: React.FC<SelectProps> = ({
         className = "",
         border = "border border-secondary/20",
         id,
+        error,
         ...props
 }) => {
         const selectId = id || React.useId();
 
         return (
-                <div className={`${width} flex flex-col gap-4`}>
+                <div className={`${width} flex flex-col gap-2`}>
                         {label && (
                                 <label
                                         htmlFor={selectId}
@@ -41,7 +43,7 @@ export const Select: React.FC<SelectProps> = ({
                         <div className="relative w-full">
                                 <select
                                         id={selectId}
-                                        className={`appearance-none w-full rounded-md ${props.disabled ? 'bg-accent' : 'bg-background'} focus:outline-none focus:ring-1 focus:ring-foreground ${border} py-2 pl-3 pr-8 cursor-pointer text-sm ${className}`}
+                                        className={`appearance-none w-full rounded-md ${props.disabled ? 'bg-accent' : 'bg-background'} focus:outline-none focus:ring-1 focus:ring-foreground ${error ? 'border-red-500 border-2' : border} py-2 pl-3 pr-8 cursor-pointer text-sm ${className}`}
                                         {...props}
                                 >
                                         {placeholder && (
@@ -61,6 +63,9 @@ export const Select: React.FC<SelectProps> = ({
                                 </select>
                                 <IoChevronDown className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-secondary" />
                         </div>
+                        {error && (
+                                <span className="text-xs text-red-500">{error}</span>
+                        )}
                 </div>
         );
 };

@@ -13,7 +13,7 @@ export async function fetchWithAuth(endpoint: string, options: FetchOptions = {}
                 throw new Error("API URL is not defined");
         }
 
-        const cookieStore = cookies();
+        const cookieStore = await cookies();
         const token = cookieStore.get('access_token')?.value;
 
         const headers: Record<string, string> = {

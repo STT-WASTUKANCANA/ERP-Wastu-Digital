@@ -2,11 +2,12 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { createUser, updateUser } from "@/lib/api/master/users";
 import { UserFormData, Role, Division, User } from "@/types/user-props";
+import { FormWrapper } from "@/components/ui/form-wrapper";
+import { SubmitButton } from "@/components/ui/submit-button";
 
 interface UserFormProps {
     roles: Role[];
@@ -89,80 +90,70 @@ export default function UserForm({
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <div className="bg-white p-8 rounded-lg shadow space-y-8">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-8">
-                    <div className="col-span-1">
-                        <Input
-                            label="Nama Lengkap"
-                            id="name"
-                            name="name"
-                            type="text"
-                            value={formData.name}
-                            onChange={handleChange}
-                            placeholder="Contoh: John Doe"
-                            required
-                        />
-                    </div>
-
-                    <div className="col-span-1">
-                        <Input
-                            label="Email"
-                            id="email"
-                            name="email"
-                            type="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            placeholder="Contoh: john@example.com"
-                            required
-                        />
-                    </div>
-
-                    <div>
-                        <Select
-                            label="Role"
-                            id="role_id"
-                            name="role_id"
-                            value={formData.role_id?.toString() || ""}
-                            onChange={handleChange}
-                            placeholder="Pilih role"
-                            options={roles.map((role) => ({
-                                value: role.id,
-                                label: role.name,
-                            }))}
-                        />
-                    </div>
-
-                    <div>
-                        <Select
-                            label="Divisi"
-                            id="division_id"
-                            name="division_id"
-                            value={formData.division_id?.toString() || ""}
-                            onChange={handleChange}
-                            placeholder="Pilih divisi"
-                            options={divisions.map((division) => ({
-                                value: division.id,
-                                label: division.name,
-                            }))}
-                        />
-                    </div>
-
-                    <div className="col-span-2">
-                        <Button
-                            type="submit"
-                            disabled={loading}
-                            className="w-full bg-primary text-white px-4 py-2 rounded-md hover:brightness-90 transition"
-                        >
-                            {loading
-                                ? "Memproses..."
-                                : mode === "edit"
-                                    ? "Perbarui Pengguna"
-                                    : "Tambah Pengguna"}
-                        </Button>
-                    </div>
-                </div>
+        <FormWrapper onSubmit={handleSubmit}>
+            <div className="col-span-1">
+                <Input
+                    label="Nama Lengkap"
+                    id="name"
+                    name="name"
+                    type="text"
+                    value={formData.name}
+                    onChange={handleChange}
+                    placeholder="Contoh: John Doe"
+                    required
+                />
             </div>
-        </form>
+
+            <div className="col-span-1">
+                <Input
+                    label="Email"
+                    id="email"
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="Contoh: john@example.com"
+                    required
+                />
+            </div>
+
+            <div>
+                <Select
+                    label="Role"
+                    id="role_id"
+                    name="role_id"
+                    value={formData.role_id?.toString() || ""}
+                    onChange={handleChange}
+                    placeholder="Pilih role"
+                    options={roles.map((role) => ({
+                        value: role.id,
+                        label: role.name,
+                    }))}
+                />
+            </div>
+
+            <div>
+                <Select
+                    label="Divisi"
+                    id="division_id"
+                    name="division_id"
+                    value={formData.division_id?.toString() || ""}
+                    onChange={handleChange}
+                    placeholder="Pilih divisi"
+                    options={divisions.map((division) => ({
+                        value: division.id,
+                        label: division.name,
+                    }))}
+                />
+            </div>
+
+            <div className="col-span-2">
+                <SubmitButton
+                    loading={loading}
+                    submitText={mode === "edit" ? "Perbarui Pengguna" : "Tambah Pengguna"}
+                />
+            </div>
+        </FormWrapper>
     );
 }
+
