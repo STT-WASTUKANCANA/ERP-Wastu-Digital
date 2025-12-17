@@ -14,3 +14,17 @@ export function getStorageUrl(filePath: string | null | undefined): string {
 
   return `${STORAGE_URL}/${cleanPath}`;
 }
+
+export function formatDate(dateString: string | null | undefined): string {
+  if (!dateString) return "-";
+  try {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat("id-ID", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    }).format(date);
+  } catch (e) {
+    return dateString;
+  }
+}

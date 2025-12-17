@@ -4,7 +4,7 @@ import { MouseEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { IncomingMail, statusMap } from '@/types/mail-props';
 import { ColumnDef } from '@/types/ui-props';
-import { getStorageUrl } from '@/lib/utils';
+import { getStorageUrl, formatDate } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { BsEye } from 'react-icons/bs';
 import { FiEdit } from 'react-icons/fi';
@@ -27,6 +27,7 @@ export const getIncomingMailColumns = (
                         header: 'Tanggal',
                         accessorKey: 'date',
                         mobile: true,
+                        cell: (row) => formatDate(row.date),
                 },
                 {
                         header: 'Kategori',

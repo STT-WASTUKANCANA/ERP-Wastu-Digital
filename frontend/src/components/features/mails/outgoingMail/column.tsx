@@ -3,7 +3,7 @@
 import { MouseEvent } from 'react';
 import { OutgoingMail } from '@/types/mail-props';
 import { ColumnDef } from '@/types/ui-props';
-import { getStorageUrl } from '@/lib/utils';
+import { getStorageUrl, formatDate } from '@/lib/utils';
 import { ActionButtons } from '@/components/ui/action-buttons';
 
 type HandleActionClickFn = (e: MouseEvent, action: string, mailId: string, roleId?: number) => void;
@@ -23,6 +23,7 @@ export const getOutgoingMailColumns = (
                         header: 'Tanggal',
                         accessorKey: 'date',
                         mobile: true,
+                        cell: (row) => formatDate(row.date),
                 },
                 {
                         header: 'Kategori',
