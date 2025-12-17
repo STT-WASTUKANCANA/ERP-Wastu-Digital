@@ -43,7 +43,7 @@ export default function SigninForm() {
     } else {
       const message =
         result.data?.error?.toLowerCase().includes("unauthorized") ||
-        result.data?.message?.toLowerCase().includes("unauthorized")
+          result.data?.message?.toLowerCase().includes("unauthorized")
           ? "Gagal masuk, silakan coba lagi."
           : generalError || "Terjadi kesalahan, silakan coba lagi."
 
@@ -58,15 +58,15 @@ export default function SigninForm() {
 
   return (
     <>
-      <div className="space-y-12">
+      <div className="w-full max-w-md space-y-8 md:space-y-12 px-4 md:px-0">
         <div className="space-y-2 text-center">
-          <h1 className="font-semibold">Selamat Datang Kembali</h1>
-          <h6 className="text-secondary">
+          <h1 className="font-semibold text-2xl md:text-3xl lg:text-4xl">Selamat Datang Kembali</h1>
+          <h6 className="text-secondary text-sm md:text-base">
             Masukkan email dan kata sandi untuk mengakses akun Anda.
           </h6>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6 w-[430px]">
+        <form onSubmit={handleSubmit} className="space-y-6 w-full">
           <div>
             <Input
               name="email"

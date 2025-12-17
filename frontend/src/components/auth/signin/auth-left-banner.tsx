@@ -3,7 +3,7 @@ import { PatternLogo } from "@/components/ui/pattern"
 
 export default function AuthLeftBanner() {
   return (
-    <div className="relative w-[50%] bg-primary rounded-2xl flex justify-center items-center overflow-hidden p-16">
+    <div className="relative w-full lg:w-1/2 bg-primary rounded-2xl hidden lg:flex justify-center items-center overflow-hidden p-8 md:p-12 lg:p-16">
       <PatternLogo className="opacity-50" style={{ top: '-50px', left: '-60px', transform: 'rotate(-25deg) scale(0.8)' }} />
       <PatternLogo className="opacity-75" style={{ top: '10%', right: '-40px', transform: 'rotate(15deg) scale(1.2)' }} />
       <PatternLogo className="opacity-60" style={{ bottom: '20%', left: '30%', transform: 'rotate(5deg)' }} />
