@@ -1,4 +1,4 @@
-import DivisionForm from "@/components/features/master/divisions/division-form";
+import DivisionForm from "@/components/features/manage/divisions/division-form";
 import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
 import { FiCornerDownLeft } from "react-icons/fi";

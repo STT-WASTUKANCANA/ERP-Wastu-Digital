@@ -2,6 +2,7 @@ import { BsGrid1X2, BsInbox, BsSend } from "react-icons/bs";
 import { GoTable } from "react-icons/go";
 import { IoDocumentTextOutline } from "react-icons/io5";
 import { LuUsers } from "react-icons/lu";
+import { MdOutlineAccountTree } from "react-icons/md";
 import { RiMailCheckLine } from "react-icons/ri";
 import { VscGraphLine } from "react-icons/vsc";
 
@@ -37,23 +38,18 @@ export const navLinks = [
                 ],
         },
         {
-                title: "Master Data",
+                title: "Manajemen",
                 links: [
                         {
                                 name: "Divisi",
-                                href: "/workspace/master/division",
-                                icon: BsGrid1X2,
+                                href: "/workspace/manage/division",
+                                icon: MdOutlineAccountTree,
                         },
                         {
                                 name: "Pengguna",
-                                href: "/workspace/master/user",
+                                href: "/workspace/manage/user",
                                 icon: LuUsers,
                         },
-                ],
-        },
-        {
-                title: "Manajemen",
-                links: [
                         {
                                 name: "Dokumen",
                                 href: "/documents",

@@ -1,6 +1,6 @@
 "use client";
 
-import UserTable from "@/components/features/users/user-table";
+import UserTable from "@/components/features/manage/users/user-table";
 import { useUsers } from "@/hooks/features/user/useUsers";
 
 export default function UsersPage() {

@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { detailUser } from "@/lib/api/master/users";
-import { getRoleList } from "@/lib/api/master/role";
-import { getDivisionList } from "@/lib/api/master/division";
+import { detailUser } from "@/lib/api/manage/users";
+import { getRoleList } from "@/lib/api/manage/role";
+import { getDivisionList } from "@/lib/api/manage/division";
 import { Role, Division, User } from "@/types/user-props";
 
 interface UseUserFormOptions {

@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
-import { createUser, updateUser } from "@/lib/api/master/users";
+import { createUser, updateUser } from "@/lib/api/manage/users";
 import { UserFormData, Role, Division, User } from "@/types/user-props";
 import { FormWrapper } from "@/components/ui/form-wrapper";
 import { SubmitButton } from "@/components/ui/submit-button";
@@ -76,7 +76,7 @@ export default function UserForm({
                     ? "Pengguna berhasil ditambahkan."
                     : "Pengguna berhasil diperbarui.";
                 alert(message);
-                router.push("/workspace/users");
+                router.push("/workspace/manage/user");
             } else {
                 const errorMessage = res.data?.error || res.data?.message || "Operasi gagal.";
                 alert(errorMessage);

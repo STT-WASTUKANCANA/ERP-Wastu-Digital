@@ -1,33 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import UserForm from "@/components/features/users/user-form";
+import UserForm from "@/components/features/manage/users/user-form";
 import { useUserForm } from "@/hooks/features/user/useUserForm";
 import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 import { FiCornerDownLeft } from "react-icons/fi";
 
-export default function EditUserPage() {
+export default function CreateUserPage() {
     const router = useRouter();
-    const [userId, setUserId] = useState<string | null>(null);
+    const { roles, divisions, isLoading } = useUserForm();
 
-    useEffect(() => {
-        const id = sessionStorage.getItem("editingUserId");
-        if (!id) {
-            alert("Tidak ada pengguna yang dipilih. Mengarahkan...");
-            router.push("/workspace/users");
-            return;
-        }
-        setUserId(id);
-    }, [router]);
-
-    const { roles, divisions, user, isLoading } = useUserForm({
-        userId,
-        isEdit: true,
-    });
-
-    if (isLoading || !userId) {
+    if (isLoading) {
         return (
             <div className="flex items-center justify-center min-h-[400px]">
                 <p>Memuat...</p>
@@ -53,8 +37,7 @@ export default function EditUserPage() {
             <UserForm
                 roles={roles}
                 divisions={divisions}
-                initialData={user}
-                mode="edit"
+                mode="create"
             />
         </div>
     );

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import DivisionForm from "@/components/features/master/divisions/division-form";
+import DivisionForm from "@/components/features/manage/divisions/division-form";
 import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
 import { FiCornerDownLeft } from "react-icons/fi";
@@ -14,7 +14,7 @@ export default function EditDivisionPage() {
     useEffect(() => {
         const storedId = sessionStorage.getItem("editingDivisionId");
         if (!storedId) {
-            router.push("/workspace/master/division");
+            router.push("/workspace/manage/division");
             return;
         }
         setId(storedId);

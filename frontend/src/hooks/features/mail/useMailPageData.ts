@@ -10,7 +10,7 @@ import {
   getMailCategories as getOutgoingCategories,
 } from "@/lib/api/mails/outgoing";
 import { detailDecisionMail, getMailCategories as getDecisionCategories } from "@/lib/api/mails/decision";
-import { getDivisionList } from "@/lib/api/master/division";
+import { getDivisionList } from "@/lib/api/manage/division";
 
 type MailCategory = any;
 type MailDetail = any;

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { getDivisionList, deleteDivision } from "@/lib/api/master/division";
+import { getDivisionList, deleteDivision } from "@/lib/api/manage/division";
 import { Division } from "@/types/division-props";
 import { getDivisionColumns } from "./division-column";
 import { DataTable } from "@/components/shared/datatable";
@@ -61,7 +61,7 @@ export default function DivisionTable() {
 
         if (action === "Edit") {
             sessionStorage.setItem("editingDivisionId", id);
-            router.push(`/workspace/master/division/edit`);
+            router.push(`/workspace/manage/division/edit`);
         } else if (action === "Delete") {
             const confirmed = window.confirm("Hapus Divisi? Data yang dihapus tidak dapat dikembalikan.");
 
@@ -85,7 +85,7 @@ export default function DivisionTable() {
 
     return (
         <>
-            <PageHeader title="Master Divisi" description="Kelola data divisi dan kepala bidang dengan efisien.">
+            <PageHeader title="Manajemen Divisi" description="Kelola data divisi dan kepala bidang dengan efisien.">
                 <Button className="text-foreground/70 text-sm cursor-pointer px-8 py-2 flex justify-center items-center gap-2 border border-secondary/20 bg-background">
                     <HiOutlineUpload />
                     <span>Export</span>
@@ -93,7 +93,7 @@ export default function DivisionTable() {
 
                 <Button
                     className="bg-primary text-background text-sm px-4 py-2"
-                    onClick={() => router.push("/workspace/master/division/create")}
+                    onClick={() => router.push("/workspace/manage/division/create")}
                 >
                     +
                 </Button>

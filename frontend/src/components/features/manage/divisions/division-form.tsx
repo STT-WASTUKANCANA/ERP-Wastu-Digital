@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { DivisionFormData } from "@/types/division-props";
 import { User } from "@/types/user-props";
-import { createDivision, updateDivision, getDivision } from "@/lib/api/master/division";
-import { getUserList } from "@/lib/api/master/users";
+import { createDivision, updateDivision, getDivision } from "@/lib/api/manage/division";
+import { getUserList } from "@/lib/api/manage/users";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
@@ -80,7 +80,7 @@ export default function DivisionForm({ id }: DivisionFormProps) {
 
             if (res?.ok) {
                 alert(`Divisi berhasil ${isEdit ? "udiupdate" : "dibuat"}`);
-                router.push("/workspace/master/division");
+                router.push("/workspace/manage/division");
             } else {
                 if (res?.status === 422 && res?.data?.errors) {
                     setErrors(res.data.errors);

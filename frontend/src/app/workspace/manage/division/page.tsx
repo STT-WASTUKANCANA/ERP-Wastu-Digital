@@ -1,4 +1,4 @@
-import DivisionTable from "@/components/features/master/divisions/division-table";
+import DivisionTable from "@/components/features/manage/divisions/division-table";
 import { Suspense } from "react";
 
 export default function DivisionPage() {

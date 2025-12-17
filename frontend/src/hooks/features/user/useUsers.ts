@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { getUserList } from "@/lib/api/master/users";
+import { getUserList } from "@/lib/api/manage/users";
 import { User } from "@/types/user-props";
 
 export function useUsers() {

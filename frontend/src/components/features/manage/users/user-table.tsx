@@ -8,7 +8,7 @@ import { TableContainer } from "@/components/shared/table-container";
 import { DataTable } from "@/components/shared/datatable";
 import { UserTableProps } from "@/types/user-props";
 import { getUserColumns } from "./column";
-import { deleteUser } from "@/lib/api/master/users";
+import { deleteUser } from "@/lib/api/manage/users";
 
 const UserTable = ({ users, onUserUpdated, isLoading }: UserTableProps) => {
     const router = useRouter();
@@ -18,7 +18,7 @@ const UserTable = ({ users, onUserUpdated, isLoading }: UserTableProps) => {
 
         if (action === "Edit") {
             sessionStorage.setItem(`editingUserId`, userId);
-            router.push(`/workspace/master/user/edit/${userId}`);
+            router.push(`/workspace/manage/user/edit`);
             return;
         }
 
@@ -48,7 +48,7 @@ const UserTable = ({ users, onUserUpdated, isLoading }: UserTableProps) => {
             >
                 <Button
                     className="bg-primary text-background text-sm px-4 py-2"
-                    onClick={() => router.push("/workspace/master/user/create")}
+                    onClick={() => router.push("/workspace/manage/user/create")}
                 >
                     +
                 </Button>
