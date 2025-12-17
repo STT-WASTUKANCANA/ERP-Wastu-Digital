@@ -157,15 +157,24 @@ class MailService
         }
 
         // Tentukan status selanjutnya berdasarkan data yang dikirim
-        $nextStatus = null;
+        $mailStatus = null;
+        $logStatus = null;
 
         if (array_key_exists('division_id', $data)) {
-            $nextStatus = 2; // Sekum Review / Edit Disposisi
+            $mailStatus = 2; // Sekum Review / Edit Disposisi
+            $logStatus = 2;
         } elseif (array_key_exists('follow_status', $data)) {
-            $nextStatus = 3; // Divisi Review
+            // Division Review
+            $logStatus = 3; // Log selalu di slot 3 (Divisi) agar tidak menimpa slot 2 (Sekum)
+            
+            if ($data['follow_status'] == 3) {
+                $mailStatus = 3; // Selesai
+            } else {
+                $mailStatus = 2; // Tetap 2 (Disposisi/Proses) jika belum selesai
+            }
         }
 
-        if (!$nextStatus) {
+        if (!$mailStatus || !$logStatus) {
             Log::warning('MailService: invalid status transition based on payload', [
                 'id' => $id,
                 'current_status' => $mail->status,
@@ -174,15 +183,15 @@ class MailService
             return null;
         }
 
-        return DB::transaction(function () use ($mail, $data, $id, $type, $nextStatus) {
+        return DB::transaction(function () use ($mail, $data, $id, $type, $mailStatus, $logStatus) {
             try {
-                $updateData = ['status' => $nextStatus];
+                $updateData = ['status' => $mailStatus];
 
-                if ($nextStatus === 2) {
+                if ($mailStatus === 2 && isset($data['division_id'])) {
                     $updateData['division_id'] = $data['division_id'];
                 }
 
-                if ($nextStatus === 3) {
+                if (isset($data['follow_status'])) {
                     $updateData['follow_status'] = $data['follow_status'];
                 }
 
@@ -192,11 +201,11 @@ class MailService
                     [
                         'mail_id' => $id,
                         'type'    => 1,
-                        'status'  => $nextStatus,
+                        'status'  => $logStatus,
                     ],
                     [
                         'user_id' => $data['user_id'],
-                        'desc'    => $nextStatus === 3
+                        'desc'    => $logStatus === 3
                             ? ($data['division_desc'] ?? null)
                             : ($data['desc'] ?? null),
                     ]

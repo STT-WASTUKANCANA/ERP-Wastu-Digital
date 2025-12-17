@@ -42,12 +42,18 @@ export const getIncomingMailColumns = (
                         accessorKey: 'status',
                         mobile: true,
                         cell: (row) => {
-                                const badgeMap = {
-                                        1: { label: statusMap[1], color: "bg-secondary text-white" },
-                                        2: { label: statusMap[2], color: "bg-blue-100 text-blue-800" },
-                                        3: { label: statusMap[3], color: "bg-green-100 text-green-800" },
-                                };
-                                return <Badge value={row.status} map={badgeMap} />;
+                                if (row.status == 1) {
+                                        return <Badge value={1} map={{ 1: { label: statusMap[1], color: "bg-secondary text-white" } }} />;
+                                }
+
+                                if (row.status == 2) {
+                                        if (row.follow_status == 2) {
+                                                return <Badge value="Proses" map={{ "Proses": { label: "Proses", color: "bg-yellow-100 text-yellow-800" } }} />;
+                                        }
+                                        return <Badge value={2} map={{ 2: { label: statusMap[2], color: "bg-blue-100 text-blue-800" } }} />;
+                                }
+
+                                return <Badge value={3} map={{ 3: { label: "Selesai", color: "bg-green-100 text-green-800" } }} />;
                         },
                 },
                 {
@@ -57,7 +63,7 @@ export const getIncomingMailColumns = (
                                 const mail = row;
 
                                 const showReview = roleId === 2 && (mail.status == 1 || mail.status == 2);
-                                const showDivisionReview = roleId === 4 && mail.follow_status == 1;
+                                const showDivisionReview = roleId === 4 && (mail.follow_status == 1 || mail.follow_status == 2);
 
                                 const canEdit = !showReview && (roleId === 1 && mail.status == 1);
 
@@ -80,12 +86,15 @@ export const getIncomingMailColumns = (
 
                                                 {showDivisionReview && (
                                                         <Button
-                                                                color='bg-primary'
                                                                 rounded="rounded-md"
                                                                 onClick={(e) => handleActionClick(e, 'Division Review', mail.id.toString())}
-                                                                className="p-2 bg-primary hover:bg-primary/80 cursor-pointer flex items-center gap-2"
+                                                                className="p-2 bg-background hover:bg-muted border border-secondary/20 cursor-pointer flex items-center gap-2"
                                                         >
-                                                                <BsEye className="w-3.5 h-3.5 text-white" />
+                                                                {mail.follow_status == 2 ? (
+                                                                        <FiEdit className="w-3.5 h-3.5 text-foreground" />
+                                                                ) : (
+                                                                        <BsEye className="w-3.5 h-3.5 text-foreground" />
+                                                                )}
                                                         </Button>
                                                 )}
 
