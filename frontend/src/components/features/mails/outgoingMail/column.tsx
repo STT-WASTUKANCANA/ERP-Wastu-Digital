@@ -3,18 +3,16 @@
 import { MouseEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { FiDownload, FiEdit, FiTrash2 } from 'react-icons/fi';
-import { IncomingMail, statusMap } from '@/types/mail-props';
+import { OutgoingMail } from '@/types/mail-props';
 import { ColumnDef } from '@/types/ui-props';
 import { getStorageUrl } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
-import { BsEye } from 'react-icons/bs';
 
 type HandleActionClickFn = (e: MouseEvent, action: string, mailId: string, roleId?: number) => void;
 
-export const getIncomingMailColumns = (
+export const getOutgoingMailColumns = (
         handleActionClick: HandleActionClickFn,
         roleId: number | null
-): ColumnDef<IncomingMail>[] => {
+): ColumnDef<OutgoingMail>[] => {
 
         return [
                 {
@@ -37,61 +35,19 @@ export const getIncomingMailColumns = (
                         cell: (row) => row.user_name,
                 },
                 {
-                        header: 'Status',
-                        accessorKey: 'status',
-                        mobile: true,
-                        cell: (row) => {
-                                const badgeMap = {
-                                        1: { label: statusMap[1], color: "bg-secondary text-white" },
-                                        2: { label: statusMap[2], color: "bg-blue-100 text-blue-800" },
-                                        3: { label: statusMap[3], color: "bg-green-100 text-green-800" },
-                                };
-                                return <Badge value={row.status} map={badgeMap} />;
-                        },
-                },
-                {
                         header: '',
                         id: 'actions',
                         cell: (row) => {
                                 const mail = row;
                                 const fileUrl = getStorageUrl(mail.attachment);
 
-                                const canEdit = (
-                                        (roleId === 1 && mail.status == 1) ||
-                                        (roleId === 2 && mail.status == 2) ||
-                                        (roleId === 3 && mail.status == 3)
-                                );
-
+                                const canEdit = roleId === 2;
 
                                 return (
                                         <div className="flex justify-start items-center gap-2">
-                                                {roleId === 2 && mail.status == 1 && (
-                                                        <Button
-                                                                rounded="rounded-md"
-                                                                onClick={(e) => handleActionClick(e, 'Review', mail.id.toString())}
-                                                                className="px-3 py-1.5 text-background bg-background hover:bg-muted border border-secondary/20 cursor-pointer flex items-center gap-2"
-                                                        >
-                                                                <BsEye className="w-3.5 h-3.5 text-background" />
-                                                        </Button>
-                                                )}
-
-                                                {roleId === 4 && mail.follow_status == 1 && (
-                                                        <Button
-                                                                color='bg-primary'
-                                                                rounded="rounded-md"
-                                                                onClick={(e) => handleActionClick(e, 'Division Review', mail.id.toString())}
-                                                                className="px-3 py-1.5 text-background bg-background hover:bg-muted border border-secondary/20 cursor-pointer flex items-center gap-2"
-                                                        >
-                                                                <BsEye className="w-3.5 h-3.5 text-background" />
-                                                        </Button>
-                                                )}
 
                                                 {mail.attachment && (
-                                                        <a
-                                                                href={fileUrl}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                        >
+                                                        <a href={fileUrl} target="_blank" rel="noopener noreferrer">
                                                                 <Button
                                                                         rounded="rounded-md"
                                                                         className="p-2 bg-background hover:bg-muted border border-secondary/20 cursor-pointer"
@@ -100,8 +56,6 @@ export const getIncomingMailColumns = (
                                                                 </Button>
                                                         </a>
                                                 )}
-
-
 
                                                 {canEdit && (
                                                         <Button

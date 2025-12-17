@@ -3,8 +3,13 @@
 import { useState, useEffect } from "react";
 import {
   detailIncomingMail,
-  getMailCategories,
+  getMailCategories as getIncomingCategories,
 } from "@/lib/api/mails/incoming";
+import {
+  detailOutgoingMail,
+  getMailCategories as getOutgoingCategories,
+} from "@/lib/api/mails/outgoing";
+import { detailDecisionMail, getMailCategories as getDecisionCategories } from "@/lib/api/mails/decision";
 import { getDivisionList } from "@/lib/api/master/division";
 
 type MailCategory = any;
@@ -13,25 +18,19 @@ type Division = any;
 
 interface UseMailPageDataOptions {
   mailIdSessionKey: string;
+  mailType: "incoming" | "outgoing" | "decision";
   fetchDivisions?: boolean;
   fetchRole?: boolean;
   redirectUrl?: string;
 }
 
-interface MailPageData {
-  categories: MailCategory[];
-  divisions: Division[];
-  mail: MailDetail | null;
-  roleId: number | null;
-  isLoading: boolean;
-}
-
 export function useMailPageData({
   mailIdSessionKey,
+  mailType,
   fetchDivisions = false,
   fetchRole = false,
   redirectUrl = "/workspace/mail/incoming",
-}: UseMailPageDataOptions): MailPageData {
+}: UseMailPageDataOptions) {
   const [categories, setCategories] = useState<MailCategory[]>([]);
   const [divisions, setDivisions] = useState<Division[]>([]);
   const [mail, setMail] = useState<MailDetail | null>(null);
@@ -54,19 +53,35 @@ export function useMailPageData({
 
     const fetchData = async () => {
       setIsLoading(true);
+
       try {
+        const apiMap: Record<string, any> = {
+          incoming: {
+            detail: detailIncomingMail,
+            categories: getIncomingCategories,
+          },
+          outgoing: {
+            detail: detailOutgoingMail,
+            categories: getOutgoingCategories,
+          },
+          decision: {
+            detail: detailDecisionMail,
+            categories: getDecisionCategories,
+          },
+        };
+
+        const api = apiMap[mailType];
+
         const basePromises = [
-          getMailCategories(),
-          detailIncomingMail(Number(mailId)),
+          api.categories(),
+          api.detail(Number(mailId)),
         ];
 
         if (fetchDivisions) {
           basePromises.push(getDivisionList());
         }
 
-        const [categoriesRes, mailRes, divisionsRes] = await Promise.all(
-          basePromises
-        );
+        const [categoriesRes, mailRes, divisionsRes] = await Promise.all(basePromises);
 
         setCategories(categoriesRes.data?.data || []);
         setMail(mailRes.data?.data || null);
@@ -83,7 +98,7 @@ export function useMailPageData({
     };
 
     fetchData();
-  }, [mailIdSessionKey, fetchDivisions, fetchRole, redirectUrl]);
+  }, [mailIdSessionKey, mailType, fetchDivisions, fetchRole, redirectUrl]);
 
   return { categories, divisions, mail, roleId, isLoading };
 }

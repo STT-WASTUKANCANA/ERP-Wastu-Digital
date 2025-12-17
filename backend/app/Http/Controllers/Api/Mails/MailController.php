@@ -23,8 +23,16 @@ class MailController extends Controller
 
         private function getTypeFromRoute(Request $request): int
         {
-                return str_contains($request->path(), 'outgoing') ? 2 : 1; // 2 = Outgoing, 1 = Incoming
+                $name = $request->route()->getName();
+
+                return match (true) {
+                        str_contains($name, 'incoming') => 1,
+                        str_contains($name, 'outgoing') => 2,
+                        str_contains($name, 'decision') => 3,
+                        default => 0,
+                };
         }
+
 
         public function index(Request $request)
         {
@@ -46,21 +54,37 @@ class MailController extends Controller
                         $validatedData = $request->validated();
                         $validatedData['user_id'] = Auth::id();
 
-                        if ($request->hasFile('attachment')) {
-                                $year = date('Y');
-                                $month = date('m');
-                                $day = date('d');
-                                $dynamicPath = "mails/incoming/{$year}/{$month}/{$day}";
+                        // ambil type dari route (1 = incoming, 2 = outgoing)
+                        $type = $this->getTypeFromRoute($request);
 
+
+
+                        if ($request->hasFile('attachment')) {
+                                $year  = date('Y');
+                                $month = date('m');
+                                $day   = date('d');
+
+                                // mapping folder berdasarkan type
+                                $folder = match ($type) {
+                                        1 => 'incoming',
+                                        2 => 'outgoing',
+                                        3 => 'decision',
+                                };
+
+                                $dynamicPath = "mails/{$folder}/{$year}/{$month}/{$day}";
                                 $filePath = $request->file('attachment')->store($dynamicPath, 'public');
+
                                 $validatedData['attachment'] = $filePath;
                         }
 
-                        $type = $this->getTypeFromRoute($request);
                         $mail = $this->service->create($validatedData, $type);
 
                         Log::info('Mail:store', ['id' => $mail->id, 'type' => $type]);
-                        return response()->json(['status' => true, 'data' => new MailResource($mail)], 201);
+
+                        return response()->json([
+                                'status' => true,
+                                'data'   => new MailResource($mail)
+                        ], 201);
                 } catch (Throwable $e) {
                         Log::error('Mail:store', ['msg' => $e->getMessage()]);
                         return response()->json(['status' => false, 'message' => 'Internal Server Error'], 500);
@@ -177,7 +201,5 @@ class MailController extends Controller
                 }
         }
 
-        public function progress() {
-                
-        }
+        public function progress() {}
 }

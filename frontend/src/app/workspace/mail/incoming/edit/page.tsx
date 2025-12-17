@@ -8,20 +8,20 @@ import IncomingForm from "@/components/features/mails/incomingMail/incoming-form
 import { useMailPageData } from "@/hooks/features/mail/useMailPageData";
 
 export default function Page() {
-  const { categories, mail, roleId, isLoading, divisions } = useMailPageData({
+  const { categories, mail, isLoading, divisions } = useMailPageData({
     mailIdSessionKey: "editingMailId",
-    fetchRole: true,
+    mailType: "incoming",
     fetchDivisions: true
   });
-
+  
   if (isLoading) {
     return <div>Loading mail data...</div>;
   }
   return (
     <div className="space-y-8 lg:px-24 xl:px-56">
       <PageHeader
-        title="Edit Incoming Mail"
-        description="Modify the details of an existing incoming mail record."
+        title="Edit Surat Masuk"
+        description="Ubah detail dari surat masuk yang sudah ada."
       >
         <Button
           color="bg-background"
@@ -29,16 +29,15 @@ export default function Page() {
           route="back"
         >
           <FiCornerDownLeft />
-          Back
+          Kembali
         </Button>
       </PageHeader>
 
-      {mail && roleId !== null && (
+      {mail && (
         <IncomingForm
           categories={categories}
           initialData={mail}
           mode="edit"
-          roleId={roleId}
           divisions={divisions}
         />
       )}

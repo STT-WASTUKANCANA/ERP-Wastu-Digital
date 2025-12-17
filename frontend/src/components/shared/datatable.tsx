@@ -32,7 +32,7 @@ export const DataTable = <T extends { id: string | number }>({
                                                         colSpan={columns.length}
                                                         className="text-center px-4 py-6 text-sm text-muted-foreground"
                                                 >
-                                                        Loading...
+                                                        Memproses...
                                                 </td>
                                         </tr>
                                 ) : data.length > 0 ? (

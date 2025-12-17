@@ -14,11 +14,19 @@ class MailRequest extends FormRequest
     public function rules(): array
     {
         $isOutgoing = $this->routeIs('api.mails.outgoing.*');
+        $isDecision = $this->routeIs('api.mails.decision.*');
 
         if ($this->routeIs('api.mails.incoming.review')) {
             return [
-                'division_id' => 'nullable|exists:divisions,id', 
+                'division_id' => 'nullable|exists:divisions,id',
                 'desc' => 'nullable|string',
+            ];
+        }
+
+        if ($this->routeIs('api.mails.incoming.divisionReview')) {
+            return [
+                'follow_status' => 'required|integer',
+                'division_desc' => 'nullable|string',
             ];
         }
 
@@ -39,6 +47,13 @@ class MailRequest extends FormRequest
                         'purpose' => 'required|string|max:255',
                     ]);
                 }
+
+                if ($isDecision) {
+                    $rules = array_merge($rules, [
+                        'title' => 'required|string|max:255',
+                    ]);
+                }
+
                 return $rules;
 
             case 'PUT':
@@ -58,6 +73,13 @@ class MailRequest extends FormRequest
                         'purpose' => 'sometimes|string|max:255',
                     ]);
                 }
+
+                if ($isDecision) {
+                    $rules = array_merge($rules, [
+                        'title' => 'sometimes|string|max:255',
+                    ]);
+                }
+
                 return $rules;
 
             default:

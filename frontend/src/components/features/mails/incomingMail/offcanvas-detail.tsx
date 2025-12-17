@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, MouseEvent } from 'react';
-import { IncomingMail, IncomingOffcanvasDetailProps, statusMap } from '@/types/mails/incoming-props';
+import { IncomingMail, IncomingOffcanvasDetailProps, statusMap } from '@/types/mail-props';
 import { IoClose } from "react-icons/io5";
 import { FiEdit, FiTrash2, FiDownload } from "react-icons/fi";
 import { getStorageUrl } from '@/lib/utils';

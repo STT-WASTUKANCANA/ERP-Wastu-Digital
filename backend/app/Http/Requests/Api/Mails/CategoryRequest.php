@@ -25,7 +25,7 @@ class CategoryRequest extends FormRequest
                             return $query->where('user_id', auth()->id());
                         }),
                     ],
-                    'type' => 'required|in:1,2',
+                    'type' => 'required|in:1,2,3',
                 ];
 
             case 'PUT':

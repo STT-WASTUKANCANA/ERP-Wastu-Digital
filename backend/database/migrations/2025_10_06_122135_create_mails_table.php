@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->string('name', 100);
-            $table->enum('type', ['1', '2'])->comment('1 = Incoming Mail, 2 = Outgoing Mail');
+            $table->enum('type', ['1', '2', '3'])->comment('1 = Surat Masuk, 2 = Surat Keluar, 3 = Surat Keputusan');
             $table->timestamps();
             $table->softDeletes();
         });

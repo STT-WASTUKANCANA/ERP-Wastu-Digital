@@ -38,18 +38,18 @@ const Page = async () => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
       <Card
-        title="Incoming Mail"
+        title="Surat Masuk"
         value={incomingMailValue.toString()}
         percent={incomingMailPercent}
         icon={BsInbox}
       />
       <Card
-        title="Outgoing Mail"
+        title="Surat Keluar"
         value={outgoingMailValue.toString()}
         percent={outgoingMailPercent}
         icon={BsSend}
       />
-      <Card title="Users" value={usersValue} icon={LuUsers} />
+      <Card title="Pengguna" value={usersValue} icon={LuUsers} />
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import { CSSProperties, MouseEventHandler, ReactNode } from "react";
-import { IncomingMail } from "./mails/incoming-props";
+import { IncomingMail } from "./mail-props";
 
 export interface InputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -74,9 +74,9 @@ export interface DataTableProps<T> {
   isLoading?: boolean;
 }
 export interface TableContainerProps {
-        onSearchChange?: (value: string) => void;
-        onFilterClick?: () => void;
-        onModifyColumnClick?: () => void;
-        onEntriesChange?: (value: number) => void;
-        children: React.ReactNode;
+  onSearchChange?: (value: string) => void;
+  onFilterClick?: () => void;
+  onModifyColumnClick?: () => void;
+  onEntriesChange?: (value: number) => void;
+  children: React.ReactNode;
 }

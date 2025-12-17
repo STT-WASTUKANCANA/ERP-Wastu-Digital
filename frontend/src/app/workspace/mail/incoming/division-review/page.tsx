@@ -9,15 +9,13 @@ import { FiCornerDownLeft } from "react-icons/fi";
 export default function Page() {
 
   const { categories, divisions, mail, isLoading } = useMailPageData({
-    mailIdSessionKey: "reviewMailId",
+    mailIdSessionKey: "divisionReviewMailId",
     mailType: "incoming",
     fetchDivisions: true,
   });
 
-  console.log(mail);
-
   if (isLoading) {
-    return <div>Loading mail data...</div>;
+    return <div>Memproses data surat...</div>;
   }
 
   return (
@@ -41,7 +39,7 @@ export default function Page() {
           categories={categories}
           initialData={mail}
           divisions={divisions}
-          mode="review"
+          mode="division_review"
         />
       )}
     </div>

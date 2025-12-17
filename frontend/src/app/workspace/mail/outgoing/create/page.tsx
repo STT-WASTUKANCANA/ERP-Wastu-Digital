@@ -1,8 +1,8 @@
 import { FiCornerDownLeft } from "react-icons/fi";
 import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
-import { getMailCategories } from "@/lib/api/mails/incoming";
-import IncomingForm from "@/components/features/mails/incomingMail/incoming-form";
+import { getMailCategories } from "@/lib/api/mails/outgoing";
+import OutgoingForm from "@/components/features/mails/outgoingMail/outgoing-form";
 
 export default async function Page() {
         const res = await getMailCategories();
@@ -11,8 +11,8 @@ export default async function Page() {
         return (
                 <div className="space-y-8 lg:px-24 xl:px-56">
                         <PageHeader
-                                title="Buat Surat Masuk"
-                                description="Lengkapi formulir berikut untuk menambah data surat masuk baru."
+                                title="Buat Surat Keluar"
+                                description="Lengkapi formulir berikut untuk menambah data surat keluar baru."
                         >
                                 <Button
                                         color="bg-background"
@@ -24,7 +24,7 @@ export default async function Page() {
                                 </Button>
                         </PageHeader>
 
-                        <IncomingForm categories={categories} mode="create" />
+                        <OutgoingForm categories={categories} mode="create" />
                 </div>
         );
 }

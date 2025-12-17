@@ -47,3 +47,11 @@ export async function reviewIncomingMail(payload: FormData, id: number) {
                 body: payload,
         });
 }
+
+export async function divisionReviewIncomingMail(payload: FormData, id: number) {
+
+        return await fetchWithAuth(`/mails/incoming/division-review/${id}`, {
+                method: "POST",
+                body: payload,
+        });
+}

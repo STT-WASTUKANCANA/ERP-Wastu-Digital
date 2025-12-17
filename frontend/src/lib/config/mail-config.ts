@@ -1,0 +1,51 @@
+import { getIncomingMailColumns } from "@/components/features/mails/incomingMail/column";
+import { getOutgoingMailColumns } from "@/components/features/mails/outgoingMail/column";
+import { deleteIncomingMail } from "@/lib/api/mails/incoming";
+import { deleteOutgoingMail } from "@/lib/api/mails/outgoing";
+import { deleteDecisionMail } from "@/lib/api/mails/decision";
+import { ColumnDef } from "@/types/ui-props";
+import { getDecisionMailColumns } from "@/components/features/mails/decisionMail/column";
+
+export const mailConfig = {
+        incoming: {
+                title: "Surat Masuk",
+                description: "Kelola semua surat masuk dengan efisien.",
+                createPath: "/workspace/mail/incoming/create",
+                editPath: "/workspace/mail/incoming/edit",
+                reviewPath: "/workspace/mail/incoming/review",
+                divisionReviewPath: "/workspace/mail/incoming/division-review",
+                getColumns: (
+                        handler: (e: any, action: string, id: string, roleId?: number) => void,
+                        roleId: number | null
+                ): ColumnDef<any>[] => getIncomingMailColumns(handler, roleId),
+                delete: (id: number) => deleteIncomingMail(id),
+        },
+
+        outgoing: {
+                title: "Surat Keluar",
+                description: "Kelola semua surat keluar dengan efisien.",
+                createPath: "/workspace/mail/outgoing/create",
+                editPath: "/workspace/mail/outgoing/edit",
+                reviewPath: "/workspace/mail/outgoing/review",
+                divisionReviewPath: "/workspace/mail/outgoing/division-review",
+                getColumns: (
+                        handler: (e: any, action: string, id: string, roleId?: number) => void,
+                        roleId: number | null
+                ): ColumnDef<any>[] => getOutgoingMailColumns(handler, roleId),
+                delete: (id: number) => deleteOutgoingMail(id),
+        },
+
+        decision: {
+                title: "Surat Keputusan",
+                description: "Kelola semua surat keputusan dengan efisien.",
+                createPath: "/workspace/mail/decision/create",
+                editPath: "/workspace/mail/decision/edit",
+                reviewPath: "/workspace/mail/decision/review",
+                divisionReviewPath: "/workspace/mail/decision/division-review",
+                getColumns: (
+                        handler: (e: any, action: string, id: string, roleId?: number) => void,
+                        roleId: number | null
+                ): ColumnDef<any>[] => getDecisionMailColumns(handler, roleId),
+                delete: (id: number) => deleteDecisionMail(id),
+        },
+};

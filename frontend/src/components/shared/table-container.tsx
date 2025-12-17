@@ -23,7 +23,7 @@ export const TableContainer = ({
                         <div className="flex justify-between items-center gap-2 mb-4 flex-row lg:flex-row-reverse">
                                 <div className="flex items-center gap-3 w-full lg:w-auto justify-start lg:justify-end">
                                         <Input
-                                                placeholder="🔍︎  Input the keyword"
+                                                placeholder="🔍︎  Masukan kata kunci..."
                                                 className="w-[80%] sm:w-[250px] lg:w-[300px]"
                                                 onChange={(e) => onSearchChange?.(e.target.value)}
                                         />

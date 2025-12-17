@@ -1,35 +1,41 @@
-import { cookies } from "next/headers";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+import { fetchWithAuth } from "../api";
 
 export async function getOutgoingMailSummary() {
-        
-        if (!API_URL) {
-                throw new Error("API URL is not defined");
-        }
+        return await fetchWithAuth('/mails/outgoing/summary', { method: "GET" });
+}
 
-        try {
-                const cookieStore = cookies();
-                const token = cookieStore.get('access_token')?.value;
+export async function getOutgoingMailList() {
+        return await fetchWithAuth('/mails/outgoing', { method: "GET" });
+}
 
-                const res = await fetch(`${API_URL}/mails/outgoing/summary`, {
-                        method: "GET",
-                        headers: {
-                                Accept: "application/json",
-                                'Authorization': `Bearer ${token}`,
-                        },
-                });
+export async function getMailCategories() {
+        return await fetchWithAuth('/mails/outgoing/category', { method: "GET" });
+}
 
-                const data = await res.json();
+export async function createOutgoingMail(payload: FormData) {
 
-                // console.log("Response OK?:", res.ok);
-                // console.log("Response Status:", res.status);
-                // console.log("Response Data:", JSON.stringify(data, null, 2));
+        return await fetchWithAuth('/mails/outgoing', {
+                method: "POST",
+                body: payload,
+        });
+}
 
-                return { ok: res.ok, data };
+export async function detailOutgoingMail(id: number) {
+        return await fetchWithAuth(`/mails/outgoing/${id}`, {
+                method: "GET",
+        });
+}
 
-        } catch (error) {
-                console.error("Fetch failed:", error);
-                return { ok: false, data: null, error: error };
-        }
+export async function updateOutgoingMail(payload: FormData, id: number) {
+
+        return await fetchWithAuth(`/mails/outgoing/${id}`, {
+                method: "POST",
+                body: payload,
+        });
+}
+
+export async function deleteOutgoingMail(id: number) {
+        return await fetchWithAuth(`/mails/outgoing/${id}`, {
+                method: "DELETE",
+        });
 }

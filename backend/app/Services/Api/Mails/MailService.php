@@ -2,6 +2,7 @@
 
 namespace App\Services\Api\Mails;
 
+use App\Models\Workspace\Mails\DecisionLetter;
 use App\Models\Workspace\Mails\IncomingMail;
 use App\Models\Workspace\Mails\MailLog;
 use App\Models\Workspace\Mails\OutgoingMail;
@@ -12,7 +13,12 @@ class MailService
 {
     private function getModel(int $type)
     {
-        return $type === 1 ? IncomingMail::class : OutgoingMail::class;
+        return match ($type) {
+            1 => IncomingMail::class,
+            2 => OutgoingMail::class,
+            3 => DecisionLetter::class,
+            default => null,
+        };
     }
 
     public function all(int $type)
@@ -27,24 +33,22 @@ class MailService
     {
         return DB::transaction(function () use ($data, $type) {
             try {
+                Log::info('Mail: Created Data', [
+                    'type' => $type,
+                    'data' => $data,
+                ]);
                 $model = $this->getModel($type);
                 $mail = $model::create($data);
 
-                if ($type === 1) {
-                    MailLog::create([
-                        'user_id' => $data['user_id'],
-                        'mail_id' => $mail->id,
-                        'type'    => 1,
-                        'status'  => 1,
-                        'desc'    => $data['desc'] ?? null,
-                    ]);
-                }
-
-                Log::info('Mail: created', [
-                    'id'   => $mail->id,
-                    'type' => $type
+                MailLog::create([
+                    'user_id' => $data['user_id'],
+                    'mail_id' => $mail->id,
+                    'type'    => (string) $type,
+                    'status'  => $type == 1 ? '1' : null,
+                    'desc'    => $data['desc'] ?? null,
                 ]);
 
+                Log::info('Mail: created', ['id' => $mail->id, 'type' => $type]);
                 return $mail;
             } catch (\Throwable $e) {
                 Log::error('Mail: creation failed', [
@@ -56,6 +60,7 @@ class MailService
             }
         });
     }
+
     public function find($id, int $type)
     {
         $model = $this->getModel($type);
@@ -89,16 +94,14 @@ class MailService
                     Log::info('MailLog: desc updated', [
                         'mail_id' => $mail->id,
                         'type' => 1,
-                        'status' => $mail->status,
-                        'desc' => $data['desc']
+                        'status' => $mail->status
                     ]);
                 }
             }
 
             Log::info('Mail: updated successfully', [
                 'id' => $id,
-                'type' => $type,
-                'payload' => $data
+                'type' => $type
             ]);
 
             return $mail;
@@ -112,6 +115,7 @@ class MailService
             throw $e;
         }
     }
+
     public function delete($id, int $type)
     {
         $mail = $this->find($id, $type);
@@ -129,7 +133,12 @@ class MailService
         $diff = $prev > 0 ? (($curr - $prev) / $prev) * 100 : ($curr > 0 ? 100 : 0);
         $status = $diff > 0 ? 'increase' : ($diff < 0 ? 'decrease' : 'unchanged');
 
-        Log::info('Mail: monthly summary', ['curr' => $curr, 'prev' => $prev, 'diff' => round($diff, 2)]);
+        Log::info('Mail: monthly summary', [
+            'curr' => $curr,
+            'prev' => $prev,
+            'diff' => round($diff, 2)
+        ]);
+
         return [
             'current_month_total' => $curr,
             'previous_month_total' => $prev,
@@ -137,47 +146,64 @@ class MailService
             'status' => $status,
         ];
     }
+
     public function reviewIncomingMail($id, array $data, int $type)
     {
-
         $mail = $this->find($id, $type);
 
         if (!$mail) {
-            Log::warning('MailService: review failed, mail not found', [
+            Log::warning('MailService: review failed, mail not found', compact('id', 'type'));
+            return null;
+        }
+
+        $nextStatus = [
+            1 => 2,
+            2 => 3,
+            3 => 3,
+        ][$mail->status] ?? null;
+
+
+        if (!$nextStatus) {
+            Log::warning('MailService: invalid status transition', [
                 'id' => $id,
-                'type' => $type
+                'current_status' => $mail->status
             ]);
             return null;
         }
 
-        return DB::transaction(function () use ($mail, $data, $id, $type) {
+        return DB::transaction(function () use ($mail, $data, $id, $type, $nextStatus) {
             try {
-                $mail->update([
-                    'division_id' => $data['division_id'],
-                    'status' => 2
-                ]);
+                $updateData = ['status' => $nextStatus];
+
+                if ($nextStatus === 2) {
+                    $updateData['division_id'] = $data['division_id'];
+                }
+
+                if ($nextStatus === 3) {
+                    $updateData['follow_status'] = $data['follow_status'];
+                }
+
+                $mail->update($updateData);
 
                 MailLog::updateOrCreate(
                     [
                         'mail_id' => $id,
                         'type'    => 1,
-                        'status'  => 2,
+                        'status'  => $nextStatus,
                     ],
                     [
                         'user_id' => $data['user_id'],
-                        'desc'    => $data['desc'] ?? null,
+                        'desc'    => $nextStatus === 3
+                            ? ($data['division_desc'] ?? null)
+                            : ($data['desc'] ?? null),
                     ]
                 );
 
-                Log::info('MailService: reviewed successfully', [
-                    'id' => $id,
-                    'type' => $type,
-                    'user_id' => $data['user_id']
-                ]);
+                Log::info('MailService: reviewed successfully', compact('id', 'type'));
 
                 return $mail->load('mail_log');
             } catch (\Throwable $e) {
-                Log::error('MailService: review transaction failed', [
+                Log::error('MailService: review failed', [
                     'id' => $id,
                     'type' => $type,
                     'payload' => $data,

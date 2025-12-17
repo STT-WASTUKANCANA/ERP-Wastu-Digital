@@ -34,7 +34,7 @@ export const Card: React.FC<CardProps> = ({ title, value, percent, icon: Icon })
                                                         <span>{percentValue}%</span>
                                                         {isNegative ? <CgArrowBottomLeft /> : <CgArrowTopRight />}
                                                 </div>
-                                                <span className="text-xs text-secondary/80">From last month</span>
+                                                <span className="text-xs text-secondary/80">Dari bulan lalu</span>
                                         </div>
                                 )}
                         </div>

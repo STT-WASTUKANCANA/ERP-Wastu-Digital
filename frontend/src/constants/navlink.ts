@@ -2,31 +2,52 @@ import { BsGrid1X2, BsInbox, BsSend } from "react-icons/bs";
 import { GoTable } from "react-icons/go";
 import { IoDocumentTextOutline } from "react-icons/io5";
 import { LuUsers } from "react-icons/lu";
+import { RiMailCheckLine } from "react-icons/ri";
 import { VscGraphLine } from "react-icons/vsc";
 
 export const navLinks = [
         {
-                title: "Dashboard",
+                title: "Dasbor",
                 links: [
                         {
-                                name: "Overview",
+                                name: "Ikhtisar",
                                 href: '/workspace/overview',
                                 icon: BsGrid1X2,
                         },
                 ],
         },
         {
-                title: "Mail",
+                title: "Surat",
                 links: [
                         {
-                                name: "Incoming Mail",
+                                name: "Surat Masuk",
                                 href: "/workspace/mail/incoming",
                                 icon: BsInbox,
                         },
                         {
-                                name: "Outgoing Mail",
+                                name: "Surat Keluar",
                                 href: "/workspace/mail/outgoing",
                                 icon: BsSend,
+                        },
+                        {
+                                name: "Surat Keputusan",
+                                href: "/workspace/mail/decision",
+                                icon: RiMailCheckLine,
+                        },
+                ],
+        },
+        {
+                title: "Manajemen",
+                links: [
+                        {
+                                name: "Pengguna",
+                                href: "/users",
+                                icon: LuUsers,
+                        },
+                        {
+                                name: "Dokumen",
+                                href: "/documents",
+                                icon: IoDocumentTextOutline,
                         },
                 ],
         },
@@ -45,21 +66,6 @@ export const navLinks = [
                                 name: "Table",
                                 href: "/workspace/table",
                                 icon: GoTable,
-                        },
-                ],
-        },
-        {
-                title: "Management",
-                links: [
-                        {
-                                name: "Users",
-                                href: "/users",
-                                icon: LuUsers,
-                        },
-                        {
-                                name: "Documents",
-                                href: "/documents",
-                                icon: IoDocumentTextOutline,
                         },
                 ],
         },

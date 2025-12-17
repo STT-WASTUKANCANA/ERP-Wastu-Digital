@@ -28,17 +28,24 @@ class CategoryController extends Controller
             $type = 1;
         } elseif ($request->routeIs('api.mails.outgoing.category')) {
             $type = 2;
+        } elseif ($request->routeIs('api.mails.decision.category')) {
+            $type = 3;
         }
 
         $categories = $this->service->all($type);
 
-        Log::info('Category:index', ['user_id' => Auth::id(), 'type' => $type, 'count' => $categories->count()]);
+        Log::info('Category:index', [
+            'user_id' => Auth::id(),
+            'type' => $type,
+            'count' => $categories->count()
+        ]);
 
         return response()->json([
             'status' => true,
-            'data'   => CategoryResource::collection($categories)
+            'data' => CategoryResource::collection($categories)
         ]);
     }
+
 
     public function store(CategoryRequest $request)
     {

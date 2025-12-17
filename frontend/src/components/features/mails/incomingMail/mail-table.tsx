@@ -1,115 +1,123 @@
 "use client";
 
-import { useState, useMemo, MouseEvent } from 'react';
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { HiOutlineUpload } from 'react-icons/hi';
-import { IncomingMail, IncomingMailTableProps } from '@/types/mails/incoming-props';
-import { OffcanvasDetail } from '@/components/features/mails/incomingMail/offcanvas-detail';
-import { PageHeader } from '@/components/shared/page-header';
-import { TableContainer } from '@/components/shared/table-container';
-import { DataTable } from '../../../shared/datatable';
-import { IncomingCreateModal } from './create-modal';
-import { getIncomingMailColumns } from './column';
-import { deleteIncomingMail } from '@/lib/api/mails/incoming';
-import { useRole } from '@/contexts/role';
+import { useState, useMemo, MouseEvent } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { PageHeader } from "@/components/shared/page-header";
+import { TableContainer } from "@/components/shared/table-container";
+import { DataTable } from "@/components/shared/datatable";
+import {
+  IncomingMail,
+  OutgoingMail,
+  DecisionMail,
+  MailTableProps,
+} from "@/types/mail-props";
+import { OffcanvasDetail } from "@/components/features/mails/incomingMail/offcanvas-detail";
+import { useRole } from "@/contexts/role";
+import { mailConfig } from "@/lib/config/mail-config";
+import { HiOutlineUpload } from "react-icons/hi";
 
-const IncomingMailTable = ({ incomingMails, onMailCreated, isLoading }: IncomingMailTableProps) => {
+type MailTypes = IncomingMail | OutgoingMail | DecisionMail;
+
+const MailTable = <T extends MailTypes>({
+  mails,
+  onMailCreated,
+  isLoading,
+  type,
+}: MailTableProps<T>) => {
   const router = useRouter();
-  const [selectedMail, setSelectedMail] = useState<IncomingMail | null>(null);
-  const [isCreateModalOpen, setCreateModalOpen] = useState(false);
-
   const { roleId } = useRole();
 
-  const handleRowClick = (mail: IncomingMail) => {
-    if (window.innerWidth < 1024) {
-      setSelectedMail(mail);
-    }
-  };
+  const config = mailConfig[type];
 
-  const handleCloseOffcanvas = () => setSelectedMail(null);
+  const [selectedMail, setSelectedMail] = useState<T | null>(null);
+
+  const handleRowClick = (mail: T) => {
+    if (window.innerWidth < 1024) setSelectedMail(mail);
+  };
 
   const handleActionClick = async (e: MouseEvent, action: string, mailId: string) => {
     e.stopPropagation();
 
-    if (action === 'Download') {
-      alert('Fitur download belum diimplementasikan.');
+    if (action === "Edit") {
+      sessionStorage.setItem(`editingMailId`, mailId);
+      router.push(config.editPath);
       return;
     }
 
-    if (action === 'Edit') {
-      e.preventDefault();
-      sessionStorage.setItem('editingMailId', mailId);
-      if (roleId) sessionStorage.setItem('roleId', roleId.toString());
-      router.push('/workspace/mail/incoming/edit');
+    if (action === "Review") {
+      sessionStorage.setItem(`reviewMailId`, mailId);
+      router.push(config.reviewPath);
       return;
     }
 
-    if (action === 'Review') {
-      e.preventDefault();
-      sessionStorage.setItem('reviewMailId', mailId);
-      router.push('/workspace/mail/incoming/review');
+    if (action === "Division Review") {
+      sessionStorage.setItem(`divisionReviewMailId`, mailId);
+      router.push(config.divisionReviewPath);
       return;
     }
 
-    if (action === 'Delete') {
-      if (confirm('Yakin ingin menghapus surat ini?')) {
-        try {
-          await deleteIncomingMail(Number(mailId));
-          alert('Surat berhasil dihapus.');
-          onMailCreated();
-        } catch (err) {
-          console.error(err);
-          alert('Terjadi kesalahan saat menghapus surat.');
-        }
+    if (action === "Delete") {
+      if (confirm("Yakin ingin menghapus surat ini?")) {
+        await config.delete(Number(mailId));
+        onMailCreated();
       }
     }
   };
 
   const columns = useMemo(
-    () => getIncomingMailColumns(handleActionClick, roleId),
+    () => config.getColumns(handleActionClick, roleId),
     [roleId]
   );
 
+  const canCreate =
+    (roleId === 1 && type === "incoming") ||
+    (roleId === 2 && type === "outgoing") ||
+    (roleId === 2 && type === "decision"); // role tertentu bisa buat decision
+
   return (
     <>
-      <PageHeader
-        title="Incoming Mails"
-        description="Manage all incoming mails efficiently."
-      >
+      <PageHeader title={config.title} description={config.description}>
         <Button className="text-foreground/70 text-sm cursor-pointer px-8 py-2 flex justify-center items-center gap-2 border border-secondary/20 bg-background">
           <HiOutlineUpload />
           <span>Export</span>
         </Button>
-        {(roleId === 1) && (
+
+        {canCreate && (
           <Button
-            className="bg-primary text-background text-sm cursor-pointer px-4 py-2"
-            route='/workspace/mail/incoming/create'
+            className="bg-primary text-background text-sm px-4 py-2"
+            onClick={() => {
+              if (["incoming", "outgoing", "decision"].includes(type)) {
+                router.push(config.createPath);
+              } else {
+                alert("Failed");
+              }
+            }}
           >
             +
           </Button>
         )}
       </PageHeader>
 
-      <TableContainer onSearchChange={(value) => console.log('Searching for:', value)}>
+      <TableContainer onSearchChange={(v) => console.log(v)}>
         <DataTable
           columns={columns}
-          data={incomingMails}
+          data={mails}
           onRowClick={handleRowClick}
-          emptyStateMessage="No incoming mails found."
+          emptyStateMessage={`Tidak ada data ${type}.`}
           isLoading={isLoading}
         />
       </TableContainer>
 
-      {selectedMail && (
+      {selectedMail && type === "incoming" && (
         <OffcanvasDetail
-          mail={selectedMail}
-          onClose={handleCloseOffcanvas}
+          mail={selectedMail as IncomingMail}
+          onClose={() => setSelectedMail(null)}
           onAction={handleActionClick}
         />
       )}
     </>
   );
-};  
+};
 
-export default IncomingMailTable;
+export default MailTable;

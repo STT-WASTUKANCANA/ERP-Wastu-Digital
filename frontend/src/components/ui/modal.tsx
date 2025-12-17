@@ -65,7 +65,7 @@ export const Modal: React.FC<ModalProps> = ({
           </h3>
           <button
             onClick={onClose}
-            className="p-1 rounded-full text-secondary hover:bg-muted transition-colors"
+            className="p-1 rounded-full text-secondary hover:bg-muted transition-colors cursor-pointer"
             aria-label="Close modal"
           >
             <IoClose size={24} />

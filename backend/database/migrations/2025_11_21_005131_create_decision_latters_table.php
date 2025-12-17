@@ -6,25 +6,34 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
-        Schema::create('mail_logs', function (Blueprint $table) {
+        Schema::create('decision_latters', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('mail_id');
-            $table->enum('type', ['1', '2', '3'])->comment('1 = Surat Masuk, 2 = Surat Keluar, 3 = Surat Keputusan');
-            $table->tinyInteger('status')->nullable();
-            $table->text('desc')->nullable();
+            $table->string('number', 100);
+            $table->unsignedBigInteger('category_id');
+            $table->string('title', 255);
+            $table->date('date');
+            $table->string('attachment', 255);
             $table->timestamps();
+            $table->softDeletes();
 
+            // Foreign key
             $table->foreign('user_id')
                 ->references('id')->on('users')
                 ->onDelete('cascade');
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
-        Schema::dropIfExists('mail_logs');
+        Schema::dropIfExists('decision_latters');
     }
 };
