@@ -2,12 +2,18 @@
 
 use App\Http\Controllers\Api\Master\DivisionController;
 use App\Http\Controllers\Api\Master\UserController;
+use App\Models\Role;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:api')
     ->prefix('master')
     ->name('master.')
     ->group(function () {
+
+        // Simple role list for dropdown
+        Route::get('/role', function () {
+            return response()->json(['data' => Role::all()]);
+        })->name('role.index');
 
         Route::prefix('division')
             ->name('division.')

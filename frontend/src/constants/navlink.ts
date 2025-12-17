@@ -41,7 +41,7 @@ export const navLinks = [
                 links: [
                         {
                                 name: "Pengguna",
-                                href: "/users",
+                                href: "/workspace/users",
                                 icon: LuUsers,
                         },
                         {

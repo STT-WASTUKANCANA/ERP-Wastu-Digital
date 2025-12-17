@@ -25,10 +25,9 @@ class UserService
     {
         return DB::transaction(function () use ($data) {
             try {
-                // Hash password jika ada
-                if (isset($data['password'])) {
-                    $data['password'] = Hash::make($data['password']);
-                }
+                // Use default password from .env if not provided
+                $password = $data['password'] ?? env('DEFAULT_PASSWORD', 'Minimal8@');
+                $data['password'] = Hash::make($password);
 
                 $user = User::create($data);
 

@@ -21,7 +21,7 @@ class UserRequest extends FormRequest
                 return [
                     'name' => 'required|string|max:255',
                     'email' => 'required|email|unique:users,email',
-                    'password' => 'required|string|min:8',
+                    'password' => 'nullable|string|min:8', // Uses DEFAULT_PASSWORD from .env if not provided
                     'role_id' => 'nullable|exists:roles,id',
                     'division_id' => 'nullable|exists:divisions,id',
                 ];
