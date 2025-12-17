@@ -1,7 +1,7 @@
 import { BsGrid1X2, BsInbox, BsSend } from "react-icons/bs";
 import { GoTable } from "react-icons/go";
 import { IoDocumentTextOutline } from "react-icons/io5";
-import { LuUsers } from "react-icons/lu";
+import { LuMails, LuUsers } from "react-icons/lu";
 import { MdOutlineAccountTree } from "react-icons/md";
 import { RiMailCheckLine } from "react-icons/ri";
 import { VscGraphLine } from "react-icons/vsc";
@@ -14,6 +14,16 @@ export const navLinks = [
                                 name: "Ikhtisar",
                                 href: '/workspace/overview',
                                 icon: BsGrid1X2,
+                        },
+                ],
+        },
+        {
+                title: "Master",
+                links: [
+                        {
+                                name: "Kategori Surat",
+                                href: "/workspace/master/mail-category",
+                                icon: LuMails,
                         },
                 ],
         },
@@ -49,11 +59,6 @@ export const navLinks = [
                                 name: "Pengguna",
                                 href: "/workspace/manage/user",
                                 icon: LuUsers,
-                        },
-                        {
-                                name: "Dokumen",
-                                href: "/documents",
-                                icon: IoDocumentTextOutline,
                         },
                 ],
         },

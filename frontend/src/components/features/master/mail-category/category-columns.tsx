@@ -1,0 +1,38 @@
+"use client";
+
+import { ColumnDef } from "@/types/ui-props";
+import { MailCategory } from "@/lib/api/master/mail-category";
+import { ActionButtons } from "@/components/ui/action-buttons";
+
+export const getMailCategoryColumns = (
+    handleActionClick: (e: React.MouseEvent, action: string, id: string) => void
+): ColumnDef<MailCategory>[] => [
+        {
+            accessorKey: "name",
+            header: "Nama Kategori",
+        },
+        {
+            accessorKey: "type_label",
+            header: "Jenis Surat",
+            cell: (row) => (
+                <div className="badge badge-outline">{row.type_label}</div>
+            ),
+        },
+        {
+            accessorKey: "description",
+            header: "Deskripsi",
+            cell: (row) => <div>{row.description || "-"}</div>,
+        },
+        {
+            id: "actions",
+            header: "Aksi",
+            cell: (row) => (
+                <ActionButtons
+                    id={row.id.toString()}
+                    showEdit={true}
+                    showDelete={true}
+                    onAction={handleActionClick}
+                />
+            ),
+        },
+    ];

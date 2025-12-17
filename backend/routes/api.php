@@ -9,5 +9,6 @@ Route::name('api.')->group(function () {
 
     require __DIR__ . '/api/manage.php';
 
+    require __DIR__ . '/api/master.php';
     require __DIR__ . '/api/mails.php';
 });
