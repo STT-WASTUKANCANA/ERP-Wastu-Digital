@@ -1,13 +1,13 @@
 <?php
 
-use App\Http\Controllers\Api\Master\DivisionController;
-use App\Http\Controllers\Api\Master\UserController;
+use App\Http\Controllers\Api\Manage\DivisionController;
+use App\Http\Controllers\Api\Manage\UserController;
 use App\Models\Role;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:api')
-    ->prefix('master')
-    ->name('master.')
+    ->prefix('manage')
+    ->name('manage.')
     ->group(function () {
 
         // Simple role list for dropdown

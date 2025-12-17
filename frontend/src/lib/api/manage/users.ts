@@ -1,17 +1,17 @@
 import { fetchWithAuth } from "../api";
 
 export async function getUserList() {
-    return await fetchWithAuth('/master/users', { method: "GET" });
+    return await fetchWithAuth('/manage/users', { method: "GET" });
 }
 
 export async function detailUser(id: number) {
-    return await fetchWithAuth(`/master/users/${id}`, {
+    return await fetchWithAuth(`/manage/users/${id}`, {
         method: "GET",
     });
 }
 
 export async function createUser(payload: any) {
-    return await fetchWithAuth('/master/users', {
+    return await fetchWithAuth('/manage/users', {
         method: "POST",
         headers: {
             'Content-Type': 'application/json',
@@ -21,7 +21,7 @@ export async function createUser(payload: any) {
 }
 
 export async function updateUser(payload: any, id: number) {
-    return await fetchWithAuth(`/master/users/${id}`, {
+    return await fetchWithAuth(`/manage/users/${id}`, {
         method: "PUT",
         headers: {
             'Content-Type': 'application/json',
@@ -31,7 +31,7 @@ export async function updateUser(payload: any, id: number) {
 }
 
 export async function deleteUser(id: number) {
-    return await fetchWithAuth(`/master/users/${id}`, {
+    return await fetchWithAuth(`/manage/users/${id}`, {
         method: "DELETE",
     });
 }

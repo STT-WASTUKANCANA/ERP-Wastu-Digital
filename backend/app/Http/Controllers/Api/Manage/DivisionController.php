@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Api\Master;
+namespace App\Http\Controllers\Api\Manage;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\Master\DivisionRequest;
+use App\Http\Requests\Api\Manage\DivisionRequest;
 use App\Http\Resources\Api\Master\DivisionResource;
 use App\Models\Division;
 use App\Services\Api\Master\DivisionService;
