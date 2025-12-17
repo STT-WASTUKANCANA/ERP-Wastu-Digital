@@ -12,6 +12,7 @@ export interface SidebarProps {
   setSidebarShow: (value: boolean) => void;
   isPinned: boolean;
   setIsPinned: (value: boolean) => void;
+  roleId?: number | null;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -19,6 +20,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   setSidebarShow,
   isPinned,
   setIsPinned,
+  roleId,
 }) => {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const pathname = usePathname();
@@ -38,6 +40,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
       }
     }
   };
+
+  // Filter logic:
+  // If roleId exists (is set and not null), it is a restricted user (Sekum, Pulahta, Bidang, Tata Laksana).
+  // They should only see "Dasbor" and "Surat".
+  // Admin (roleId null/undefined) sees everything.
+  const filteredNavLinks = React.useMemo(() => {
+    if (roleId === 1 || roleId === 2 || roleId === 3 || roleId === 4) {
+      return navLinks.filter((section) =>
+        section.title === "Dasbor" || section.title === "Surat"
+      );
+    }
+    return navLinks;
+  }, [roleId]);
 
   return (
     <div
@@ -71,7 +86,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       <div className="space-y-4">
-        {navLinks.map((section, idx) => (
+        {filteredNavLinks.map((section, idx) => (
           <div key={idx} className="space-y-2">
             {sidebarShow && (
               <span className="block text-secondary text-xs uppercase tracking-wide sm">
@@ -133,10 +148,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <Link
                   key={linkIdx}
                   href={link.href || "#"}
-                  className={`h-11 px-3 rounded-md flex items-center gap-3 text-sm font-medium transition ${
-                    pathname.startsWith(link.href)
-                    ? "text-primary bg-primary/20"
-                    : "text-foreground/60 hover:text-primary hover:bg-primary/10"
+                  className={`h-11 px-3 rounded-md flex items-center gap-3 text-sm font-medium transition ${pathname.startsWith(link.href)
+                      ? "text-primary bg-primary/20"
+                      : "text-foreground/60 hover:text-primary hover:bg-primary/10"
                     }`}
                 >
                   {Icon && <Icon className="w-4 h-4" />}

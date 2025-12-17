@@ -1,9 +1,9 @@
-import { BsGrid1X2, BsInbox, BsSend } from "react-icons/bs";
+import { BsInbox, BsSend } from "react-icons/bs";
 import { GoTable } from "react-icons/go";
-import { IoDocumentTextOutline } from "react-icons/io5";
 import { LuMails, LuUsers } from "react-icons/lu";
 import { MdOutlineAccountTree } from "react-icons/md";
 import { RiMailCheckLine } from "react-icons/ri";
+import { TbLayoutGrid } from "react-icons/tb";
 import { VscGraphLine } from "react-icons/vsc";
 
 export const navLinks = [
@@ -13,7 +13,7 @@ export const navLinks = [
                         {
                                 name: "Ikhtisar",
                                 href: '/workspace/overview',
-                                icon: BsGrid1X2,
+                                icon: TbLayoutGrid,
                         },
                 ],
         },
