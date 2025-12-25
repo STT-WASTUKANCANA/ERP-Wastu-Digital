@@ -62,22 +62,22 @@ export const navLinks = [
                         },
                 ],
         },
-        {
-                title: "Contoh",
-                links: [
-                        {
-                                name: "Reports",
-                                icon: VscGraphLine,
-                                children: [
-                                        { name: "Monthly", href: "/users" },
-                                        { name: "Weekly", href: "/users/add" },
-                                ],
-                        },
-                        {
-                                name: "Table",
-                                href: "/workspace/table",
-                                icon: GoTable,
-                        },
-                ],
-        },
+        // {
+        //         title: "Contoh",
+        //         links: [
+        //                 {
+        //                         name: "Reports",
+        //                         icon: VscGraphLine,
+        //                         children: [
+        //                                 { name: "Monthly", href: "/users" },
+        //                                 { name: "Weekly", href: "/users/add" },
+        //                         ],
+        //                 },
+        //                 {
+        //                         name: "Table",
+        //                         href: "/workspace/table",
+        //                         icon: GoTable,
+        //                 },
+        //         ],
+        // },
 ];
