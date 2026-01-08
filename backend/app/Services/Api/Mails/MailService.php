@@ -24,7 +24,11 @@ class MailService
     public function all(int $type)
     {
         $model = $this->getModel($type);
-        $query = $model::with('mail_category', 'mail_log')->latest();
+        $relations = ['mail_category', 'mail_log'];
+        if ($type === 1) {
+            $relations[] = 'division';
+        }
+        $query = $model::with($relations)->latest();
 
         if ($type === 2) { // Outgoing Mail Logic
             $user = auth()->user();
@@ -147,7 +151,20 @@ class MailService
     public function find($id, int $type)
     {
         $model = $this->getModel($type);
-        return $model::with('mail_category', 'mail_log')->find($id);
+        $mail = $model::with('mail_category', 'mail_log')->find($id);
+
+        if ($mail && $type === 1) {
+            $user = auth()->user();
+            // Logic: Update Last Read By if user belongs to the target division
+            if ($user && $mail->division_id && $user->division_id == $mail->division_id) {
+                // Always overwrite to track "Last Read By"
+                if ($mail->user_view_id !== $user->id) {
+                     $mail->update(['user_view_id' => $user->id]);
+                }
+            }
+        }
+
+        return $mail;
     }
 
     public function update($id, array $data, int $type)
@@ -282,6 +299,7 @@ class MailService
 
                 if ($mailStatus === 2 && isset($data['division_id'])) {
                     $updateData['division_id'] = $data['division_id'];
+                    $updateData['user_view_id'] = null; // Reset read status on new disposition
                 }
 
                 if (isset($data['follow_status'])) {

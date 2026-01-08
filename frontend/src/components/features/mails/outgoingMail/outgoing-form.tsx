@@ -196,7 +196,7 @@ export default function OutgoingForm({
             />
           </div>
 
-          <div>
+          <div className="col-span-2 md:col-span-1">
             <Select
               label="Kategori Surat"
               id="category_id"
@@ -214,7 +214,7 @@ export default function OutgoingForm({
             />
           </div>
 
-          <div>
+          <div className="col-span-2 md:col-span-1">
             <Input
               label="Tanggal Surat"
               id="date"
@@ -226,7 +226,7 @@ export default function OutgoingForm({
             />
           </div>
 
-          <div>
+          <div className="col-span-2 md:col-span-1">
             <Input
               label="Instansi"
               id="institute"
@@ -239,7 +239,7 @@ export default function OutgoingForm({
             />
           </div>
 
-          <div>
+          <div className="col-span-2 md:col-span-1">
             <Input
               label="Tujuan Surat"
               id="purpose"

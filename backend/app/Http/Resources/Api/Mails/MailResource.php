@@ -44,6 +44,8 @@ class MailResource extends JsonResource
             'date'          => $this->date,
             'attachment'    => $this->attachment,
             'division_id'   => $this->division_id,
+            'division_name' => $this->division?->name,
+            'user_view_id'  => $this->user_view_id,
             'desc'          => $tataLaksanaNotes->desc ?? null,
             'sekum_desc'    => $sekumDesc->desc ?? null,
             'division_desc' => $divisionDesc->desc ?? null,

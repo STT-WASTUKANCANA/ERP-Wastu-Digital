@@ -11,10 +11,12 @@ export type IncomingMail = {
         user_id: string;
         user_name?: string;
         category_name: string;
+        division_name?: string;
         status: number;
         follow_status: number;
         date: string;
         attachment: string;
+        user_view_id?: number | null;
 };
 
 export type OutgoingMail = {

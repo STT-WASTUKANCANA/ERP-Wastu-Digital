@@ -51,11 +51,28 @@ export const getIncomingMailColumns = (
                                         if (row.follow_status == 2) {
                                                 return <Badge value="Proses" map={{ "Proses": { label: "Proses", color: "bg-yellow-100 text-yellow-800" } }} />;
                                         }
-                                        return <Badge value={2} map={{ 2: { label: statusMap[2], color: "bg-blue-100 text-blue-800" } }} />;
+
+                                        const label = row.division_name ? `Disposisi: ${row.division_name}` : statusMap[2];
+                                        return <Badge value={2} map={{ 2: { label: label, color: "bg-blue-100 text-blue-800" } }} />;
                                 }
 
                                 return <Badge value={3} map={{ 3: { label: "Selesai", color: "bg-green-100 text-green-800" } }} />;
                         },
+                },
+                {
+                        header: 'Dilihat',
+                        accessorKey: 'user_view_id',
+                        cell: (row) => {
+                                // Only relevant if Disposition (Status 2) or Done (Status 3)
+                                if (row.status >= 2) {
+                                        if (row.user_view_id) {
+                                                return <Badge value="Sudah" map={{ "Sudah": { label: "Sudah Dilihat", color: "bg-green-100 text-green-800" } }} />;
+                                        } else {
+                                                return <span className="text-gray-400 italic text-xs">Belum Dilihat</span>;
+                                        }
+                                }
+                                return <span className="text-gray-300">-</span>;
+                        }
                 },
                 {
                         header: '',

@@ -15,6 +15,16 @@ class IncomingMail extends Model
     protected $table = 'incoming_mails';
     protected $guarded = ['id'];
     protected $casts = ['date' => 'datetime'];
+
+    public function viewer(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_view_id');
+    }
+    
+    public function division(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Division::class, 'division_id');
+    }
     public static function getTotalForCurrentMonth(): int
     {
         $start = Carbon::now()->startOfMonth();
