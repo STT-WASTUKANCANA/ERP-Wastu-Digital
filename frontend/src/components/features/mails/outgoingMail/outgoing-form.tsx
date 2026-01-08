@@ -68,17 +68,14 @@ export default function OutgoingForm({
       });
 
       // Initialize validation fields if existing
-      if (initialData.status) {
+      // If status is Pending (1), set to empty to show placeholder.
+      // Otherwise set to the existing status (2, 3, or 4).
+      if (initialData.status && String(initialData.status) !== '1') {
         setValidationStatus(String(initialData.status));
-      }
-      if (initialData.validation_note) {
-        setValidationNote(initialData.validation_note);
+      } else {
+        setValidationStatus("");
       }
 
-      // Initialize validation fields if existing
-      if (initialData.status) {
-        setValidationStatus(String(initialData.status));
-      }
       if (initialData.validation_note) {
         setValidationNote(initialData.validation_note);
       }
@@ -185,126 +182,127 @@ export default function OutgoingForm({
       )}
 
       <div className="bg-white p-8 rounded-lg shadow space-y-8">
-        <div className="col-span-2">
-          <Input
-            label="Nomor Surat"
-            id="number"
-            name="number"
-            type="text"
-            value={formData.number}
-            onChange={handleChange}
-            placeholder="Contoh: OUT-001/STT/2025"
-            disabled={isReadOnly}
-          />
-        </div>
-
-        <div>
-          <Select
-            label="Kategori Surat"
-            id="category_id"
-            name="category_id"
-            value={formData.category_id}
-            onChange={handleChange}
-            placeholder="Pilih kategori"
-            disabled={isReadOnly}
-            options={categories
-              .filter((cat) => roleId === 3 ? cat.type === '3' : true)
-              .map((cat) => ({
-                value: cat.id,
-                label: cat.name,
-              }))}
-          />
-        </div>
-
-        <div>
-          <Input
-            label="Tanggal Surat"
-            id="date"
-            name="date"
-            type="date"
-            value={formData.date}
-            onChange={handleChange}
-            disabled={isReadOnly}
-          />
-        </div>
-
-        <div>
-          <Input
-            label="Instansi"
-            id="institute"
-            name="institute"
-            type="text"
-            value={formData.institute}
-            onChange={handleChange}
-            placeholder="Nama instansi"
-            disabled={isReadOnly}
-          />
-        </div>
-
-        <div>
-          <Input
-            label="Tujuan Surat"
-            id="purpose"
-            name="purpose"
-            type="text"
-            value={formData.purpose}
-            onChange={handleChange}
-            placeholder="Contoh: Undangan rapat kerja"
-            disabled={isReadOnly}
-          />
-        </div>
-
-        <TextareaField
-          label="Alamat Instansi"
-          id="address"
-          name="address"
-          value={formData.address}
-          onChange={handleChange}
-          placeholder="Alamat lengkap instansi"
-          className="col-span-2"
-          disabled={isReadOnly}
-        />
-
-        <TextareaField
-          label="Perihal"
-          id="desc"
-          name="desc"
-          value={formData.desc}
-          onChange={handleChange}
-          placeholder="Isi deskripsi surat..."
-          className="col-span-2"
-          disabled={isReadOnly}
-        />
-
-        {mode === "edit" && formData.attachment && (
-          <PdfPreview attachment={formData.attachment} className="col-span-2" />
-        )}
-
-        <div className="col-span-2">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-8">
           <div className="col-span-2">
-            {roleId === 3 ? (
-              <Input
-                label="Link Google Drive"
-                id="attachment"
-                name="attachment"
-                type="text"
-                value={formData.attachment}
-                onChange={handleChange}
-                placeholder="https://drive.google.com/..."
-                disabled={isReadOnly}
-              />
-            ) : (
-              !isReadOnly && (
-                <FileDropzone
-                  label={mode === "edit" ? "Upload Lampiran Baru (Opsional)" : "Lampiran (PDF)"}
+            <Input
+              label="Nomor Surat"
+              id="number"
+              name="number"
+              type="text"
+              value={formData.number}
+              onChange={handleChange}
+              placeholder="Contoh: OUT-001/STT/2025"
+              disabled={isReadOnly}
+            />
+          </div>
+
+          <div>
+            <Select
+              label="Kategori Surat"
+              id="category_id"
+              name="category_id"
+              value={formData.category_id}
+              onChange={handleChange}
+              placeholder="Pilih kategori"
+              disabled={isReadOnly}
+              options={categories
+                .filter((cat) => roleId === 3 ? cat.type === '3' : true)
+                .map((cat) => ({
+                  value: cat.id,
+                  label: cat.name,
+                }))}
+            />
+          </div>
+
+          <div>
+            <Input
+              label="Tanggal Surat"
+              id="date"
+              name="date"
+              type="date"
+              value={formData.date}
+              onChange={handleChange}
+              disabled={isReadOnly}
+            />
+          </div>
+
+          <div>
+            <Input
+              label="Instansi"
+              id="institute"
+              name="institute"
+              type="text"
+              value={formData.institute}
+              onChange={handleChange}
+              placeholder="Nama instansi"
+              disabled={isReadOnly}
+            />
+          </div>
+
+          <div>
+            <Input
+              label="Tujuan Surat"
+              id="purpose"
+              name="purpose"
+              type="text"
+              value={formData.purpose}
+              onChange={handleChange}
+              placeholder="Contoh: Undangan rapat kerja"
+              disabled={isReadOnly}
+            />
+          </div>
+
+          <TextareaField
+            label="Alamat Instansi"
+            id="address"
+            name="address"
+            value={formData.address}
+            onChange={handleChange}
+            placeholder="Alamat lengkap instansi"
+            className="col-span-2"
+            disabled={isReadOnly}
+          />
+
+          <TextareaField
+            label="Perihal"
+            id="desc"
+            name="desc"
+            value={formData.desc}
+            onChange={handleChange}
+            placeholder="Isi deskripsi surat..."
+            className="col-span-2"
+            disabled={isReadOnly}
+          />
+
+          {mode === "edit" && formData.attachment && (
+            <PdfPreview attachment={formData.attachment} className="col-span-2" />
+          )}
+
+          <div className="col-span-2">
+            <div className="col-span-2">
+              {roleId === 3 ? (
+                <Input
+                  label="Link Google Drive"
+                  id="attachment"
                   name="attachment"
-                  onFilesAccepted={(accepted) => setFiles(accepted)}
+                  type="text"
+                  value={formData.attachment}
+                  onChange={handleChange}
+                  placeholder="https://drive.google.com/..."
+                  disabled={isReadOnly}
                 />
-              )
-            )}
+              ) : (
+                !isReadOnly && (
+                  <FileDropzone
+                    label={mode === "edit" ? "Upload Lampiran Baru (Opsional)" : "Lampiran (PDF)"}
+                    name="attachment"
+                    onFilesAccepted={(accepted) => setFiles(accepted)}
+                  />
+                )
+              )}
+            </div>
           </div>
         </div>
-
       </div>
 
       {

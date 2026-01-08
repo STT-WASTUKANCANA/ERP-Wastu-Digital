@@ -34,9 +34,9 @@ export function ActionButtons({
                 <Button
                     rounded="rounded-md"
                     onClick={(e) => onAction(e, viewLabel, id, roleId ?? undefined)}
-                    className="px-3 py-1.5 text-background bg-background hover:bg-muted border border-secondary/20 cursor-pointer flex items-center gap-2"
+                    className="p-2 bg-background hover:bg-muted border border-secondary/20 cursor-pointer flex items-center gap-2"
                 >
-                    <BsEye className="w-3.5 h-3.5 text-background" />
+                    <BsEye className="w-3.5 h-3.5 text-primary" />
                 </Button>
             )}
 

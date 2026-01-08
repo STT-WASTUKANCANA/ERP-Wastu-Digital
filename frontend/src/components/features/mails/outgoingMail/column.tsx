@@ -43,15 +43,30 @@ export const getOutgoingMailColumns = (
                         header: '',
                         id: 'actions',
                         cell: (row) => {
-                                const canEdit = true; // Access control is handled in the edit page
+                                const isSekum = roleId === 2;
+                                // Verification is needed only if status is 1 (Pending/Verifikasi Sekum)
+                                const isVerificationNeeded = String(row.status) === '1';
+
+                                // Sekum uses "View" (Eye) for verification (Status 1)
+                                // For other statuses (Approved/Rejected/Revision), Sekum can use normal "Edit"
+                                const showVerificationView = isSekum && isVerificationNeeded;
+                                const showEdit = !isSekum || (isSekum && !isVerificationNeeded);
+
+                                // Delete logic:
+                                // Sekum can always delete.
+                                // Users (Creators) can only delete if status is 1 (Pending/Not yet verified).
+                                // Once verified (Status != 1), user cannot delete.
+                                const showDelete = isSekum || isVerificationNeeded;
 
                                 return (
                                         <ActionButtons
                                                 id={row.id.toString()}
                                                 onAction={handleActionClick}
                                                 roleId={roleId}
-                                                showEdit={canEdit}
-                                                showDelete={true}
+                                                showEdit={showEdit}
+                                                showDelete={showDelete}
+                                                showView={showVerificationView}
+                                                viewLabel="Edit" // Reuse Edit action to open the form
                                                 showDownload={!!row.attachment}
                                                 downloadUrl={row.attachment ? getStorageUrl(row.attachment) : undefined}
                                         />
