@@ -24,7 +24,29 @@ class MailService
     public function all(int $type)
     {
         $model = $this->getModel($type);
-        $data = $model::with('mail_category', 'mail_log')->latest()->get();
+        $query = $model::with('mail_category', 'mail_log')->latest();
+
+        if ($type === 2) { // Outgoing Mail Logic
+            $user = auth()->user();
+            if (!$user) return [];
+
+            // Role IDs: 1=TataLaksana, 2=Sekum, 3=Pulahta, 4=Kabid, 5=Admin
+            if (in_array($user->role_id, [2, 5])) {
+                // Admin & Sekum: View All
+                return $query->get();
+            } elseif (in_array($user->role_id, [3])) {
+                // Pulahta: View Approved (3) Only + Own Created
+                $query->where(function($q) use ($user) {
+                     $q->where('status', '3')
+                       ->orWhere('user_id', $user->id);
+                });
+            } else {
+                // Tata Laksana & Kabid (Others): View Own Created Only
+                $query->where('user_id', $user->id);
+            }
+        }
+
+        $data = $query->get();
         Log::info('Mail: fetched all', ['count' => $data->count(), 'type' => $type]);
         return $data;
     }
@@ -33,6 +55,29 @@ class MailService
     {
         return DB::transaction(function () use ($data, $type) {
             try {
+                $user = auth()->user();
+
+                // Logic for Outgoing Mail (Type 2)
+                if ($type === 2) {
+                    // Check Role Pulahta (3) - Only SK Allowed
+                    if ($user->role_id === 3) {
+                         $category = \App\Models\MailCategory::find($data['category_id']);
+                         // 3 = Surat Keputusan
+                         if (!$category || $category->type != '3') {
+                             throw new \Exception("Pulahta hanya dapat membuat Surat Keputusan (SK).");
+                         }
+                    }
+
+                    // Set Status
+                    // Sekum (2) & Admin (5) => Approved (3)
+                    if (in_array($user->role_id, [2, 5])) {
+                        $data['status'] = '3';
+                    } else {
+                        // Others (Tata Laksana/Kabid/Pulahta) => Verifikasi Sekum (1)
+                        $data['status'] = '1';
+                    }
+                }
+
                 Log::info('Mail: Created Data', [
                     'type' => $type,
                     'data' => $data,
@@ -40,11 +85,21 @@ class MailService
                 $model = $this->getModel($type);
                 $mail = $model::create($data);
 
+                $logStatus = null;
+                if ($type == 2) {
+                    // For Outgoing: '1', '2', '3', '4' are already compatible with MailLog?
+                    // MailLog uses tinyInteger status. '1' -> 1.
+                    // Let's ensure integer value for log.
+                    $logStatus = (int) $data['status'];
+                } else {
+                    $logStatus = $type == 1 ? 1 : null;
+                }
+
                 MailLog::create([
                     'user_id' => $data['user_id'],
                     'mail_id' => $mail->id,
                     'type'    => (string) $type,
-                    'status'  => $type == 1 ? '1' : null,
+                    'status'  => $logStatus,
                     'desc'    => $data['desc'] ?? null,
                 ]);
 
@@ -59,6 +114,34 @@ class MailService
                 throw $e;
             }
         });
+    }
+
+    public function validateOutgoingMail($id, array $data)
+    {
+        $mail = $this->find($id, 2); // Type 2 = Outgoing
+        if (!$mail) return null;
+
+        $user = auth()->user();
+        if ($user->role_id != 2 && $user->role_id != 5) { // Only Sekum & Admin
+             throw new \Exception("Unauthorized validation.");
+        }
+
+        // data['status'] should be '2', '3', '4' (Revision, Approved, Rejected)
+        $mail->update(['status' => $data['status']]);
+        
+        // Log changes
+        $logStatus = (int) $data['status'];
+
+        MailLog::create([
+            'user_id' => $user->id,
+            'mail_id' => $mail->id,
+            'type'    => '2', // Outgoing
+            'status'  => $logStatus,
+            'desc'    => $data['note'] ?? 'Status validation by ' . $user->name,
+        ]);
+
+        Log::info('Mail: validated', ['id' => $id, 'status' => $data['status']]);
+        return $mail;
     }
 
     public function find($id, int $type)
@@ -81,6 +164,16 @@ class MailService
         }
 
         try {
+            // Logic for Outgoing Mail (Type 2): Reset Status if "Perlu Perbaikan" -> "Verifikasi Sekum" on update
+            if ($type === 2) {
+                $user = auth()->user();
+                // If current status is '2' (Perlu Perbaikan) and user is Creator (Not Sekum/Admin)
+                if ($mail->status == '2' && !in_array($user->role_id, [2, 5])) {
+                    $data['status'] = '1'; // Reset to Verifikasi Sekum
+                    // No new log created, so the previous Sekum log remains the latest for display
+                }
+            }
+
             $mail->update($data);
 
             if ($type === 1 && isset($data['desc'])) {

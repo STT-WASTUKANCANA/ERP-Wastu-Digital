@@ -52,7 +52,8 @@ class MailResource extends JsonResource
 
     private function outgoingFormat()
     {
-        $initialLog = $this->mail_log->first();
+        $initialLog = $this->mail_log->sortBy('created_at')->first();
+        $validationLog = $this->mail_log->sortByDesc('created_at')->first();
 
         return [
             'id'            => $this->id,
@@ -60,6 +61,7 @@ class MailResource extends JsonResource
             'user_id'       => $this->user_id,
             'user_name'     => $this->user?->name,
             'category_name' => $this->mail_category?->name,
+            'status'        => $this->status,
             'date'          => $this->date,
             'attachment'    => $this->attachment,
 
@@ -68,6 +70,7 @@ class MailResource extends JsonResource
             'purpose'       => $this->purpose,
 
             'desc'          => $initialLog->desc ?? null,
+            'validation_note' => ($validationLog && $validationLog->id !== $initialLog->id) ? ($validationLog->desc ?? null) : null,
         ];
     }
 

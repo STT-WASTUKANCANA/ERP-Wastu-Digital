@@ -13,6 +13,7 @@ import {
   MailTableProps,
 } from "@/types/mail-props";
 import { OffcanvasDetail } from "@/components/features/mails/incomingMail/offcanvas-detail";
+import { OutgoingOffcanvasDetail } from "@/components/features/mails/outgoingMail/offcanvas-detail";
 import { useRole } from "@/contexts/role";
 import { mailConfig } from "@/lib/config/mail-config";
 import { HiOutlineUpload } from "react-icons/hi";
@@ -72,7 +73,7 @@ const MailTable = <T extends MailTypes>({
 
   const canCreate =
     (roleId === 1 && type === "incoming") ||
-    (roleId === 2 && type === "outgoing") ||
+    (type === "outgoing") ||
     (roleId === 2 && type === "decision"); // role tertentu bisa buat decision
 
   return (
@@ -112,6 +113,14 @@ const MailTable = <T extends MailTypes>({
       {selectedMail && type === "incoming" && (
         <OffcanvasDetail
           mail={selectedMail as IncomingMail}
+          onClose={() => setSelectedMail(null)}
+          onAction={handleActionClick}
+        />
+      )}
+
+      {selectedMail && type === "outgoing" && (
+        <OutgoingOffcanvasDetail
+          mail={selectedMail as OutgoingMail}
           onClose={() => setSelectedMail(null)}
           onAction={handleActionClick}
         />

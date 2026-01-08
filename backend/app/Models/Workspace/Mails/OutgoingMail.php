@@ -13,7 +13,10 @@ class OutgoingMail extends Model
     use SoftDeletes;
     protected $table = 'outgoing_mails';
     protected $guarded = ['id'];
-    protected $casts = ['date' => 'datetime'];
+    protected $casts = [
+        'date' => 'datetime',
+        'status' => 'string',
+    ];
     public static function getTotalForCurrentMonth(): int
     {
         $start = Carbon::now()->startOfMonth();
@@ -38,6 +41,6 @@ class OutgoingMail extends Model
     }
     public function mail_log()
     {
-        return $this->hasOne(MailLog::class, 'mail_id')->where('type', 2);
+        return $this->hasMany(MailLog::class, 'mail_id')->where('type', 2);
     }
 }

@@ -1,10 +1,10 @@
-"use client";
 
 import { MouseEvent } from 'react';
-import { OutgoingMail } from '@/types/mail-props';
+import { OutgoingMail, outgoingStatusMap } from '@/types/mail-props';
 import { ColumnDef } from '@/types/ui-props';
 import { getStorageUrl, formatDate } from '@/lib/utils';
 import { ActionButtons } from '@/components/ui/action-buttons';
+import { Badge } from '@/components/ui/badge';
 
 type HandleActionClickFn = (e: MouseEvent, action: string, mailId: string, roleId?: number) => void;
 
@@ -35,10 +35,15 @@ export const getOutgoingMailColumns = (
                         cell: (row) => row.user_name,
                 },
                 {
+                        header: 'Status',
+                        accessorKey: 'status',
+                        cell: (row) => <Badge value={String(row.status)} map={outgoingStatusMap} />,
+                },
+                {
                         header: '',
                         id: 'actions',
                         cell: (row) => {
-                                const canEdit = roleId === 2;
+                                const canEdit = true; // Access control is handled in the edit page
 
                                 return (
                                         <ActionButtons

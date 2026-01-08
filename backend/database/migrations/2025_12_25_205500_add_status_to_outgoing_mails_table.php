@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('divisions', function (Blueprint $table) {
-            $table->foreignId('leader_id')->nullable()->constrained('users')->onDelete('set null');
+        Schema::table('outgoing_mails', function (Blueprint $table) {
+            $table->enum('status', ['1', '2', '3', '4'])->default('1')->after('purpose')->comment('1=Verifikasi Sekum, 2=Perlu Perbaikan, 3=Disetujui, 4=Ditolak');
         });
     }
 
@@ -21,9 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('divisions', function (Blueprint $table) {
-            $table->dropForeign(['leader_id']);
-            $table->dropColumn('leader_id');
+        Schema::table('outgoing_mails', function (Blueprint $table) {
+            $table->dropColumn('status');
         });
     }
 };

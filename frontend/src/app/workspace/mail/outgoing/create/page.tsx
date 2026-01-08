@@ -4,9 +4,12 @@ import { Button } from "@/components/ui/button";
 import { getMailCategories } from "@/lib/api/mails/outgoing";
 import OutgoingForm from "@/components/features/mails/outgoingMail/outgoing-form";
 
+import { getUserRoleId } from "@/lib/role";
+
 export default async function Page() {
         const res = await getMailCategories();
         const categories = res.data?.data ?? [];
+        const roleId = await getUserRoleId();
 
         return (
                 <div className="space-y-8 lg:px-24 xl:px-56">
@@ -24,7 +27,7 @@ export default async function Page() {
                                 </Button>
                         </PageHeader>
 
-                        <OutgoingForm categories={categories} mode="create" />
+                        <OutgoingForm categories={categories} mode="create" roleId={roleId ?? undefined} />
                 </div>
         );
 }

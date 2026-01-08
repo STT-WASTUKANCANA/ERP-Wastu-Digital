@@ -6,11 +6,14 @@ import { Button } from "@/components/ui/button";
 import { useMailPageData } from "@/hooks/features/mail/useMailPageData";
 import OutgoingForm from "@/components/features/mails/outgoingMail/outgoing-form";
 
+import { useRole } from "@/contexts/role";
+
 export default function Page() {
         const { categories, mail, isLoading, divisions } = useMailPageData({
                 mailIdSessionKey: "editingMailId",
                 mailType: "outgoing",
         });
+        const { roleId } = useRole();
 
         if (isLoading) {
                 return <div>Loading mail data...</div>;
@@ -37,6 +40,7 @@ export default function Page() {
                                         initialData={mail}
                                         mode="edit"
                                         divisions={divisions}
+                                        roleId={roleId ?? undefined}
                                 />
                         )}
                 </div>

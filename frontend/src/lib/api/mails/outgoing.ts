@@ -39,3 +39,13 @@ export async function deleteOutgoingMail(id: number) {
                 method: "DELETE",
         });
 }
+
+export async function validateOutgoingMail(id: number, status: string, note?: string) {
+        return await fetchWithAuth(`/mails/outgoing/validate/${id}`, {
+                method: "PUT",
+                headers: {
+                        "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ status, note }),
+        });
+}

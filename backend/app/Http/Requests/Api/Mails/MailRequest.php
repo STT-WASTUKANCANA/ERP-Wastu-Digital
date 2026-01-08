@@ -38,7 +38,24 @@ class MailRequest extends FormRequest
                     'number' => 'required|string|max:100',
                     'category_id' => 'required|exists:mail_categories,id',
                     'date' => 'required|date',
-                    'attachment' => 'required|file|mimes:pdf|max:10240', // max 10MB
+                    'attachment' => [
+                        'required',
+                        function ($attribute, $value, $fail) {
+                             if (request()->hasFile($attribute)) {
+                                  $file = request()->file($attribute);
+                                  if ($file->getMimeType() != 'application/pdf') {
+                                      $fail('File harus berformat PDF.');
+                                  }
+                                  if ($file->getSize() > 10240 * 1024) { // 10MB
+                                      $fail('Ukuran file terlalu besar. Maksimal 10MB.');
+                                  }
+                             } else {
+                                  if (!is_string($value)) {
+                                      $fail('Lampiran harus berupa file PDF atau Link Google Drive.');
+                                  }
+                             }
+                        }
+                    ],
                     'desc' => 'nullable|string',
                 ];
 
@@ -92,13 +109,9 @@ class MailRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'attachment.max' => 'Ukuran file terlalu besar. Maksimal 10MB.',
-            'attachment.mimes' => 'File harus berformat PDF.',
-            'attachment.required' => 'Lampiran surat wajib diisi.',
-            'number.required' => 'Nomor surat wajib diisi.',
-            'category_id.required' => 'Kategori surat wajib dipilih.',
             'category_id.exists' => 'Kategori surat tidak valid.',
             'date.required' => 'Tanggal surat wajib diisi.',
+            'attachment.required' => 'Lampiran surat wajib diisi (File PDF atau Link Drive).',
         ];
     }
 

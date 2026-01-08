@@ -6,6 +6,7 @@ import { ProfileDropdown } from "@/components/shared/profile-dropdown";
 import { useScrollY } from "@/hooks/utils/useScrollY";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Topbar } from "@/components/layout/Topbar";
+import { RoleProvider } from "@/contexts/role";
 
 export default function ClientLayout({
     children,
@@ -31,61 +32,61 @@ export default function ClientLayout({
         setIsHydrated(true);
     }, []);
 
-    if (!isHydrated) {
-        return (
-            <div className="min-h-screen bg-accent p-6">
-                <div className="mt-[60px] space-y-6 opacity-0">{children}</div>
-            </div>
-        );
-    }
-
     return (
-        <div className="relative">
-            <div
-                className="flex flex-col relative"
-                onClick={() => {
-                    if (window.innerWidth < 1024) setSidebarShow(false);
-                }}
-            >
-                {sidebarShow && <div className="absolute inset-0 bg-black/40 z-30 lg:hidden"></div>}
+        <RoleProvider roleId={roleId}>
+            {!isHydrated ? (
+                <div className="min-h-screen bg-accent p-6">
+                    <div className="mt-[60px] space-y-6 opacity-0">{children}</div>
+                </div>
+            ) : (
+                <div className="relative">
+                    <div
+                        className="flex flex-col relative"
+                        onClick={() => {
+                            if (window.innerWidth < 1024) setSidebarShow(false);
+                        }}
+                    >
+                        {sidebarShow && <div className="absolute inset-0 bg-black/40 z-30 lg:hidden"></div>}
 
-                <Topbar
-                    scroll={scrollY}
-                    sidebarShow={sidebarShow}
-                    setSidebarShow={setSidebarShow}
-                    profileDropdownShow={profileDropdownShow}
-                    setProfileDropdownShow={setProfileDropdownShow}
-                    notificationDropdownShow={notificationDropdownShow}
-                    setNotificationDropdownShow={setNotificationDropdownShow}
-                />
+                        <Topbar
+                            scroll={scrollY}
+                            sidebarShow={sidebarShow}
+                            setSidebarShow={setSidebarShow}
+                            profileDropdownShow={profileDropdownShow}
+                            setProfileDropdownShow={setProfileDropdownShow}
+                            notificationDropdownShow={notificationDropdownShow}
+                            setNotificationDropdownShow={setNotificationDropdownShow}
+                        />
 
-                {profileDropdownShow && <ProfileDropdown />}
-                {notificationDropdownShow && (
-                    <NotificationDropdown
-                        notificationDropdownShow={notificationDropdownShow}
-                        setNotificationDropdownShow={setNotificationDropdownShow}
+                        {profileDropdownShow && <ProfileDropdown />}
+                        {notificationDropdownShow && (
+                            <NotificationDropdown
+                                notificationDropdownShow={notificationDropdownShow}
+                                setNotificationDropdownShow={setNotificationDropdownShow}
+                            />
+                        )}
+
+                        <main
+                            className={`p-6 bg-accent min-h-screen transition-all duration-300 ${sidebarShow ? "lg:ml-[280px]" : "lg:ml-16"
+                                }`}
+                            onClick={() => {
+                                setProfileDropdownShow(false);
+                                setNotificationDropdownShow(false);
+                            }}
+                        >
+                            <div className="mt-[60px] space-y-6 lg:p-8">{children}</div>
+                        </main>
+                    </div>
+
+                    <Sidebar
+                        sidebarShow={sidebarShow}
+                        setSidebarShow={setSidebarShow}
+                        isPinned={isPinned}
+                        setIsPinned={setIsPinned}
+                        roleId={roleId}
                     />
-                )}
-
-                <main
-                    className={`p-6 bg-accent min-h-screen transition-all duration-300 ${sidebarShow ? "lg:ml-[280px]" : "lg:ml-16"
-                        }`}
-                    onClick={() => {
-                        setProfileDropdownShow(false);
-                        setNotificationDropdownShow(false);
-                    }}
-                >
-                    <div className="mt-[60px] space-y-6 lg:p-8">{children}</div>
-                </main>
-            </div>
-
-            <Sidebar
-                sidebarShow={sidebarShow}
-                setSidebarShow={setSidebarShow}
-                isPinned={isPinned}
-                setIsPinned={setIsPinned}
-                roleId={roleId}
-            />
-        </div>
+                </div>
+            )}
+        </RoleProvider>
     );
 }

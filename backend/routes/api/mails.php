@@ -43,6 +43,10 @@ Route::middleware('auth:api')
                             Route::put('/review/{id}', 'review')->name('review');
                             Route::put('/division-review/{id}', 'review')->name('divisionReview');
                         }
+                        
+                        if ($type === 'outgoing') {
+                            Route::put('/validate/{id}', 'validateOutgoing')->name('validate');
+                        }
                     });
                 });
         }

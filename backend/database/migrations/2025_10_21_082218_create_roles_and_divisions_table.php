@@ -20,13 +20,13 @@ return new class extends Migration
             $table->id();
             $table->string('name', 50)->unique();
             $table->string('description')->nullable();
-            $table->unsignedBigInteger('leader_id');
+            $table->unsignedBigInteger('leader_id')->nullable();
             $table->timestamps();
             $table->softDeletes();
 
             $table->foreign('leader_id')
                     ->references('id')->on('users')
-                    ->onDelete('cascade');
+                    ->onDelete('set null');
         });
 
     }

@@ -230,5 +230,34 @@ class MailController extends Controller
                 }
         }
 
+
+        public function validateOutgoing(Request $request, $id)
+        {
+                try {
+                        $type = $this->getTypeFromRoute($request);
+                        if ($type !== 2) {
+                                return response()->json(['status' => false, 'message' => 'Invalid route for validation'], 400);
+                        }
+
+
+                        $data = $request->validate([
+                            'status' => ['required', \Illuminate\Validation\Rule::in(['approved', 'rejected', '1', '2', '3', '4', 1, 2, 3, 4])], 
+                            'note'   => 'nullable|string'
+                        ]);
+
+                        $mail = $this->service->validateOutgoingMail($id, $data);
+
+                        if (!$mail) {
+                                return response()->json(['status' => false, 'message' => 'Mail not found'], 404);
+                        }
+
+                        Log::info('Mail:validateOutgoing success', ['id' => $id]);
+                        return response()->json(['status' => true, 'data' => new MailResource($mail)]);
+                } catch (Throwable $e) {
+                        Log::error('Mail:validateOutgoing failed', ['msg' => $e->getMessage()]);
+                        return response()->json(['status' => false, 'message' => $e->getMessage()], 500);
+                }
+        }
+
         public function progress() {}
 }
