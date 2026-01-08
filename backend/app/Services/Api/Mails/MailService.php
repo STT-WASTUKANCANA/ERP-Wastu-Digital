@@ -293,7 +293,7 @@ class MailService
             return null;
         }
 
-        return DB::transaction(function () use ($mail, $data, $id, $type, $mailStatus, $logStatus) {
+        $updatedMail = DB::transaction(function () use ($mail, $data, $id, $type, $mailStatus, $logStatus) {
             try {
                 $updateData = ['status' => $mailStatus];
 
@@ -335,5 +335,26 @@ class MailService
                 throw $e;
             }
         });
+
+        // Send Email Notification to Division Leader if Disposition (Status 2)
+        if ($updatedMail && $mailStatus === 2) {
+            try {
+                $updatedMail->refresh(); // Reload to get new division relation
+                $leader = $updatedMail->division?->leader;
+                
+                if ($leader && $leader->email) {
+                    \Illuminate\Support\Facades\Mail::to($leader->email)
+                        ->send(new \App\Mail\DispositionNotification($updatedMail, $data['sekum_desc'] ?? ''));
+                    Log::info('MailService: notification sent', ['email' => $leader->email]);
+                } else {
+                     Log::warning('MailService: notification skipped - no leader email found', ['division_id' => $updatedMail->division_id]);
+                }
+            } catch (\Exception $e) {
+                Log::error('MailService: failed to send email notification', ['error' => $e->getMessage()]);
+                // Don't throw, just log. Transaction is already committed.
+            }
+        }
+
+        return $updatedMail;
     }
 }
