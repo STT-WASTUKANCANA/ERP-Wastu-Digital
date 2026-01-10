@@ -15,7 +15,9 @@ class DivisionService
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('leader_name', 'like', "%{$search}%");
+                  ->orWhereHas('leader', function ($subQ) use ($search) {
+                      $subQ->where('name', 'like', "%{$search}%");
+                  });
             });
         }
 
