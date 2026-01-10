@@ -4,8 +4,9 @@ export async function getDecisionMailSummary() {
         return await fetchWithAuth('/mails/decision/summary', { method: "GET" });
 }
 
-export async function getDecisionMailList() {
-        return await fetchWithAuth('/mails/decision', { method: "GET" });
+export async function getDecisionMailList(search?: string) {
+        const query = search ? `?search=${encodeURIComponent(search)}` : '';
+        return await fetchWithAuth(`/mails/decision${query}`, { method: "GET" });
 }
 
 export async function getMailCategories() {

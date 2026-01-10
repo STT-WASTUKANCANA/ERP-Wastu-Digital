@@ -25,9 +25,10 @@ const MailTable = <T extends MailTypes>({
   onMailCreated,
   isLoading,
   type,
+  onSearch,
 }: MailTableProps<T>) => {
   const router = useRouter();
-  const { roleId } = useRole();
+  const { roleId, userId } = useRole();
 
   const config = mailConfig[type];
 
@@ -67,8 +68,8 @@ const MailTable = <T extends MailTypes>({
   };
 
   const columns = useMemo(
-    () => config.getColumns(handleActionClick, roleId),
-    [roleId]
+    () => config.getColumns(handleActionClick, roleId, userId),
+    [roleId, userId]
   );
 
   const canCreate =
@@ -100,7 +101,7 @@ const MailTable = <T extends MailTypes>({
         )}
       </PageHeader>
 
-      <TableContainer onSearchChange={(v) => console.log(v)}>
+      <TableContainer onSearchChange={onSearch}>
         <DataTable
           columns={columns}
           data={mails}

@@ -10,7 +10,8 @@ type HandleActionClickFn = (e: MouseEvent, action: string, mailId: string, roleI
 
 export const getDecisionMailColumns = (
         handleActionClick: HandleActionClickFn,
-        roleId: number | null
+        roleId: number | null,
+        userId: string | null
 ): ColumnDef<DecisionMail>[] => [
                 {
                         header: 'Nomor Surat',
@@ -40,7 +41,8 @@ export const getDecisionMailColumns = (
                         header: '',
                         id: 'actions',
                         cell: (row) => {
-                                const canEdit = roleId === 2;
+                                const isCreator = String(row.user_id) === String(userId);
+                                const canEdit = roleId === 2 || (roleId === 3 && isCreator);
 
                                 return (
                                         <ActionButtons
@@ -48,7 +50,7 @@ export const getDecisionMailColumns = (
                                                 onAction={handleActionClick}
                                                 roleId={roleId}
                                                 showEdit={canEdit}
-                                                showDelete={true}
+                                                showDelete={isCreator}
                                                 showDownload={!!row.attachment}
                                                 downloadUrl={row.attachment ? getStorageUrl(row.attachment) : undefined}
                                         />

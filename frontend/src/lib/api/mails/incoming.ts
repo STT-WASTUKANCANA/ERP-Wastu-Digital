@@ -4,8 +4,9 @@ export async function getIncomingMailSummary() {
         return await fetchWithAuth('/mails/incoming/summary', { method: "GET" });
 }
 
-export async function getIncomingMailList() {
-        return await fetchWithAuth('/mails/incoming', { method: "GET" });
+export async function getIncomingMailList(search?: string) {
+        const query = search ? `?search=${encodeURIComponent(search)}` : '';
+        return await fetchWithAuth(`/mails/incoming${query}`, { method: "GET" });
 }
 
 export async function getMailCategories() {

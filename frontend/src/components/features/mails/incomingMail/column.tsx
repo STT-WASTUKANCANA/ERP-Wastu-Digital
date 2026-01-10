@@ -14,7 +14,8 @@ type HandleActionClickFn = (e: MouseEvent, action: string, mailId: string, roleI
 
 export const getIncomingMailColumns = (
         handleActionClick: HandleActionClickFn,
-        roleId: number | null
+        roleId: number | null,
+        userId: string | null
 ): ColumnDef<IncomingMail>[] => {
 
         return [
@@ -41,7 +42,7 @@ export const getIncomingMailColumns = (
                 {
                         header: 'Status',
                         accessorKey: 'status',
-                        mobile: true,
+                        mobile: false,
                         cell: (row) => {
                                 if (row.status == 1) {
                                         return <Badge value={1} map={{ 1: { label: statusMap[1], color: "bg-secondary text-white" } }} />;
@@ -52,7 +53,7 @@ export const getIncomingMailColumns = (
                                                 return <Badge value="Proses" map={{ "Proses": { label: "Proses", color: "bg-yellow-100 text-yellow-800" } }} />;
                                         }
 
-                                        const label = row.division_name ? `Disposisi: ${row.division_name}` : statusMap[2];
+                                        const label = row.division_name ? `Disposisi - ${row.division_name}` : statusMap[2];
                                         return <Badge value={2} map={{ 2: { label: label, color: "bg-blue-100 text-blue-800" } }} />;
                                 }
 
@@ -79,11 +80,13 @@ export const getIncomingMailColumns = (
                         id: 'actions',
                         cell: (row) => {
                                 const mail = row;
+                                const isCreator = String(mail.user_id) === String(userId);
 
                                 const showReview = roleId === 2 && (mail.status == 1 || mail.status == 2);
                                 const showDivisionReview = roleId === 4 && (mail.follow_status == 1 || mail.follow_status == 2);
 
                                 const canEdit = !showReview && (roleId === 1 && mail.status == 1);
+                                const canDelete = mail.status == 1 && isCreator;
 
                                 return (
                                         <div className="flex justify-start items-center gap-2">
@@ -121,7 +124,7 @@ export const getIncomingMailColumns = (
                                                         onAction={handleActionClick}
                                                         roleId={roleId}
                                                         showEdit={canEdit}
-                                                        showDelete={true}
+                                                        showDelete={canDelete}
                                                         showDownload={!!mail.attachment}
                                                         downloadUrl={mail.attachment ? getStorageUrl(mail.attachment) : undefined}
                                                         showView={false}

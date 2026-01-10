@@ -10,7 +10,8 @@ type HandleActionClickFn = (e: MouseEvent, action: string, mailId: string, roleI
 
 export const getOutgoingMailColumns = (
         handleActionClick: HandleActionClickFn,
-        roleId: number | null
+        roleId: number | null,
+        userId: string | null
 ): ColumnDef<OutgoingMail>[] => {
 
         return [
@@ -18,6 +19,10 @@ export const getOutgoingMailColumns = (
                         header: 'Nomor Surat',
                         accessorKey: 'number',
                         mobile: true,
+                },
+                {
+                        header: 'Tujuan',
+                        accessorKey: 'institute',
                 },
                 {
                         header: 'Tanggal',
@@ -46,17 +51,22 @@ export const getOutgoingMailColumns = (
                                 const isSekum = roleId === 2;
                                 // Verification is needed only if status is 1 (Pending/Verifikasi Sekum)
                                 const isVerificationNeeded = String(row.status) === '1';
+                                const isCreator = String(row.user_id) === String(userId);
 
                                 // Sekum uses "View" (Eye) for verification (Status 1)
                                 // For other statuses (Approved/Rejected/Revision), Sekum can use normal "Edit"
                                 const showVerificationView = isSekum && isVerificationNeeded;
-                                const showEdit = !isSekum || (isSekum && !isVerificationNeeded);
+
+                                // Show Edit:
+                                // 1. If Sekum: Can edit if verification is NOT needed (already verified/rejected/revision)
+                                // 2. If Others (including Admin): Can edit ONLY if they are the creator
+                                const showEdit = isSekum ? !isVerificationNeeded : isCreator;
 
                                 // Delete logic:
                                 // Sekum can always delete.
-                                // Users (Creators) can only delete if status is 1 (Pending/Not yet verified).
+                                // Users (Creators) can only delete if status is 1 (Pending/Not yet verified) AND they are the creator.
                                 // Once verified (Status != 1), user cannot delete.
-                                const showDelete = isSekum || isVerificationNeeded;
+                                const showDelete = isSekum || (isVerificationNeeded && isCreator);
 
                                 return (
                                         <ActionButtons

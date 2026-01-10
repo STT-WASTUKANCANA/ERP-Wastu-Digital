@@ -4,13 +4,14 @@ import { createContext, useContext, ReactNode } from 'react';
 
 type RoleContextType = {
   roleId: number | null;
+  userId: string | null;
 };
 
 const RoleContext = createContext<RoleContextType | undefined>(undefined);
 
-export const RoleProvider = ({ children, roleId }: { children: ReactNode, roleId: number | null }) => {
+export const RoleProvider = ({ children, roleId, userId }: { children: ReactNode, roleId: number | null, userId: string | null }) => {
   return (
-    <RoleContext.Provider value={{ roleId }}>
+    <RoleContext.Provider value={{ roleId, userId }}>
       {children}
     </RoleContext.Provider>
   );

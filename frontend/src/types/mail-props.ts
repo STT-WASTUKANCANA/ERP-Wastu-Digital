@@ -56,6 +56,7 @@ export interface MailTableProps<T> {
         onMailCreated: () => void;
         isLoading: boolean;
         type: 'incoming' | 'outgoing' | 'decision';
+        onSearch?: (query: string) => void;
 }
 
 export type IncomingMailTableProps = MailTableProps<IncomingMail>;

@@ -19,16 +19,30 @@ const MailsClient = () => {
                         : rawType === "outgoing" ? "outgoing"
                                 : "decision";
 
-        const fetchMails = async () => {
+        const [searchQuery, setSearchQuery] = useState("");
+        const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+
+        // Debounce Logic
+        useEffect(() => {
+                const handler = setTimeout(() => {
+                        setDebouncedSearchQuery(searchQuery);
+                }, 500);
+
+                return () => {
+                        clearTimeout(handler);
+                };
+        }, [searchQuery]);
+
+        const fetchMails = async (search: string = "") => {
                 setIsLoading(true);
 
                 let result;
                 if (type === "incoming") {
-                        result = await getIncomingMailList();
+                        result = await getIncomingMailList(search);
                 } else if (type === "outgoing") {
-                        result = await getOutgoingMailList();
+                        result = await getOutgoingMailList(search);
                 } else {
-                        result = await getDecisionMailList();
+                        result = await getDecisionMailList(search);
                 }
 
                 if (result.ok && result.data && Array.isArray(result.data.data)) {
@@ -46,8 +60,15 @@ const MailsClient = () => {
                 effectRan.current = true;
         }, []);
 
+        // Refetch when debounced search changes
+        useEffect(() => {
+                if (effectRan.current) {
+                        fetchMails(debouncedSearchQuery);
+                }
+        }, [debouncedSearchQuery]);
+
         const handleMailCreated = () => {
-                fetchMails();
+                fetchMails(debouncedSearchQuery);
         };
 
         return (
@@ -56,6 +77,7 @@ const MailsClient = () => {
                         onMailCreated={handleMailCreated}
                         isLoading={isLoading}
                         type={type}
+                        onSearch={(q) => setSearchQuery(q)}
                 />
         );
 };

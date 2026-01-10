@@ -16,8 +16,9 @@ export const mailConfig = {
                 divisionReviewPath: "/workspace/mail/incoming/division-review",
                 getColumns: (
                         handler: (e: any, action: string, id: string, roleId?: number) => void,
-                        roleId: number | null
-                ): ColumnDef<any>[] => getIncomingMailColumns(handler, roleId),
+                        roleId: number | null,
+                        userId: string | null
+                ): ColumnDef<any>[] => getIncomingMailColumns(handler, roleId, userId),
                 delete: (id: number) => deleteIncomingMail(id),
         },
 
@@ -30,8 +31,9 @@ export const mailConfig = {
                 divisionReviewPath: "/workspace/mail/outgoing/division-review",
                 getColumns: (
                         handler: (e: any, action: string, id: string, roleId?: number) => void,
-                        roleId: number | null
-                ): ColumnDef<any>[] => getOutgoingMailColumns(handler, roleId),
+                        roleId: number | null,
+                        userId: string | null
+                ): ColumnDef<any>[] => getOutgoingMailColumns(handler, roleId, userId),
                 delete: (id: number) => deleteOutgoingMail(id),
         },
 
@@ -44,8 +46,9 @@ export const mailConfig = {
                 divisionReviewPath: "/workspace/mail/decision/division-review",
                 getColumns: (
                         handler: (e: any, action: string, id: string, roleId?: number) => void,
-                        roleId: number | null
-                ): ColumnDef<any>[] => getDecisionMailColumns(handler, roleId),
+                        roleId: number | null,
+                        userId: string | null
+                ): ColumnDef<any>[] => getDecisionMailColumns(handler, roleId, userId),
                 delete: (id: number) => deleteDecisionMail(id),
         },
 };

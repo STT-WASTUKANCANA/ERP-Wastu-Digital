@@ -33,7 +33,8 @@ export default function OutgoingForm({
   const isSekumVerification = roleId === 2 && mode === "edit";
   const isApproved = initialData?.status === 3 || initialData?.status === '3';
   // Creator (Tata Laksana/Others) cannot edit if already approved
-  const isCreatorReadOnly = roleId !== 2 && mode === "edit" && isApproved;
+  // Admin (5) should be able to edit regardless of approval
+  const isCreatorReadOnly = ![2, 5].includes(roleId || 0) && mode === "edit" && isApproved;
   const isReadOnly = isSekumVerification || isCreatorReadOnly;
 
   const [formData, setFormData] = useState({

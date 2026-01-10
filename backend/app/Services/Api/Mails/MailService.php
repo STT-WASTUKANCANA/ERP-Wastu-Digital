@@ -21,7 +21,7 @@ class MailService
         };
     }
 
-    public function all(int $type)
+    public function all(int $type, ?string $search = null)
     {
         $model = $this->getModel($type);
         $relations = ['mail_category', 'mail_log'];
@@ -29,6 +29,26 @@ class MailService
             $relations[] = 'division';
         }
         $query = $model::with($relations)->latest();
+
+        // Apply Search Filter
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search, $type) {
+                // Universal search on 'number'
+                $q->where('number', 'like', "%{$search}%");
+
+                if ($type === 1) { // Incoming
+                     // Search by Category Name via relation
+                     $q->orWhereHas('mail_category', function($subQ) use ($search) {
+                         $subQ->where('name', 'like', "%{$search}%");
+                     });
+                } elseif ($type === 2) { // Outgoing
+                     $q->orWhere('institute', 'like', "%{$search}%")
+                       ->orWhere('purpose', 'like', "%{$search}%");
+                } elseif ($type === 3) { // Decision
+                     $q->orWhere('title', 'like', "%{$search}%");
+                }
+            });
+        }
 
         if ($type === 2) { // Outgoing Mail Logic
             $user = auth()->user();
@@ -51,7 +71,7 @@ class MailService
         }
 
         $data = $query->get();
-        Log::info('Mail: fetched all', ['count' => $data->count(), 'type' => $type]);
+        Log::info('Mail: fetched all', ['count' => $data->count(), 'type' => $type, 'search' => $search]);
         return $data;
     }
 
