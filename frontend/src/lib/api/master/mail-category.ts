@@ -16,11 +16,14 @@ export interface MailCategoryFormData {
     description: string;
 }
 
-export async function getMailCategoryList(type?: number) {
-    let url = '/master/mail-category';
-    if (type) {
-        url += `?type=${type}`;
-    }
+export async function getMailCategoryList(type?: number, search?: string) {
+    const params = new URLSearchParams();
+    if (type) params.append('type', String(type));
+    if (search) params.append('search', search);
+
+    const queryString = params.toString();
+    const url = `/master/mail-category${queryString ? `?${queryString}` : ''}`;
+
     return await fetchWithAuth(url, { method: "GET" });
 }
 

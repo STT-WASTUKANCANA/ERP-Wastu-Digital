@@ -11,18 +11,26 @@ import { Button } from "@/components/ui/button";
 
 export default function CategoryTable() {
     const router = useRouter();
-    const [originalData, setOriginalData] = useState<MailCategory[]>([]);
-    const [filteredData, setFilteredData] = useState<MailCategory[]>([]);
+    const [categories, setCategories] = useState<MailCategory[]>([]);
     const [loading, setLoading] = useState(true);
     const [entries, setEntries] = useState(10);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
 
-    const fetchData = async () => {
+    // Debounce search input
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedSearchQuery(searchQuery);
+        }, 500);
+        return () => clearTimeout(handler);
+    }, [searchQuery]);
+
+    const fetchData = async (search: string = "") => {
         setLoading(true);
         try {
-            const res = await getMailCategoryList();
+            const res = await getMailCategoryList(undefined, search);
             if (res?.ok && res?.data?.status) {
-                setOriginalData(res.data.data);
-                setFilteredData(res.data.data);
+                setCategories(res.data.data);
             }
         } catch (error) {
             console.error(error);
@@ -32,26 +40,16 @@ export default function CategoryTable() {
     };
 
     useEffect(() => {
-        fetchData();
-    }, []);
+        fetchData(debouncedSearchQuery);
+    }, [debouncedSearchQuery]);
 
     const handleSearch = (term: string) => {
-        if (!term) {
-            setFilteredData(originalData);
-            return;
-        }
-        const lower = term.toLowerCase();
-        const filtered = originalData.filter(
-            (item) =>
-                item.name.toLowerCase().includes(lower) ||
-                item.type_label.toLowerCase().includes(lower)
-        );
-        setFilteredData(filtered);
+        setSearchQuery(term);
     };
 
     const paginatedData = useMemo(() => {
-        return filteredData.slice(0, entries);
-    }, [filteredData, entries]);
+        return categories.slice(0, entries);
+    }, [categories, entries]);
 
     const handleActionClick = async (e: React.MouseEvent, action: string, id: string) => {
         e.preventDefault();
