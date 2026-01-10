@@ -38,7 +38,7 @@ class MailRequest extends FormRequest
                     'number' => 'required|string|max:100',
                     'category_id' => 'required|exists:mail_categories,id',
                     'date' => 'required|date',
-                    'attachment' => [
+                    'attachment' => $isDecision ? 'required|string|url' : [
                         'required',
                         function ($attribute, $value, $fail) {
                              if (request()->hasFile($attribute)) {

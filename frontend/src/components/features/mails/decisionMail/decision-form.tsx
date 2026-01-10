@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { FileDropzone } from "@/components/ui/file-dropzone";
+// import { FileDropzone } from "@/components/ui/file-dropzone"; // Removed
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { createDecisionMail, updateDecisionMail } from "@/lib/api/mails/decision";
@@ -26,7 +26,7 @@ export default function DecisionForm({
 }: DecisionFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [files, setFiles] = useState<File[]>([]);
+  // const [files, setFiles] = useState<File[]>([]); // Removed
 
   const [formData, setFormData] = useState({
     number: "",
@@ -64,9 +64,9 @@ export default function DecisionForm({
     setLoading(true);
 
     const data = new FormData();
-    const { attachment, ...rest } = formData;
-    Object.entries(rest).forEach(([key, value]) => data.append(key, String(value)));
-    if (files.length > 0) data.append("attachment", files[0]);
+    // const { attachment, ...rest } = formData;
+    Object.entries(formData).forEach(([key, value]) => data.append(key, String(value)));
+    // if (files.length > 0) data.append("attachment", files[0]); // Removed
     if (mode === "edit") data.append("_method", "PUT");
 
     const res = mode === "edit"
@@ -134,11 +134,14 @@ export default function DecisionForm({
         <PdfPreview attachment={formData.attachment} className="col-span-2" />
       )}
       <div className="col-span-2">
-        <FileDropzone
-          label={mode === "edit" ? "Upload Lampiran Baru (Opsional)" : "Lampiran (PDF)"}
+        <Input
+          label="Link Google Drive (URL)"
           name="attachment"
-          onFilesAccepted={(accepted) => setFiles(accepted)}
+          value={formData.attachment}
+          onChange={handleChange}
+          placeholder="https://drive.google.com/..."
         />
+        {/* <FileDropzone ... /> Removed */}
       </div>
       <div className="col-span-2">
         <SubmitButton

@@ -74,7 +74,7 @@ const MailTable = <T extends MailTypes>({
   const canCreate =
     (roleId === 1 && type === "incoming") ||
     (type === "outgoing") ||
-    (roleId === 2 && type === "decision"); // role tertentu bisa buat decision
+    (roleId === 3 && type === "decision"); // Hanya Pulahta (Role ID 3) yg bisa buat decision
 
   return (
     <>

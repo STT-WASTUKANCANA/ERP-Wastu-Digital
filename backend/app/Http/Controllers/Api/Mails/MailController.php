@@ -54,8 +54,16 @@ class MailController extends Controller
                         $validatedData = $request->validated();
                         $validatedData['user_id'] = Auth::id();
 
-                        // ambil type dari route (1 = incoming, 2 = outgoing)
+                        // ambil type dari route (1 = incoming, 2 = outgoing, 3 = decision)
                         $type = $this->getTypeFromRoute($request);
+                        
+                        // Decision Letter (Type 3) Restriction: Only Pulahta (Role ID 3)
+                        if ($type === 3 && Auth::user()->role_id !== 3) {
+                            return response()->json([
+                                'status' => false,
+                                'message' => 'Hanya Role Pulahta yang diizinkan membuat Surat Keputusan.'
+                            ], 403);
+                        }
 
                         Log::debug('Mail:store started', [
                                 'type' => $type,

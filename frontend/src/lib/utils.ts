@@ -1,12 +1,16 @@
 const STORAGE_URL = process.env.NEXT_PUBLIC_STORAGE_URL;
 
 export function getStorageUrl(filePath: string | null | undefined): string {
-  if (!STORAGE_URL) {
-    console.error("NEXT_PUBLIC_STORAGE_URL is not defined in .env.local");
+  if (!filePath) {
     return '';
   }
 
-  if (!filePath) {
+  if (filePath.startsWith('http://') || filePath.startsWith('https://')) {
+    return filePath;
+  }
+
+  if (!STORAGE_URL) {
+    console.error("NEXT_PUBLIC_STORAGE_URL is not defined in .env.local");
     return '';
   }
 
