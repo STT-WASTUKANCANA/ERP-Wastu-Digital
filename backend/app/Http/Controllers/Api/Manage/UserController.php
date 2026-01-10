@@ -25,7 +25,7 @@ class UserController extends Controller
     public function index(Request $request)
     {
         try {
-            $users = $this->service->all();
+            $users = $this->service->all($request->search);
             return UserResource::collection($users);
         } catch (Throwable $e) {
             Log::error('UserController: index failed', ['error' => $e->getMessage()]);
