@@ -8,9 +8,18 @@ use Illuminate\Support\Facades\Log;
 
 class DivisionService
 {
-    public function all(): Collection
+    public function all($search = null): Collection
     {
-        return Division::latest()->get();
+        $query = Division::latest();
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('leader_name', 'like', "%{$search}%");
+            });
+        }
+
+        return $query->get();
     }
     public function create(array $data): Division
     {

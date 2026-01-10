@@ -20,9 +20,9 @@ class DivisionController extends Controller
         $this->service = $service;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $divisions = $this->service->all();
+        $divisions = $this->service->all($request->search);
 
         Log::info('Division:index', ['count' => $divisions->count()]);
 
