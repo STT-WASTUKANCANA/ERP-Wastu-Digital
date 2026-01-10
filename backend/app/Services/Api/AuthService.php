@@ -27,17 +27,17 @@ class AuthService
 
         public function signin(array $credentials): ?array
         {
-                Log::debug('Percobaan signin', ['email' => $credentials['email']]);
+                Log::debug('[Auth] Memulai proses login', ['email' => $credentials['email']]);
 
                 if (!$accessToken = auth('api')->attempt($credentials)) {
-                        Log::warning('Signin gagal: kredensial salah', ['email' => $credentials['email']]);
+                        Log::warning('[Auth] Gagal login: Password atau email salah', ['email' => $credentials['email']]);
                         return null;
                 }
 
                 $user = auth('api')->user();
                 $refreshTokenString = Str::random(60);
 
-                RefreshToken::create([
+                $refreshToken = RefreshToken::create([
                         'user_id'    => $user->id,
                         'token'      => Hash::make($refreshTokenString),
                         'expires_at' => now()->addDays(7),
@@ -45,58 +45,93 @@ class AuthService
                         'user_agent' => request()->userAgent(),
                 ]);
 
-                Log::info('User berhasil signin', ['email' => $credentials['email']]);
+                Log::info('[Auth] Pengguna berhasil login', [
+                    'id' => $user->id,
+                    'email' => $user->email,
+                    'ip' => request()->ip()
+                ]);
 
                 return [
                         'access_token'  => $accessToken,
-                        'refresh_token' => $refreshTokenString,
+                        'refresh_token' => $refreshToken->id . '|' . $refreshTokenString,
                 ];
         }
 
         public function signout(?string $refreshTokenString): void
         {
                 if ($refreshTokenString) {
-                        $tokens = RefreshToken::where('user_id', auth('api')->id())->get();
-                        foreach ($tokens as $token) {
-                                if (Hash::check($refreshTokenString, $token->token)) {
-                                        $token->delete();
-                                        Log::info('Refresh token dihapus dari DB', ['id' => $token->id]);
-                                        break;
-                                }
+                        // Memastikan format token adalah ID|STRING sebelum diproses
+                        if (str_contains($refreshTokenString, '|')) {
+                            [$id, $token] = explode('|', $refreshTokenString, 2);
+                            $storedToken = RefreshToken::find($id);
+                            
+                            if ($storedToken && Hash::check($token, $storedToken->token)) {
+                                $storedToken->delete();
+                                Log::info('[Auth] Refresh token berhasil dihapus', ['token_id' => $id]);
+                            } else {
+                                Log::warning('[Auth] Gagal logout: Token tidak valid atau tidak ditemukan', ['token_id' => $id]);
+                            }
                         }
                 }
 
                 $user = auth('api')->user();
-                Log::info('User signout', ['id' => $user?->id, 'email' => $user?->email]);
+                Log::info('[Auth] Pengguna melakukan logout', ['id' => $user?->id, 'email' => $user?->email]);
                 auth('api')->logout();
         }
 
         public function refresh(?string $refreshTokenString): ?string
         {
                 if (!$refreshTokenString) {
+                        Log::warning('[Auth] Permintaan refresh gagal: Token kosong');
                         return null;
                 }
 
-                $refreshToken = RefreshToken::where('user_id', auth('api')->id())->where('expires_at', '>', now())->get()->first(function ($token) use ($refreshTokenString) {
-                        return Hash::check($refreshTokenString, $token->token);
-                });
+                if (!str_contains($refreshTokenString, '|')) {
+                    Log::error('[Auth] Refresh token token rusak: Format tidak sesuai (Tanpa pemisah pipe)');
+                    return null;
+                }
+
+                [$id, $token] = explode('|', $refreshTokenString, 2);
+
+                $refreshToken = RefreshToken::find($id);
 
                 if (!$refreshToken) {
-                        Log::warning('Refresh token tidak valid atau kedaluwarsa');
-                        return null;
+                    Log::warning('[Auth] Refresh gagal: ID Token tidak ditemukan di database', ['token_id' => $id]);
+                    return null;
                 }
 
-                $user = $this->currentUser();
+                if ($refreshToken->expires_at <= now()) {
+                    Log::warning('[Auth] Refresh gagal: Token sudah kadaluwarsa', ['token_id' => $id, 'expired_at' => $refreshToken->expires_at]);
+                    return null;
+                }
+
+                if (!Hash::check($token, $refreshToken->token)) {
+                    Log::error('[Auth] Refresh gagal: Hash token tidak cocok (Potensi manipulasi)', ['token_id' => $id]);
+                    return null;
+                }
+
+                $user = User::find($refreshToken->user_id);
+                if (!$user) {
+                     Log::critical('[Auth] Refresh gagal: Data pengguna terkait token hilang', ['user_id' => $refreshToken->user_id]);
+                     return null;
+                }
+
                 $newAccessToken = auth('api')->login($user);
 
-                Log::info('Token berhasil diperbarui menggunakan refresh token', ['id' => $user?->id]);
+                Log::info('[Auth] Refresh token berhasil: Akses token baru diterbitkan', [
+                    'user_id' => $user->id,
+                    'token_id' => $id
+                ]);
+                
                 return $newAccessToken;
         }
 
         public function currentUser(): ?User
         {
                 $user = auth('api')->user();
-                Log::debug('Mengambil data user saat ini', ['id' => $user?->id, 'email' => $user?->email]);
+                if ($user) {
+                    Log::debug('[Auth] Mengambil data pengguna aktif', ['id' => $user->id]);
+                }
                 return $user;
         }
 }
