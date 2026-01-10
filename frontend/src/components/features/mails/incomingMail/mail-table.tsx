@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, MouseEvent } from "react";
+import { useState, useMemo, MouseEvent, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/shared/page-header";
@@ -33,6 +33,25 @@ const MailTable = <T extends MailTypes>({
   const config = mailConfig[type];
 
   const [selectedMail, setSelectedMail] = useState<T | null>(null);
+
+  const [entries, setEntries] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Reset page when switching mail types
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [type, mails]); // Reset on mails change (search) too? This might be annoying on refresh but safer for search.
+
+  const paginatedMails = useMemo(() => {
+    const start = (currentPage - 1) * entries;
+    const end = start + entries;
+    return mails.slice(start, end);
+  }, [mails, entries, currentPage]);
+
+  const handleEntriesChange = (value: number) => {
+    setEntries(value);
+    setCurrentPage(1);
+  };
 
   const handleRowClick = (mail: T) => {
     if (window.innerWidth < 1024) setSelectedMail(mail);
@@ -75,7 +94,7 @@ const MailTable = <T extends MailTypes>({
   const canCreate =
     (roleId === 1 && type === "incoming") ||
     (type === "outgoing") ||
-    (roleId === 3 && type === "decision"); // Hanya Pulahta (Role ID 3) yg bisa buat decision
+    (roleId === 3 && type === "decision");
 
   return (
     <>
@@ -101,10 +120,17 @@ const MailTable = <T extends MailTypes>({
         )}
       </PageHeader>
 
-      <TableContainer onSearchChange={onSearch}>
+      <TableContainer
+        onSearchChange={onSearch}
+        onEntriesChange={handleEntriesChange}
+        page={currentPage}
+        total={mails.length}
+        pageSize={entries}
+        onPageChange={setCurrentPage}
+      >
         <DataTable
           columns={columns}
-          data={mails}
+          data={paginatedMails}
           onRowClick={handleRowClick}
           emptyStateMessage={`Tidak ada data ${type}.`}
           isLoading={isLoading}

@@ -1,63 +1,21 @@
 "use client";
 
-import { useState, useEffect, useMemo, MouseEvent } from "react";
+import { useMemo, MouseEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/shared/page-header";
 import { TableContainer } from "@/components/shared/table-container";
 import { DataTable } from "@/components/shared/datatable";
-import { User } from "@/types/user-props";
+import { UserTableProps } from "@/types/user-props";
 import { getUserColumns } from "./column";
-import { deleteUser, getUserList } from "@/lib/api/manage/users";
+import { deleteUser } from "@/lib/api/manage/users";
 import { HiOutlineUpload } from "react-icons/hi";
 
-const UserTable = () => {
+const UserTable = ({ users, onUserUpdated, isLoading }: UserTableProps) => {
     const router = useRouter();
-    const [users, setUsers] = useState<User[]>([]);
-    const [loading, setLoading] = useState(true);
+
     const [entries, setEntries] = useState(10);
-    const [searchQuery, setSearchQuery] = useState("");
-    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
-
-    // Debounce search input
-    useEffect(() => {
-        const handler = setTimeout(() => {
-            setDebouncedSearchQuery(searchQuery);
-        }, 500);
-        return () => clearTimeout(handler);
-    }, [searchQuery]);
-
-    const fetchData = async (search: string = "") => {
-        setLoading(true);
-        try {
-            const res = await getUserList(search); // Assuming getUserList returns response object
-            if (res?.data?.data) { // Check structure based on getUserList return
-                // getUserList returns the raw fetchWithAuth result. 
-                // Usually { data: { data: [...] } } or similar based on backend.
-                // UserService::all returns collection.
-                // UserController::index returns Resource::collection.
-                // So res.data.data is the array.
-                const data = res.data.data || [];
-                setUsers(Array.isArray(data) ? data : []);
-            }
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchData(debouncedSearchQuery);
-    }, [debouncedSearchQuery]);
-
-    const handleSearch = (term: string) => {
-        setSearchQuery(term);
-    };
-
-    const paginatedData = useMemo(() => {
-        return users.slice(0, entries);
-    }, [users, entries]);
+    const [currentPage, setCurrentPage] = useState(1);
 
     const handleActionClick = async (e: MouseEvent, action: string, userId: string) => {
         e.stopPropagation();
@@ -72,7 +30,7 @@ const UserTable = () => {
             if (confirm("Yakin ingin menghapus user ini?")) {
                 try {
                     await deleteUser(Number(userId));
-                    fetchData(debouncedSearchQuery);
+                    onUserUpdated();
                 } catch (error) {
                     console.error("Failed to delete user:", error);
                     alert("Gagal menghapus user");
@@ -85,6 +43,17 @@ const UserTable = () => {
         () => getUserColumns(handleActionClick),
         []
     );
+
+    const paginatedData = useMemo(() => {
+        const start = (currentPage - 1) * entries;
+        const end = start + entries;
+        return users.slice(start, end);
+    }, [users, entries, currentPage]);
+
+    const handleEntriesChange = (value: number) => {
+        setEntries(value);
+        setCurrentPage(1);
+    };
 
     return (
         <>
@@ -105,14 +74,18 @@ const UserTable = () => {
             </PageHeader>
 
             <TableContainer
-                onSearchChange={handleSearch}
-                onEntriesChange={setEntries}
+                onSearchChange={(v) => console.log(v)}
+                onEntriesChange={handleEntriesChange}
+                page={currentPage}
+                total={users.length}
+                pageSize={entries}
+                onPageChange={setCurrentPage}
             >
                 <DataTable
                     columns={columns}
                     data={paginatedData}
                     emptyStateMessage="Tidak ada data pengguna."
-                    isLoading={loading}
+                    isLoading={isLoading}
                 />
             </TableContainer>
         </>

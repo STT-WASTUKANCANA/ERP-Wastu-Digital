@@ -80,4 +80,10 @@ export interface TableContainerProps {
   onModifyColumnClick?: () => void;
   onEntriesChange?: (value: number) => void;
   children: React.ReactNode;
+
+  // Pagination
+  page?: number;
+  total?: number;
+  pageSize?: number;
+  onPageChange?: (page: number) => void;
 }

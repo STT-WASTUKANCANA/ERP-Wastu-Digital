@@ -23,11 +23,6 @@ class MailCategoryController extends Controller
             $query->where('type', $request->type);
         }
 
-        if ($request->has('search')) {
-            $search = $request->search;
-            $query->where('name', 'like', "%{$search}%");
-        }
-
         $categories = $query->orderBy('type')->orderBy('name')->get();
 
         return response()->json([

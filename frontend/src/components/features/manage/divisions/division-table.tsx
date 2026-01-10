@@ -13,26 +13,20 @@ import { HiOutlineUpload } from "react-icons/hi";
 
 export default function DivisionTable() {
     const router = useRouter();
-    const [divisions, setDivisions] = useState<Division[]>([]);
+    const [originalData, setOriginalData] = useState<Division[]>([]);
+    const [filteredData, setFilteredData] = useState<Division[]>([]);
     const [loading, setLoading] = useState(true);
+
     const [entries, setEntries] = useState(10);
-    const [searchQuery, setSearchQuery] = useState("");
-    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
 
-    // Debounce search input
-    useEffect(() => {
-        const handler = setTimeout(() => {
-            setDebouncedSearchQuery(searchQuery);
-        }, 500);
-        return () => clearTimeout(handler);
-    }, [searchQuery]);
-
-    const fetchData = async (search: string = "") => {
+    const fetchData = async () => {
         setLoading(true);
         try {
-            const res = await getDivisionList(search);
+            const res = await getDivisionList();
             if (res?.ok && res?.data?.status) {
-                setDivisions(res.data.data);
+                setOriginalData(res.data.data);
+                setFilteredData(res.data.data);
             }
         } catch (error) {
             console.error(error);
@@ -42,16 +36,34 @@ export default function DivisionTable() {
     };
 
     useEffect(() => {
-        fetchData(debouncedSearchQuery);
-    }, [debouncedSearchQuery]);
+        fetchData();
+    }, []);
 
     const handleSearch = (term: string) => {
-        setSearchQuery(term);
+        if (!term) {
+            setFilteredData(originalData);
+            return;
+        }
+        const lower = term.toLowerCase();
+        const filtered = originalData.filter(
+            (item) =>
+                item.name.toLowerCase().includes(lower) ||
+                (item.leader_name && item.leader_name.toLowerCase().includes(lower))
+        );
+        setFilteredData(filtered);
+        setCurrentPage(1);
     };
 
     const paginatedData = useMemo(() => {
-        return divisions.slice(0, entries);
-    }, [divisions, entries]);
+        const start = (currentPage - 1) * entries;
+        const end = start + entries;
+        return filteredData.slice(start, end);
+    }, [filteredData, entries, currentPage]);
+
+    const handleEntriesChange = (value: number) => {
+        setEntries(value);
+        setCurrentPage(1);
+    };
 
     const handleActionClick = async (e: React.MouseEvent, action: string, id: string) => {
         e.preventDefault();
@@ -98,7 +110,11 @@ export default function DivisionTable() {
 
             <TableContainer
                 onSearchChange={handleSearch}
-                onEntriesChange={setEntries}
+                onEntriesChange={handleEntriesChange}
+                page={currentPage}
+                total={filteredData.length}
+                pageSize={entries}
+                onPageChange={setCurrentPage}
             >
                 <DataTable
                     columns={columns}

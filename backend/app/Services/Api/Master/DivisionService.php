@@ -8,20 +8,9 @@ use Illuminate\Support\Facades\Log;
 
 class DivisionService
 {
-    public function all($search = null): Collection
+    public function all(): Collection
     {
-        $query = Division::latest();
-
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhereHas('leader', function ($subQ) use ($search) {
-                      $subQ->where('name', 'like', "%{$search}%");
-                  });
-            });
-        }
-
-        return $query->get();
+        return Division::latest()->get();
     }
     public function create(array $data): Division
     {

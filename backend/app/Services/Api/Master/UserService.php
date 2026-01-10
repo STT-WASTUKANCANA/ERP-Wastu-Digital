@@ -9,24 +9,9 @@ use Illuminate\Support\Facades\Log;
 
 class UserService
 {
-    public function all($search = null)
+    public function all()
     {
-        $query = User::with('role', 'division')->latest();
-
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhereHas('role', function ($q) use ($search) {
-                      $q->where('name', 'like', "%{$search}%");
-                  })
-                  ->orWhereHas('division', function ($q) use ($search) {
-                      $q->where('name', 'like', "%{$search}%");
-                  });
-            });
-        }
-
-        $data = $query->get();
+        $data = User::with('role', 'division')->latest()->get();
         Log::info('User: fetched all', ['count' => $data->count()]);
         return $data;
     }

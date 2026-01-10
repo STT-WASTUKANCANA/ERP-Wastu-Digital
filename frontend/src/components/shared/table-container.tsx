@@ -8,6 +8,7 @@ import { TbColumns2, TbDotsVertical } from 'react-icons/tb';
 import { IoChevronDown } from 'react-icons/io5';
 import { GoFilter } from 'react-icons/go';
 import { TableContainerProps } from '@/types/ui-props';
+import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
 export const TableContainer = ({
         onSearchChange,
@@ -15,8 +16,16 @@ export const TableContainer = ({
         onModifyColumnClick,
         onEntriesChange,
         children,
+        page = 1,
+        total = 0,
+        pageSize = 10,
+        onPageChange,
 }: TableContainerProps) => {
         const [toolsDropdown, setToolsDropdown] = useState(false);
+
+        const totalPages = Math.ceil(total / pageSize);
+        const startEntry = (page - 1) * pageSize + 1;
+        const endEntry = Math.min(page * pageSize, total);
 
         return (
                 <div className="relative w-full rounded-lg border border-secondary/20 p-4 lg:p-8 bg-background">
@@ -33,6 +42,7 @@ export const TableContainer = ({
                                                                 id="entries"
                                                                 className="appearance-none bg-background border border-secondary/20 rounded-md py-2 pl-3 pr-8 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
                                                                 onChange={(e) => onEntriesChange?.(Number(e.target.value))}
+                                                                defaultValue={pageSize}
                                                         >
                                                                 <option value={10}>10</option>
                                                                 <option value={25}>25</option>
@@ -74,6 +84,88 @@ export const TableContainer = ({
                         </div>
 
                         <div className="overflow-x-auto">{children}</div>
+
+                        {onPageChange && total > 0 && totalPages > 1 && (
+                                <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6 text-sm text-muted-foreground w-full">
+                                        <div className="order-2 sm:order-1">
+                                                Menampilkan {startEntry} - {endEntry} dari {total} data
+                                        </div>
+                                        <div className="flex items-center gap-1 order-1 sm:order-2">
+                                                <Button
+                                                        onClick={() => onPageChange(page - 1)}
+                                                        disabled={page === 1}
+                                                        className="px-3 py-1 h-8 bg-background border border-secondary/20 hover:bg-secondary/10 disabled:opacity-50 text-foreground text-xs font-medium"
+                                                >
+                                                        <FaChevronLeft />
+                                                </Button>
+
+                                                {(() => {
+                                                        const items = [];
+                                                        // Always show first
+                                                        items.push(1);
+
+                                                        if (page > 3) {
+                                                                items.push('...');
+                                                        }
+
+                                                        // Neighbors
+                                                        const start = Math.max(2, page - 1);
+                                                        const end = Math.min(totalPages - 1, page + 1);
+
+                                                        for (let i = start; i <= end; i++) {
+                                                                items.push(i);
+                                                        }
+
+                                                        if (page < totalPages - 2) {
+                                                                items.push('...');
+                                                        }
+
+                                                        // Always show last if > 1
+                                                        if (totalPages > 1) {
+                                                                items.push(totalPages);
+                                                        }
+
+                                                        // Handle simple cases where logic above duplicates or misses (small totalPages)
+                                                        // Simplified logic for small numbers:
+                                                        // If totalPages <= 5, show all.
+
+                                                        let finalItems = [];
+                                                        if (totalPages <= 5) {
+                                                                finalItems = Array.from({ length: totalPages }, (_, i) => i + 1);
+                                                        } else {
+                                                                finalItems = items;
+                                                                // Deduplicate just in case logic overlaps
+                                                                finalItems = [...new Set(items)];
+                                                        }
+
+                                                        return finalItems.map((item, idx) => (
+                                                                <Button
+                                                                        key={idx}
+                                                                        onClick={() => typeof item === 'number' ? onPageChange(item) : undefined}
+                                                                        disabled={item === '...'}
+                                                                        className={`px-3 py-1 h-8 min-w-[32px] rounded-md text-xs font-medium transition-colors border
+                                                                                ${item === page
+                                                                                        ? "bg-primary text-background border-primary hover:bg-primary/90"
+                                                                                        : "bg-background text-foreground border-secondary/20 hover:bg-secondary/10"
+                                                                                }
+                                                                                ${item === '...' ? 'cursor-default hover:bg-background border-none' : ''}
+                                                                        `}
+                                                                >
+                                                                        {item}
+                                                                </Button>
+                                                        ));
+                                                })()}
+
+                                                <Button
+                                                        onClick={() => onPageChange(page + 1)}
+                                                        disabled={page === totalPages}
+                                                        className="px-3 py-1 h-8 bg-background border border-secondary/20 hover:bg-secondary/10 disabled:opacity-50 text-foreground text-xs font-medium"
+                                                >
+                                                        <FaChevronRight />
+                                                </Button>
+                                        </div>
+                                </div>
+                        )}
                 </div>
         );
 };

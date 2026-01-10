@@ -1,14 +1,8 @@
 import { fetchWithAuth } from "../api";
 import { DivisionFormData } from "@/types/division-props";
 
-export async function getDivisionList(search?: string) {
-        const params = new URLSearchParams();
-        if (search) params.append('search', search);
-
-        const queryString = params.toString();
-        const url = `/manage/division${queryString ? `?${queryString}` : ''}`;
-
-        return await fetchWithAuth(url, { method: "GET" });
+export async function getDivisionList() {
+        return await fetchWithAuth('/manage/division', { method: "GET" });
 }
 
 export async function getDivision(id: string) {
