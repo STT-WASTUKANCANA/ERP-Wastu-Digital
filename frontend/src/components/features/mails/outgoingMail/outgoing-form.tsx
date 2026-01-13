@@ -143,10 +143,10 @@ export default function OutgoingForm({
       router.push("/workspace/mail/outgoing");
     } else {
       try {
-        const errorData = await res.json();
-        alert(`Gagal memvalidasi surat: ${res.status} - ${errorData.message || JSON.stringify(errorData)}`);
+        const errorData = res.data;
+        alert(`Gagal memvalidasi surat: ${res.status} - ${errorData?.message || JSON.stringify(errorData)}`);
       } catch (e) {
-        alert(`Gagal memvalidasi surat: ${res.status} - ${res.statusText}`);
+        alert(`Gagal memvalidasi surat: ${res.status}`);
       }
     }
     setLoading(false);
@@ -280,29 +280,37 @@ export default function OutgoingForm({
           )}
 
           <div className="col-span-2">
-            <div className="col-span-2">
-              {roleId === 3 ? (
-                <Input
-                  label="Link Google Drive"
-                  id="attachment"
+            {roleId === 3 ? (
+              <Input
+                label="Link Google Drive"
+                id="attachment"
+                name="attachment"
+                type="text"
+                value={formData.attachment}
+                onChange={handleChange}
+                placeholder="https://drive.google.com/..."
+                disabled={isReadOnly}
+              />
+            ) : (
+              !isReadOnly && (
+                <FileDropzone
+                  label={mode === "edit" ? "Upload Lampiran Baru (Opsional)" : "Lampiran (PDF)"}
                   name="attachment"
-                  type="text"
-                  value={formData.attachment}
-                  onChange={handleChange}
-                  placeholder="https://drive.google.com/..."
-                  disabled={isReadOnly}
+                  onFilesAccepted={(accepted) => setFiles(accepted)}
                 />
-              ) : (
-                !isReadOnly && (
-                  <FileDropzone
-                    label={mode === "edit" ? "Upload Lampiran Baru (Opsional)" : "Lampiran (PDF)"}
-                    name="attachment"
-                    onFilesAccepted={(accepted) => setFiles(accepted)}
-                  />
-                )
-              )}
-            </div>
+              )
+            )}
           </div>
+
+
+          {!isSekumVerification && !isCreatorReadOnly && (
+            <div className="col-span-2">
+              <SubmitButton
+                loading={loading}
+                submitText={mode === "edit" ? "Update Surat" : "Submit"}
+              />
+            </div>
+          )}
         </div>
       </div>
 
@@ -351,16 +359,6 @@ export default function OutgoingForm({
         )
       }
 
-      {
-        !isSekumVerification && !isCreatorReadOnly && (
-          <div className="mt-8">
-            <SubmitButton
-              loading={loading}
-              submitText={mode === "edit" ? "Update Surat" : "Submit"}
-            />
-          </div>
-        )
-      }
     </form >
   );
 }

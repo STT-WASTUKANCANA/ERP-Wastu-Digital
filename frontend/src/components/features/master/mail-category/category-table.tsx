@@ -10,6 +10,7 @@ import { TableContainer } from "@/components/shared/table-container";
 import { Button } from "@/components/ui/button";
 
 import { CategoryOffcanvasDetail } from "./offcanvas-detail";
+import { HiOutlineUpload } from "react-icons/hi";
 
 export default function CategoryTable() {
     const router = useRouter();
@@ -104,6 +105,10 @@ export default function CategoryTable() {
     return (
         <>
             <PageHeader title="Master Kategori Surat" description="Kelola kategori surat masuk, keluar, dan keputusan.">
+                <Button className="text-foreground/70 text-sm cursor-pointer px-8 py-2 flex justify-center items-center gap-2 border border-secondary/20 bg-background">
+                    <HiOutlineUpload />
+                    <span>Export</span>
+                </Button>
                 <Button
                     className="bg-primary text-background text-sm px-4 py-2"
                     onClick={() => router.push("/workspace/master/mail-category/create")}
