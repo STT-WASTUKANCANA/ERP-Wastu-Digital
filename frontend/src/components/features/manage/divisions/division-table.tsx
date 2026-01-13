@@ -109,7 +109,7 @@ export default function DivisionTable() {
             <PageHeader title="Manajemen Divisi" description="Kelola data divisi dan kepala bidang dengan efisien.">
                 <Button className="text-foreground/70 text-sm cursor-pointer px-8 py-2 flex justify-center items-center gap-2 border border-secondary/20 bg-background">
                     <HiOutlineUpload />
-                    <span>Export</span>
+                    <span>Ekspor</span>
                 </Button>
 
                 <Button

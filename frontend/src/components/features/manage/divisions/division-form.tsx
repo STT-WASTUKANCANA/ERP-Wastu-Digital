@@ -136,7 +136,7 @@ export default function DivisionForm({ id }: DivisionFormProps) {
             <div className="col-span-2">
                 <SubmitButton
                     loading={loading}
-                    submitText={isEdit ? "Simpan Perubahan" : "Buat Divisi"}
+                    submitText="Simpan"
                 />
             </div>
         </FormWrapper>

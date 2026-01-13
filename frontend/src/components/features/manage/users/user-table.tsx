@@ -92,7 +92,7 @@ const UserTable = ({ users, onUserUpdated, isLoading }: UserTableProps) => {
             >
                 <Button className="text-foreground/70 text-sm cursor-pointer px-8 py-2 flex justify-center items-center gap-2 border border-secondary/20 bg-background">
                     <HiOutlineUpload />
-                    <span>Export</span>
+                    <span>Ekspor</span>
                 </Button>
                 <Button
                     className="bg-primary text-background text-sm px-4 py-2"

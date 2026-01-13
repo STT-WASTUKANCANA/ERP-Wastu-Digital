@@ -307,7 +307,7 @@ export default function OutgoingForm({
             <div className="col-span-2">
               <SubmitButton
                 loading={loading}
-                submitText={mode === "edit" ? "Update Surat" : "Submit"}
+                submitText="Simpan"
               />
             </div>
           )}

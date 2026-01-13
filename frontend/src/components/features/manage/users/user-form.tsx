@@ -150,7 +150,7 @@ export default function UserForm({
             <div className="col-span-2">
                 <SubmitButton
                     loading={loading}
-                    submitText={mode === "edit" ? "Perbarui Pengguna" : "Tambah Pengguna"}
+                    submitText="Simpan"
                 />
             </div>
         </FormWrapper>

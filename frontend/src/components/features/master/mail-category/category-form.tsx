@@ -128,7 +128,7 @@ export default function CategoryForm({ id }: CategoryFormProps) {
             <div className="col-span-2">
                 <SubmitButton
                     loading={loading}
-                    submitText={isEdit ? "Simpan Perubahan" : "Buat Kategori"}
+                    submitText="Simpan"
                 />
             </div>
         </FormWrapper>
