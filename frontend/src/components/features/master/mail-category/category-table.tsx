@@ -9,6 +9,8 @@ import { PageHeader } from "@/components/shared/page-header";
 import { TableContainer } from "@/components/shared/table-container";
 import { Button } from "@/components/ui/button";
 
+import { CategoryOffcanvasDetail } from "./offcanvas-detail";
+
 export default function CategoryTable() {
     const router = useRouter();
     const [originalData, setOriginalData] = useState<MailCategory[]>([]);
@@ -16,6 +18,7 @@ export default function CategoryTable() {
     const [loading, setLoading] = useState(true);
     const [entries, setEntries] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
+    const [selectedCategory, setSelectedCategory] = useState<MailCategory | null>(null);
 
     const fetchData = async () => {
         setLoading(true);
@@ -63,11 +66,13 @@ export default function CategoryTable() {
     };
 
     const handleActionClick = async (e: React.MouseEvent, action: string, id: string) => {
-        e.preventDefault();
+        e?.preventDefault();
+        e?.stopPropagation(); // Prevent row click
 
         if (action === "Edit") {
             sessionStorage.setItem("editingCategoryId", id);
             router.push(`/workspace/master/mail-category/edit`);
+            setSelectedCategory(null); // Close offcanvas
         } else if (action === "Delete") {
             const confirmed = window.confirm("Hapus Kategori? Data yang dihapus tidak dapat dikembalikan.");
 
@@ -77,6 +82,7 @@ export default function CategoryTable() {
                     if (res?.data?.status) {
                         alert("Kategori berhasil dihapus");
                         fetchData();
+                        setSelectedCategory(null); // Close offcanvas
                     } else {
                         alert(res?.data?.message || "Terjadi kesalahan");
                     }
@@ -84,6 +90,12 @@ export default function CategoryTable() {
                     alert("Error menghubungi server");
                 }
             }
+        }
+    };
+
+    const handleRowClick = (item: MailCategory) => {
+        if (window.innerWidth < 1024) {
+            setSelectedCategory(item);
         }
     };
 
@@ -113,8 +125,17 @@ export default function CategoryTable() {
                     data={paginatedData}
                     isLoading={loading}
                     emptyStateMessage="Belum ada kategori surat"
+                    onRowClick={handleRowClick}
                 />
             </TableContainer>
+
+            {selectedCategory && (
+                <CategoryOffcanvasDetail
+                    category={selectedCategory}
+                    onClose={() => setSelectedCategory(null)}
+                    onAction={handleActionClick}
+                />
+            )}
         </>
     );
 }

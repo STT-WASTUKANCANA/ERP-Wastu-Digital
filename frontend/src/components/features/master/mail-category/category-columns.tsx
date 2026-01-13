@@ -10,10 +10,12 @@ export const getMailCategoryColumns = (
         {
             accessorKey: "name",
             header: "Nama Kategori",
+            mobile: true,
         },
         {
             accessorKey: "type_label",
             header: "Jenis Surat",
+            mobile: true,
             cell: (row) => (
                 <div className="badge badge-outline">{row.type_label}</div>
             ),
