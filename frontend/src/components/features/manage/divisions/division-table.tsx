@@ -11,6 +11,8 @@ import { TableContainer } from "@/components/shared/table-container";
 import { Button } from "@/components/ui/button";
 import { HiOutlineUpload } from "react-icons/hi";
 
+import { DivisionOffcanvasDetail } from "./offcanvas-detail";
+
 export default function DivisionTable() {
     const router = useRouter();
     const [originalData, setOriginalData] = useState<Division[]>([]);
@@ -19,6 +21,7 @@ export default function DivisionTable() {
 
     const [entries, setEntries] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
+    const [selectedDivision, setSelectedDivision] = useState<Division | null>(null);
 
     const fetchData = async () => {
         setLoading(true);
@@ -66,11 +69,13 @@ export default function DivisionTable() {
     };
 
     const handleActionClick = async (e: React.MouseEvent, action: string, id: string) => {
-        e.preventDefault();
+        e?.preventDefault();
+        e?.stopPropagation();
 
         if (action === "Edit") {
             sessionStorage.setItem("editingDivisionId", id);
             router.push(`/workspace/manage/division/edit`);
+            setSelectedDivision(null);
         } else if (action === "Delete") {
             const confirmed = window.confirm("Hapus Divisi? Data yang dihapus tidak dapat dikembalikan.");
 
@@ -80,6 +85,7 @@ export default function DivisionTable() {
                     if (res?.data?.status) {
                         alert("Divisi berhasil dihapus");
                         fetchData();
+                        setSelectedDivision(null);
                     } else {
                         alert(res?.data?.message || "Terjadi kesalahan");
                     }
@@ -87,6 +93,12 @@ export default function DivisionTable() {
                     alert("Error menghubungi server");
                 }
             }
+        }
+    };
+
+    const handleRowClick = (item: Division) => {
+        if (window.innerWidth < 1024) {
+            setSelectedDivision(item);
         }
     };
 
@@ -121,8 +133,17 @@ export default function DivisionTable() {
                     data={paginatedData}
                     isLoading={loading}
                     emptyStateMessage="Belum ada data divisi"
+                    onRowClick={handleRowClick}
                 />
             </TableContainer>
+
+            {selectedDivision && (
+                <DivisionOffcanvasDetail
+                    division={selectedDivision}
+                    onClose={() => setSelectedDivision(null)}
+                    onAction={handleActionClick}
+                />
+            )}
         </>
     );
 }

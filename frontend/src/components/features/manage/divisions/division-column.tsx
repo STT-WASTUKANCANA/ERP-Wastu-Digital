@@ -10,6 +10,7 @@ export const getDivisionColumns = (
         {
             header: "Nama Divisi",
             accessorKey: "name",
+            mobile: true,
         },
         {
             header: "Deskripsi",
@@ -19,6 +20,7 @@ export const getDivisionColumns = (
         {
             header: "Kepala Bidang",
             accessorKey: "leader_name",
+            mobile: true,
             cell: (row) => row.leader_name || <span className="text-gray-400 italic">Belum ditentukan</span>,
         },
         {
