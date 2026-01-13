@@ -1,6 +1,6 @@
 import { SigninPayload } from "@/types/auth-props"
 import { jwtDecode } from "jwt-decode"
-import { cookies } from "next/headers"
+
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL
 
@@ -19,4 +19,16 @@ export async function signinRequest(payload: SigninPayload) {
 
   const data = await res.json()
   return { ok: res.ok, data }
+}
+
+export async function signoutRequest() {
+  if (!API_URL) throw new Error("API URL is not defined")
+
+  const res = await fetch(`${API_URL}/auth/signout`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+  })
+
+  return { ok: res.ok }
 }

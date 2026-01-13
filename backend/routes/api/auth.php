@@ -13,6 +13,7 @@ Route::prefix('auth')
         Route::middleware('auth:api')
             ->group(function () {
                 Route::post('profile', [AuthController::class, 'profile'])->name('profile');
-                Route::post('signout', [AuthController::class, 'signout'])->name('signout');
             });
+
+        Route::post('signout', [AuthController::class, 'signout'])->name('signout');
     });
