@@ -34,6 +34,7 @@ export type OutgoingMail = {
         address: string;
         purpose: string;
         status: string; // 'pending' | 'approved' | 'rejected'
+        desc?: string;
 };
 
 export type DecisionMail = {

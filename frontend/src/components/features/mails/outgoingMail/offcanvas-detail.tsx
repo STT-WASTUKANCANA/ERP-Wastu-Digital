@@ -3,8 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import { OutgoingMail, outgoingStatusMap } from '@/types/mail-props';
 import { IoClose } from "react-icons/io5";
-import { FiEdit, FiTrash2, FiDownload, FiCheckCircle, FiXCircle, FiSave } from "react-icons/fi";
-import { getStorageUrl } from '@/lib/utils';
+import { FiEdit, FiTrash2, FiDownload, FiSave } from "react-icons/fi";
+import { getStorageUrl, formatDate } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -19,8 +19,6 @@ interface OutgoingOffcanvasDetailProps {
     onClose: () => void;
     onAction: (e: React.MouseEvent, action: string, mailId: string) => void;
 }
-
-
 
 export const OutgoingOffcanvasDetail = ({ mail, onClose, onAction }: OutgoingOffcanvasDetailProps) => {
     const [isVisible, setIsVisible] = useState(false);
@@ -68,12 +66,12 @@ export const OutgoingOffcanvasDetail = ({ mail, onClose, onAction }: OutgoingOff
         >
             <div
                 onClick={(e) => e.stopPropagation()}
-                className={`fixed top-0 right-0 h-full w-[280px] max-w-[80vw] bg-background shadow-2xl z-50
+                className={`fixed top-0 right-0 h-[100dvh] w-[280px] max-w-[80vw] bg-background shadow-2xl z-50
           flex flex-col transform transition-transform duration-300 ease-in-out
           ${isVisible ? "translate-x-0" : "translate-x-full"}`}
             >
                 <header className="flex justify-between items-center p-5 border-b border-secondary/20">
-                    <h5>Detail Surat Keluar</h5>
+                    <div className="text-lg font-semibold">Detail Surat Keluar</div>
                     <button
                         onClick={handleClose}
                         className="p-1 rounded-full text-foreground/70 hover:bg-muted hover:text-foreground"
@@ -83,35 +81,45 @@ export const OutgoingOffcanvasDetail = ({ mail, onClose, onAction }: OutgoingOff
                 </header>
 
                 <main className="flex-grow overflow-y-auto p-5">
-                    <div className="space-y-5 text-sm">
+                    <div className="space-y-4 text-sm">
                         <div>
                             <p className="text-secondary text-xs mb-1 font-medium">Nomor Surat</p>
-                            <p>{mail.number}</p>
+                            <p className="font-medium text-foreground">{mail.number}</p>
                         </div>
                         <div>
                             <p className="text-secondary text-xs mb-1 font-medium">Tanggal</p>
-                            <p>{mail.date as unknown as string}</p>
+                            <p className="text-foreground">{formatDate(mail.date)}</p>
                         </div>
                         <div>
                             <p className="text-secondary text-xs mb-1 font-medium">Kategori</p>
-                            <p>{mail.category_name}</p>
+                            <p className="text-foreground">{mail.category_name}</p>
                         </div>
                         <div>
-                            <p className="text-secondary text-xs mb-1 font-medium">Pembuat</p>
-                            <p>{mail.user_name}</p>
+                            <p className="text-secondary text-xs mb-1 font-medium">Oleh</p>
+                            <p className="text-foreground">{mail.user_name}</p>
                         </div>
                         <div>
                             <p className="text-secondary text-xs mb-1 font-medium">Instansi</p>
-                            <p>{mail.institute}</p>
+                            <p className="text-foreground">{mail.institute}</p>
                         </div>
                         <div>
-                            <p className="text-secondary text-xs mb-1 font-medium">Perihal</p>
-                            <p>{mail.purpose}</p>
+                            <p className="text-secondary text-xs mb-1 font-medium">Alamat</p>
+                            <p className="text-foreground">{mail.address}</p>
                         </div>
                         <div>
                             <p className="text-secondary text-xs mb-1 font-medium">Status</p>
                             <Badge value={String(mail.status)} map={outgoingStatusMap} />
                         </div>
+                        <div>
+                            <p className="text-secondary text-xs mb-1 font-medium">Tujuan</p>
+                            <p className="text-foreground">{mail.purpose}</p>
+                        </div>
+                        {mail.desc && (
+                            <div>
+                                <p className="text-secondary text-xs mb-1 font-medium">Perihal</p>
+                                <p className="text-foreground">{mail.desc}</p>
+                            </div>
+                        )}
                     </div>
                 </main>
 
