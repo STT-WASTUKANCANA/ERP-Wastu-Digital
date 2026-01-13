@@ -16,7 +16,7 @@ export default function SigninForm() {
   const [toastMessage, setToastMessage] = useState("")
   const [toastVariant, setToastVariant] = useState<"success" | "error">("success")
 
-  const TOAST_DURATION = 3000
+  const TOAST_DURATION = 1500
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
