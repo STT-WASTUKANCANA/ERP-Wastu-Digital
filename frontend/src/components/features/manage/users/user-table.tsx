@@ -11,18 +11,24 @@ import { getUserColumns } from "./column";
 import { deleteUser } from "@/lib/api/manage/users";
 import { HiOutlineUpload } from "react-icons/hi";
 
+import { User } from "@/types/user-props";
+import { UserOffcanvasDetail } from "./offcanvas-detail";
+
 const UserTable = ({ users, onUserUpdated, isLoading }: UserTableProps) => {
     const router = useRouter();
 
     const [entries, setEntries] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
+    const [selectedUser, setSelectedUser] = useState<User | null>(null);
+    const [searchTerm, setSearchTerm] = useState("");
 
     const handleActionClick = async (e: MouseEvent, action: string, userId: string) => {
-        e.stopPropagation();
+        e?.stopPropagation();
 
         if (action === "Edit") {
             sessionStorage.setItem(`editingUserId`, userId);
             router.push(`/workspace/manage/user/edit`);
+            setSelectedUser(null);
             return;
         }
 
@@ -31,6 +37,7 @@ const UserTable = ({ users, onUserUpdated, isLoading }: UserTableProps) => {
                 try {
                     await deleteUser(Number(userId));
                     onUserUpdated();
+                    setSelectedUser(null);
                 } catch (error) {
                     console.error("Failed to delete user:", error);
                     alert("Gagal menghapus user");
@@ -44,15 +51,37 @@ const UserTable = ({ users, onUserUpdated, isLoading }: UserTableProps) => {
         []
     );
 
+    const filteredUsers = useMemo(() => {
+        if (!searchTerm) return users;
+        const lower = searchTerm.toLowerCase();
+        return users.filter((user) =>
+            user.name.toLowerCase().includes(lower) ||
+            user.email.toLowerCase().includes(lower) ||
+            (user.role_name && user.role_name.toLowerCase().includes(lower)) ||
+            (user.division_name && user.division_name.toLowerCase().includes(lower))
+        );
+    }, [users, searchTerm]);
+
     const paginatedData = useMemo(() => {
         const start = (currentPage - 1) * entries;
         const end = start + entries;
-        return users.slice(start, end);
-    }, [users, entries, currentPage]);
+        return filteredUsers.slice(start, end);
+    }, [filteredUsers, entries, currentPage]);
+
+    const handleSearch = (term: string) => {
+        setSearchTerm(term);
+        setCurrentPage(1);
+    };
 
     const handleEntriesChange = (value: number) => {
         setEntries(value);
         setCurrentPage(1);
+    };
+
+    const handleRowClick = (user: User) => {
+        if (window.innerWidth < 1024) {
+            setSelectedUser(user);
+        }
     };
 
     return (
@@ -74,10 +103,10 @@ const UserTable = ({ users, onUserUpdated, isLoading }: UserTableProps) => {
             </PageHeader>
 
             <TableContainer
-                onSearchChange={(v) => console.log(v)}
+                onSearchChange={handleSearch}
                 onEntriesChange={handleEntriesChange}
                 page={currentPage}
-                total={users.length}
+                total={filteredUsers.length}
                 pageSize={entries}
                 onPageChange={setCurrentPage}
             >
@@ -86,8 +115,17 @@ const UserTable = ({ users, onUserUpdated, isLoading }: UserTableProps) => {
                     data={paginatedData}
                     emptyStateMessage="Tidak ada data pengguna."
                     isLoading={isLoading}
+                    onRowClick={handleRowClick}
                 />
             </TableContainer>
+
+            {selectedUser && (
+                <UserOffcanvasDetail
+                    user={selectedUser}
+                    onClose={() => setSelectedUser(null)}
+                    onAction={handleActionClick}
+                />
+            )}
         </>
     );
 };

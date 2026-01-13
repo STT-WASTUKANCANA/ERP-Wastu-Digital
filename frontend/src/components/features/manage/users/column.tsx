@@ -19,11 +19,11 @@ export const getUserColumns = (
         {
             header: 'Email',
             accessorKey: 'email',
-            mobile: true,
         },
         {
             header: 'Role',
             accessorKey: 'role_name',
+            mobile: true,
             cell: (row) => row.role_name || 'Administrator',
         },
         {
