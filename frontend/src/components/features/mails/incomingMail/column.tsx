@@ -53,12 +53,16 @@ export const getIncomingMailColumns = (
                                                 return <Badge value="Proses" map={{ "Proses": { label: "Proses", color: "bg-yellow-100 text-yellow-800" } }} />;
                                         }
 
-                                        const label = row.division_name ? `Disposisi - ${row.division_name}` : statusMap[2];
-                                        return <Badge value={2} map={{ 2: { label: label, color: "bg-blue-100 text-blue-800" } }} />;
+                                        return <Badge value={2} map={{ 2: { label: statusMap[2], color: "bg-blue-100 text-blue-800" } }} />;
                                 }
 
                                 return <Badge value={3} map={{ 3: { label: "Selesai", color: "bg-green-100 text-green-800" } }} />;
                         },
+                },
+                {
+                        header: 'Divisi',
+                        accessorKey: 'division_name',
+                        cell: (row) => row.division_name || '-',
                 },
                 {
                         header: 'Dilihat',

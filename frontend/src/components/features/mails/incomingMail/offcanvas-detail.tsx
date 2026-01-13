@@ -4,14 +4,19 @@ import React, { useEffect, useState, MouseEvent } from 'react';
 import { IncomingMail, IncomingOffcanvasDetailProps, statusMap } from '@/types/mail-props';
 import { IoClose } from "react-icons/io5";
 import { FiEdit, FiTrash2, FiDownload } from "react-icons/fi";
-import { getStorageUrl } from '@/lib/utils';
+import { getStorageUrl, formatDate } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
-const badgeMap = {
-        1: { label: statusMap[1], color: "bg-secondary text-white" },
-        2: { label: statusMap[2], color: "bg-blue-100 text-blue-800" },
-        3: { label: statusMap[3], color: "bg-green-100 text-green-800" },
+const getBadgeConfig = (status: number, followStatus: number) => {
+        if (status === 2 && followStatus === 2) {
+                return { label: "Proses", color: "bg-yellow-100 text-yellow-800" };
+        }
+        return {
+                1: { label: statusMap[1], color: "bg-secondary text-white" },
+                2: { label: statusMap[2], color: "bg-blue-100 text-blue-800" },
+                3: { label: statusMap[3], color: "bg-green-100 text-green-800" },
+        }[status] || { label: "Unknown", color: "bg-gray-100 text-gray-800" };
 };
 
 export const OffcanvasDetail = ({ mail, onClose, onAction }: IncomingOffcanvasDetailProps) => {
@@ -38,12 +43,12 @@ export const OffcanvasDetail = ({ mail, onClose, onAction }: IncomingOffcanvasDe
                 >
                         <div
                                 onClick={(e) => e.stopPropagation()}
-                                className={`fixed top-0 right-0 h-full w-[280px] max-w-[80vw] bg-background shadow-2xl z-50
+                                className={`fixed top-0 right-0 h-[100dvh] w-[280px] max-w-[80vw] bg-background shadow-2xl z-50
           flex flex-col transform transition-transform duration-300 ease-in-out
           ${isVisible ? "translate-x-0" : "translate-x-full"}`}
                         >
                                 <header className="flex justify-between items-center p-5 border-b border-secondary/20">
-                                        <h5>Mail Detail</h5>
+                                        <div className="text-lg font-semibold">Detail Surat</div>
                                         <button
                                                 onClick={handleClose}
                                                 className="p-1 rounded-full text-foreground/70 hover:bg-muted hover:text-foreground"
@@ -53,28 +58,47 @@ export const OffcanvasDetail = ({ mail, onClose, onAction }: IncomingOffcanvasDe
                                 </header>
 
                                 <main className="flex-grow overflow-y-auto p-5">
-                                        <div className="space-y-5 text-sm">
+                                        <div className="space-y-4 text-sm">
                                                 <div>
-                                                        <p className="text-secondary text-xs mb-1 font-medium">Mail Number</p>
-                                                        <p>{mail.number}</p>
+                                                        <p className="text-secondary text-xs mb-1 font-medium">Nomor Surat</p>
+                                                        <p className="font-medium text-foreground">{mail.number}</p>
                                                 </div>
                                                 <div>
-                                                        <p className="text-secondary text-xs mb-1 font-medium">Date</p>
-                                                        <p>{mail.date}</p>
+                                                        <p className="text-secondary text-xs mb-1 font-medium">Tanggal</p>
+                                                        <p className="text-foreground">{formatDate(mail.date)}</p>
                                                 </div>
                                                 <div>
-                                                        <p className="text-secondary text-xs mb-1 font-medium">Category</p>
-                                                        <p>{mail.category_name}</p>
+                                                        <p className="text-secondary text-xs mb-1 font-medium">Kategori</p>
+                                                        <p className="text-foreground">{mail.category_name}</p>
                                                 </div>
                                                 <div>
-                                                        <p className="text-secondary text-xs mb-1 font-medium">Enhancer</p>
-                                                        <p>{mail.user_name}</p>
+                                                        <p className="text-secondary text-xs mb-1 font-medium">Oleh</p>
+                                                        <p className="text-foreground">{mail.user_name || '-'}</p>
                                                 </div>
                                                 <div>
                                                         <p className="text-secondary text-xs mb-1 font-medium">Status</p>
-                                                        <Badge value={mail.status} map={badgeMap} />
+                                                        {(() => {
+                                                                const config = getBadgeConfig(mail.status, mail.follow_status);
+                                                                return (
+                                                                        <span className={`px-2 py-1 rounded-sm text-xs font-semibold ${config.color}`}>
+                                                                                {config.label}
+                                                                        </span>
+                                                                );
+                                                        })()}
                                                 </div>
+                                                {mail.division_name && (
+                                                        <div>
+                                                                <p className="text-secondary text-xs mb-1 font-medium">Divisi</p>
+                                                                <p className="text-foreground">{mail.division_name}</p>
+                                                        </div>
+                                                )}
 
+                                                {mail.desc && (
+                                                        <div>
+                                                                <p className="text-secondary text-xs mb-1 font-medium">Perihal</p>
+                                                                <p className="text-foreground">{mail.desc}</p>
+                                                        </div>
+                                                )}
                                         </div>
                                 </main>
 

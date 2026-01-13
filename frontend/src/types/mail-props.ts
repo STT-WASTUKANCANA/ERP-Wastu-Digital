@@ -17,6 +17,9 @@ export type IncomingMail = {
         date: string;
         attachment: string;
         user_view_id?: number | null;
+        desc?: string;
+        sekum_desc?: string;
+        division_desc?: string;
 };
 
 export type OutgoingMail = {
