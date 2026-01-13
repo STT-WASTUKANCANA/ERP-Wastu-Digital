@@ -24,4 +24,20 @@ class DecisionLetter extends Model
     {
         return $this->hasOne(MailLog::class, 'mail_id')->where('type', '3');
     }
+
+    public static function getTotalForCurrentMonth(): int
+    {
+        $start = \Carbon\Carbon::now()->startOfMonth();
+        $end = \Carbon\Carbon::now()->endOfMonth();
+
+        return self::whereBetween('created_at', [$start, $end])->count();
+    }
+
+    public static function getTotalForPreviousMonth(): int
+    {
+        $start = \Carbon\Carbon::now()->subMonth()->startOfMonth();
+        $end = \Carbon\Carbon::now()->subMonth()->endOfMonth();
+
+        return self::whereBetween('created_at', [$start, $end])->count();
+    }
 }
