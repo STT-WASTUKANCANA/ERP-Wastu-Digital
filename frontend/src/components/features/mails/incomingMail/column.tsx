@@ -101,9 +101,9 @@ export const getIncomingMailColumns = (
                                                                 className="p-2 bg-background hover:bg-muted border border-secondary/20 cursor-pointer flex items-center gap-2"
                                                         >
                                                                 {mail.status == 2 ? (
-                                                                        <FiEdit className="w-3.5 h-3.5 text-foreground" />
+                                                                        <FiEdit className="w-3.5 h-3.5 text-primary" />
                                                                 ) : (
-                                                                        <BsEye className="w-3.5 h-3.5 text-foreground" />
+                                                                        <BsEye className="w-3.5 h-3.5 text-primary" />
                                                                 )}
 
                                                         </Button>
@@ -116,9 +116,9 @@ export const getIncomingMailColumns = (
                                                                 className="p-2 bg-background hover:bg-muted border border-secondary/20 cursor-pointer flex items-center gap-2"
                                                         >
                                                                 {mail.follow_status == 2 ? (
-                                                                        <FiEdit className="w-3.5 h-3.5 text-foreground" />
+                                                                        <FiEdit className="w-3.5 h-3.5 text-primary" />
                                                                 ) : (
-                                                                        <BsEye className="w-3.5 h-3.5 text-foreground" />
+                                                                        <BsEye className="w-3.5 h-3.5 text-primary" />
                                                                 )}
                                                         </Button>
                                                 )}
