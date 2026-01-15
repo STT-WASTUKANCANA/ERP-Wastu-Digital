@@ -71,7 +71,7 @@ export const getIncomingMailColumns = (
                                 // Only relevant if Disposition (Status 2) or Done (Status 3)
                                 if (row.status >= 2) {
                                         if (row.user_view_id) {
-                                                return <Badge value="Sudah" map={{ "Sudah": { label: "Sudah Dilihat", color: "bg-green-100 text-green-800" } }} />;
+                                                return <span className="text-green-600 italic text-xs">Sudah Dilihat</span>;
                                         } else {
                                                 return <span className="text-gray-400 italic text-xs">Belum Dilihat</span>;
                                         }
