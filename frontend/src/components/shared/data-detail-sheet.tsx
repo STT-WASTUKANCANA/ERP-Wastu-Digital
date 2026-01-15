@@ -4,20 +4,14 @@ import React, { useEffect, useState } from 'react';
 import { IoClose } from "react-icons/io5";
 import { FiDownload } from "react-icons/fi";
 import { Button } from '@/components/ui/button';
-import { IconType } from 'react-icons';
+import { DataDetailAction } from '@/types/ui-props';
 
 export interface DataDetailItem {
     label: string;
     value: React.ReactNode | string;
 }
 
-// Definisi tipe aksi tombol
-export interface DataDetailAction {
-    label: string;
-    onClick: (e: React.MouseEvent) => void;
-    icon?: IconType;
-    variant?: 'primary' | 'danger' | 'default' | 'outline';
-}
+
 
 interface DataDetailSheetProps {
     title: string;

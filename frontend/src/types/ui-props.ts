@@ -1,4 +1,5 @@
 import { CSSProperties, MouseEventHandler, ReactNode } from "react";
+import { IconType } from "react-icons";
 import { IncomingMail } from "./mail-props";
 
 export interface InputProps
@@ -86,4 +87,11 @@ export interface TableContainerProps {
   total?: number;
   pageSize?: number;
   onPageChange?: (page: number) => void;
+}
+
+export interface DataDetailAction {
+  label: string;
+  onClick: (e: React.MouseEvent) => void;
+  icon?: IconType;
+  variant?: 'primary' | 'danger' | 'default' | 'outline';
 }

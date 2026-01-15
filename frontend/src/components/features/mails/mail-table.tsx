@@ -317,7 +317,7 @@ const MailTable = <T extends MailTypes>({
         let extraFooter: React.ReactNode = null;
         let attachment = selectedMail.attachment ? {
           url: selectedMail.attachment.startsWith('http') ? selectedMail.attachment : getStorageUrl(selectedMail.attachment),
-          fileName: selectedMail.attachment.startsWith('http') ? 'Buka Link' : 'Download Attachment'
+          fileName: selectedMail.attachment.startsWith('http') ? 'Buka Link' : 'Unduh Dokumen'
         } : undefined;
 
         if (type === "incoming") {
@@ -410,10 +410,7 @@ const MailTable = <T extends MailTypes>({
             items={items}
             onClose={() => { setSelectedMail(null); setValidationStatus(''); }}
             attachment={attachment}
-            actions={[
-              { label: "Edit", onClick: (e) => handleActionClick(e, 'Edit', String(selectedMail.id)), variant: 'primary', icon: FiEdit },
-              { label: "Delete", onClick: (e) => handleActionClick(e, 'Delete', String(selectedMail.id)), variant: 'danger', icon: FiTrash2 }
-            ]}
+            actions={config.getActions ? config.getActions(selectedMail, roleId, userId, handleActionClick) : []}
             extraFooter={extraFooter}
           />
         );
