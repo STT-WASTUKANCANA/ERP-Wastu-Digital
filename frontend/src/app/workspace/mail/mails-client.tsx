@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { OutgoingMail, IncomingMail, DecisionMail } from "@/types/mail-props";
 import { getIncomingMailList } from "@/lib/api/mails/incoming";
 import { getOutgoingMailList } from "@/lib/api/mails/outgoing";
-import MailTable from "@/components/features/mails/incoming-mail/mail-table";
+import MailTable from "@/components/features/mails/mail-table";
 import { usePathname } from "next/navigation";
 import { getDecisionMailList } from "@/lib/api/mails/decision";
 
