@@ -21,14 +21,14 @@ export const getOutgoingMailColumns = (
                         mobile: true,
                 },
                 {
-                        header: 'Tujuan',
-                        accessorKey: 'institute',
-                },
-                {
                         header: 'Tanggal',
                         accessorKey: 'date',
                         mobile: true,
                         cell: (row) => formatDate(row.date),
+                },
+                {
+                        header: 'Instansi',
+                        accessorKey: 'institute',
                 },
                 {
                         header: 'Kategori',

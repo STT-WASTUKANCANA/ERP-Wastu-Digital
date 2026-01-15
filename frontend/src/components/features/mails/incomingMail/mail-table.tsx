@@ -291,7 +291,7 @@ const MailTable = <T extends MailTypes>({
           {type === 'outgoing' && (
             <>
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium">Tujuan</label>
+                <label className="text-sm font-medium">Instansi</label>
                 <Input
                   placeholder="Contoh: Dinas Kesehatan"
                   value={destination}
