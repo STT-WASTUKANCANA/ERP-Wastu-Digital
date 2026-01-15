@@ -166,7 +166,7 @@ export default function DivisionTable() {
                 onClose={() => setShowColumnModal(false)}
                 columns={allColumnsForModal}
                 hiddenColumns={hiddenColumns}
-                mandatoryColumns={["name", "leader_name", "actions"]}
+                mandatoryColumns={["name", "leader_name"]}
                 onSave={handleSaveColumns}
             />
 

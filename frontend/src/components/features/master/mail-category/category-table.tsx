@@ -163,7 +163,7 @@ export default function CategoryTable() {
                 onClose={() => setShowColumnModal(false)}
                 columns={allColumnsForModal}
                 hiddenColumns={hiddenColumns}
-                mandatoryColumns={["name", "type_label", "actions"]}
+                mandatoryColumns={["name", "type_label"]}
                 onSave={handleSaveColumns}
             />
 

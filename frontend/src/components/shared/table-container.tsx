@@ -69,17 +69,47 @@ export const TableContainer = ({
                                                 <TbColumns2 />
                                                 <span>Modify Column</span>
                                         </Button>
-                                        <Button
-                                                size=""
-                                                className="flex justify-center items-center px-3 py-2 border border-secondary/20 gap-2 lg:hidden"
-                                                onClick={() => setToolsDropdown(!toolsDropdown)}
-                                        >
-                                                <TbDotsVertical />
-                                        </Button>
-                                        {toolsDropdown && (
-                                                <Dropdown position="right-0 top-15" shadow="shadow-lg">
-                                                </Dropdown>
-                                        )}
+                                        <div className="relative lg:hidden">
+                                                <Button
+                                                        size=""
+                                                        className="flex justify-center items-center px-3 py-2 border border-secondary/20 gap-2"
+                                                        onClick={() => setToolsDropdown(!toolsDropdown)}
+                                                >
+                                                        <TbDotsVertical />
+                                                </Button>
+                                                {toolsDropdown && (
+                                                        <Dropdown
+                                                                position="top-full right-0 mt-2"
+                                                                shadow="shadow-lg"
+                                                                backgroundColor="bg-background"
+                                                                border="border border-secondary/20"
+                                                                padding="p-2"
+                                                        >
+                                                                <div className="flex flex-col gap-1">
+                                                                        <Button
+                                                                                onClick={(e) => {
+                                                                                        setToolsDropdown(false);
+                                                                                        onFilterClick?.(e);
+                                                                                }}
+                                                                                className="w-full justify-start text-foreground/80 text-sm px-4 py-2 hover:bg-muted flex items-center gap-2 rounded-md bg-transparent border-none"
+                                                                        >
+                                                                                <GoFilter />
+                                                                                <span>Filter</span>
+                                                                        </Button>
+                                                                        <Button
+                                                                                onClick={(e) => {
+                                                                                        setToolsDropdown(false);
+                                                                                        onModifyColumnClick?.(e);
+                                                                                }}
+                                                                                className="w-full justify-start text-foreground/80 text-sm px-4 py-2 hover:bg-muted flex items-center gap-2 rounded-md bg-transparent border-none"
+                                                                        >
+                                                                                <TbColumns2 />
+                                                                                <span>Modify Column</span>
+                                                                        </Button>
+                                                                </div>
+                                                        </Dropdown>
+                                                )}
+                                        </div>
                                 </div>
                         </div>
 

@@ -16,10 +16,9 @@ export const DataTable = <T extends { id: string | number }>({
                                         {columns.map((column, index) => (
                                                 <th
                                                         key={column.header}
-                                                        className={`px-4 py-3 text-left ${!column.mobile ? "hidden lg:table-cell" : ""
-                                                                } ${column.id === "actions"
-                                                                        ? "sticky right-0 bg-accent z-20 shadow-[-5px_0px_10px_-5px_rgba(0,0,0,0.1)]"
-                                                                        : ""
+                                                        className={`px-4 py-3 text-left whitespace-nowrap ${column.id === "actions"
+                                                                ? "lg:sticky lg:right-0 lg:bg-accent lg:z-20 lg:shadow-[-5px_0px_10px_-5px_rgba(0,0,0,0.1)]"
+                                                                : ""
                                                                 }`}
                                                 >
                                                         {column.header}
@@ -49,10 +48,9 @@ export const DataTable = <T extends { id: string | number }>({
                                                         {columns.map((column, index) => (
                                                                 <td
                                                                         key={`${row.id}-${column.header}`}
-                                                                        className={`px-4 py-3 ${!column.mobile ? "hidden lg:table-cell" : ""
-                                                                                } ${column.id === "actions"
-                                                                                        ? "sticky right-0 bg-background group-hover:bg-muted z-10 shadow-[-5px_0px_10px_-5px_rgba(0,0,0,0.1)]"
-                                                                                        : ""
+                                                                        className={`px-4 py-3 whitespace-nowrap ${column.id === "actions"
+                                                                                ? "lg:sticky lg:right-0 lg:bg-background lg:group-hover:bg-muted lg:z-10 lg:shadow-[-5px_0px_10px_-5px_rgba(0,0,0,0.1)]"
+                                                                                : ""
                                                                                 }`}
                                                                 >
                                                                         {column.cell

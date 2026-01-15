@@ -172,7 +172,7 @@ const MailTable = <T extends MailTypes>({
         onClose={() => setShowColumnModal(false)}
         columns={allColumnsForModal}
         hiddenColumns={hiddenColumns}
-        mandatoryColumns={["number", "actions"]}
+        mandatoryColumns={["number"]}
         onSave={handleSaveColumns}
       />
 

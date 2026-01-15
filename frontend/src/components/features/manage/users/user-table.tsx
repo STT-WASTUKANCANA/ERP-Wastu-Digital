@@ -148,7 +148,7 @@ const UserTable = ({ users, onUserUpdated, isLoading }: UserTableProps) => {
                 onClose={() => setShowColumnModal(false)}
                 columns={allColumnsForModal}
                 hiddenColumns={hiddenColumns}
-                mandatoryColumns={["name", "role_name", "actions"]}
+                mandatoryColumns={["name", "role_name"]}
                 onSave={handleSaveColumns}
             />
 
