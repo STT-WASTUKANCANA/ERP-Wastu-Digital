@@ -115,10 +115,9 @@ export async function middleware(request: NextRequest) {
     if (pathname.startsWith('/auth')) {
         const refreshToken = request.cookies.get('refresh_token')?.value
 
-        // Sederhana: jika punya refresh token, anggap logged in
+        // Provide seamless Back navigation for logged-in users visiting auth pages
         if (refreshToken) {
-            console.log(`[Middleware] Authenticated user accessing ${pathname}. Redirecting to /workspace`)
-            return NextResponse.redirect(new URL('/workspace/overview', request.url))
+            return NextResponse.rewrite(new URL('/unauthorized', request.url))
         }
     }
 
