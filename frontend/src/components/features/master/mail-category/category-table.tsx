@@ -3,13 +3,15 @@
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { getMailCategoryList, deleteMailCategory, MailCategory } from "@/lib/api/master/mail-category";
-import { getMailCategoryColumns } from "./category-columns";
+import { getMailCategoryColumns } from "./column";
 import { DataTable } from "@/components/shared/datatable";
 import { PageHeader } from "@/components/shared/page-header";
 import { TableContainer } from "@/components/shared/table-container";
 import { Button } from "@/components/ui/button";
+import { DataDetailSheet } from "@/components/shared/data-detail-sheet";
+import { FiEdit, FiTrash2 } from "react-icons/fi";
+import { formatDate } from "@/lib/utils";
 
-import { CategoryOffcanvasDetail } from "./offcanvas-detail";
 import { HiOutlineUpload } from "react-icons/hi";
 
 import { ColumnSelectorModal } from "@/components/shared/column-selector-modal";
@@ -216,10 +218,19 @@ export default function CategoryTable() {
             />
 
             {selectedCategory && (
-                <CategoryOffcanvasDetail
-                    category={selectedCategory}
+                <DataDetailSheet
+                    title="Detail Kategori"
                     onClose={() => setSelectedCategory(null)}
-                    onAction={handleActionClick}
+                    items={[
+                        { label: "Nama Kategori", value: selectedCategory.name },
+                        { label: "Jenis Surat", value: <div className="badge badge-outline mt-1">{selectedCategory.type_label}</div> },
+                        { label: "Deskripsi", value: selectedCategory.description || "-" },
+                        { label: "Dibuat Pada", value: formatDate(selectedCategory.created_at) }
+                    ]}
+                    actions={[
+                        { label: "Edit", onClick: (e) => handleActionClick(e, 'Edit', String(selectedCategory.id)), variant: 'primary', icon: FiEdit },
+                        { label: "Hapus", onClick: (e) => handleActionClick(e, 'Delete', String(selectedCategory.id)), variant: 'danger', icon: FiTrash2 }
+                    ]}
                 />
             )}
         </>

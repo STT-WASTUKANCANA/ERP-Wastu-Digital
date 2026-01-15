@@ -4,14 +4,14 @@ import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { getDivisionList, deleteDivision } from "@/lib/api/manage/division";
 import { Division } from "@/types/division-props";
-import { getDivisionColumns } from "./division-column";
+import { getDivisionColumns } from "./column";
 import { DataTable } from "@/components/shared/datatable";
 import { PageHeader } from "@/components/shared/page-header";
 import { TableContainer } from "@/components/shared/table-container";
 import { Button } from "@/components/ui/button";
 import { HiOutlineUpload } from "react-icons/hi";
-
-import { DivisionOffcanvasDetail } from "./offcanvas-detail";
+import { DataDetailSheet } from "@/components/shared/data-detail-sheet";
+import { FiEdit, FiTrash2 } from "react-icons/fi";
 
 import { ColumnSelectorModal } from "@/components/shared/column-selector-modal";
 
@@ -171,10 +171,21 @@ export default function DivisionTable() {
             />
 
             {selectedDivision && (
-                <DivisionOffcanvasDetail
-                    division={selectedDivision}
+                <DataDetailSheet
+                    title="Detail Divisi"
                     onClose={() => setSelectedDivision(null)}
-                    onAction={handleActionClick}
+                    items={[
+                        { label: "Nama Divisi", value: selectedDivision.name },
+                        {
+                            label: "Kepala Bidang",
+                            value: selectedDivision.leader_name || <span className="text-gray-400 italic">Belum ditentukan</span>
+                        },
+                        { label: "Deskripsi", value: selectedDivision.description || "-" }
+                    ]}
+                    actions={[
+                        { label: "Edit", onClick: (e) => handleActionClick(e, 'Edit', String(selectedDivision.id)), variant: 'primary', icon: FiEdit },
+                        { label: "Hapus", onClick: (e) => handleActionClick(e, 'Delete', String(selectedDivision.id)), variant: 'danger', icon: FiTrash2 }
+                    ]}
                 />
             )}
         </>

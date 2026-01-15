@@ -11,7 +11,8 @@ import { getUserColumns } from "./column";
 import { deleteUser } from "@/lib/api/manage/users";
 import { HiOutlineUpload } from "react-icons/hi";
 
-import { UserOffcanvasDetail } from "./offcanvas-detail";
+import { DataDetailSheet } from "@/components/shared/data-detail-sheet";
+import { FiEdit, FiTrash2 } from "react-icons/fi";
 
 import { ColumnSelectorModal } from "@/components/shared/column-selector-modal";
 import { FilterModal } from "@/components/shared/filter-modal";
@@ -238,10 +239,19 @@ const UserTable = ({ users, onUserUpdated, isLoading }: UserTableProps) => {
             />
 
             {selectedUser && (
-                <UserOffcanvasDetail
-                    user={selectedUser}
+                <DataDetailSheet
+                    title="Detail Pengguna"
                     onClose={() => setSelectedUser(null)}
-                    onAction={handleActionClick}
+                    items={[
+                        { label: "Nama", value: selectedUser.name },
+                        { label: "Email", value: selectedUser.email },
+                        { label: "Role", value: selectedUser.role_name || 'Administrator' },
+                        { label: "Divisi", value: selectedUser.division_name || '-' },
+                    ]}
+                    actions={[
+                        { label: "Edit", onClick: (e) => handleActionClick(e, 'Edit', String(selectedUser.id)), variant: 'primary', icon: FiEdit },
+                        { label: "Hapus", onClick: (e) => handleActionClick(e, 'Delete', String(selectedUser.id)), variant: 'danger', icon: FiTrash2 }
+                    ]}
                 />
             )}
         </>
