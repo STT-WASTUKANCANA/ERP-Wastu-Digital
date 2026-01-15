@@ -2,7 +2,7 @@ import { FiCornerDownLeft } from "react-icons/fi";
 import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
 import { getMailCategories } from "@/lib/api/mails/incoming";
-import IncomingForm from "@/components/features/mails/incomingMail/incoming-form";
+import IncomingForm from "@/components/features/mails/incoming-mail/incoming-form";
 
 export default async function Page() {
         const res = await getMailCategories();

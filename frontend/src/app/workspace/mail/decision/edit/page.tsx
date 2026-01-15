@@ -4,7 +4,7 @@ import { FiCornerDownLeft } from "react-icons/fi";
 import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
 import { useMailPageData } from "@/hooks/features/mail/useMailPageData";
-import DecisionForm from "@/components/features/mails/decisionMail/decision-form";
+import DecisionForm from "@/components/features/mails/decision-mail/decision-form";
 
 export default function Page() {
         const { categories, mail, isLoading, divisions } = useMailPageData({

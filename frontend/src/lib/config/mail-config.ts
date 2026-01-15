@@ -1,10 +1,10 @@
-import { getIncomingMailColumns } from "@/components/features/mails/incomingMail/column";
-import { getOutgoingMailColumns } from "@/components/features/mails/outgoingMail/column";
+import { getIncomingMailColumns } from "@/components/features/mails/incoming-mail/column";
+import { getOutgoingMailColumns } from "@/components/features/mails/outgoing-mail/column";
 import { deleteIncomingMail, getMailCategories as getIncomingCategories } from "@/lib/api/mails/incoming";
 import { deleteOutgoingMail, getMailCategories as getOutgoingCategories } from "@/lib/api/mails/outgoing";
 import { deleteDecisionMail, getMailCategories as getDecisionCategories } from "@/lib/api/mails/decision";
 import { ColumnDef } from "@/types/ui-props";
-import { getDecisionMailColumns } from "@/components/features/mails/decisionMail/column";
+import { getDecisionMailColumns } from "@/components/features/mails/decision-mail/column";
 
 export const mailConfig = {
         incoming: {

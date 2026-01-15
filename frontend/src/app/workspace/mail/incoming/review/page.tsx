@@ -1,6 +1,6 @@
 "use client";
 
-import IncomingForm from "@/components/features/mails/incomingMail/incoming-form";
+import IncomingForm from "@/components/features/mails/incoming-mail/incoming-form";
 import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
 import { useMailPageData } from "@/hooks/features/mail/useMailPageData";

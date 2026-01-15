@@ -11,10 +11,14 @@ import {
   OutgoingMail,
   DecisionMail,
   MailTableProps,
+  statusMap,
+  outgoingStatusMap,
 } from "@/types/mail-props";
-import { OffcanvasDetail } from "@/components/features/mails/incomingMail/offcanvas-detail";
-import { OutgoingOffcanvasDetail } from "@/components/features/mails/outgoingMail/offcanvas-detail";
-import { DecisionOffcanvasDetail } from "@/components/features/mails/decisionMail/offcanvas-detail";
+import { DataDetailSheet } from "@/components/shared/data-detail-sheet";
+import { Badge } from "@/components/ui/badge";
+import { formatDate, getStorageUrl } from "@/lib/utils";
+import { FiEdit, FiTrash2, FiSave, FiDownload } from "react-icons/fi";
+import { validateOutgoingMail } from "@/lib/api/mails/outgoing";
 import { useRole } from "@/contexts/role";
 import { mailConfig } from "@/lib/config/mail-config";
 import { HiOutlineUpload } from "react-icons/hi";
@@ -52,6 +56,7 @@ const MailTable = <T extends MailTypes>({
   const [status, setStatus] = useState("");
   const [destination, setDestination] = useState(""); // Outgoing
   const [viewStatus, setViewStatus] = useState(""); // Incoming
+  const [validationStatus, setValidationStatus] = useState<string>(''); // Outgoing Validation
 
   // Fetch categories
   useEffect(() => {
@@ -91,25 +96,12 @@ const MailTable = <T extends MailTypes>({
   // Reset page when switching mail types
   useEffect(() => {
     setCurrentPage(1);
-    // Also reset filters? Maybe better UX to keep it or reset. 
-    // User probably expects clear filters on tab switch or keep if compatible.
-    // Given the complexity, I'll reset UI filters but `onFilterApply` handling at parent might persist.
-    // Parent `mails-client` re-mounts or keeps state? `mails-client` keys by type? No.
-    // `MailsClient` is single component.
-    // Use clear filters logic when type changes?
     setStartDate("");
     setEndDate("");
     setSelectedCategory("");
     setStatus("");
     setDestination("");
     setViewStatus("");
-    // Note: Parent state assumes clean slate or we should trigger clear.
-    // But `mails-client` doesn't clear `filterParams` automatically on type switch unless we tell it.
-    // Actually `type` changes via URL. `mails-client` derives type from URL.
-    // Since page reload or navigation happens, state might reset naturally if component unmounts.
-    // Next.js App Router usually remounts on route change unless using same layout/template.
-    // `mails-client` is used in `page.tsx`.
-    // So it should be fine.
   }, [type, mails]);
 
   const paginatedMails = useMemo(() => {
@@ -159,8 +151,6 @@ const MailTable = <T extends MailTypes>({
   const [hiddenColumns, setHiddenColumns] = useState<string[]>([]);
   const [showColumnModal, setShowColumnModal] = useState(false);
 
-  // ... (previous code)
-
   const columns = useMemo(
     () => config.getColumns(handleActionClick, roleId, userId),
     [roleId, userId]
@@ -168,8 +158,6 @@ const MailTable = <T extends MailTypes>({
 
   const visibleColumns = useMemo(() => {
     return columns.filter((col) => {
-      // AccessorKey fallback for ID if needed, or use ID directly if available.
-      // The modal needs a key.
       const key = (col.accessorKey || col.id || col.header) as string;
       return !hiddenColumns.includes(key);
     });
@@ -178,11 +166,10 @@ const MailTable = <T extends MailTypes>({
   const allColumnsForModal = useMemo(() => {
     return columns.map(col => ({
       key: (col.accessorKey || col.id || col.header) as string,
-      label: (col.header as string) || "Aksi" // Fallback label
-    })).filter(c => c.label !== ""); // Filter out empty headers if any (usually actions has empty header, handle carefully)
+      label: (col.header as string) || "Aksi"
+    })).filter(c => c.label !== "");
   }, [columns]);
 
-  // Handle saving columns
   const handleSaveColumns = (newHidden: string[]) => {
     setHiddenColumns(newHidden);
   };
@@ -315,7 +302,6 @@ const MailTable = <T extends MailTypes>({
         </div>
       </FilterModal>
 
-      {/* Column Selector Modal */}
       <ColumnSelectorModal
         isOpen={showColumnModal}
         onClose={() => setShowColumnModal(false)}
@@ -325,29 +311,113 @@ const MailTable = <T extends MailTypes>({
         onSave={handleSaveColumns}
       />
 
-      {selectedMail && type === "incoming" && (
-        <OffcanvasDetail
-          mail={selectedMail as IncomingMail}
-          onClose={() => setSelectedMail(null)}
-          onAction={handleActionClick}
-        />
-      )}
+      {selectedMail && (() => {
+        let title = "Detail Surat";
+        let items: any[] = [];
+        let extraFooter: React.ReactNode = null;
+        let attachment = selectedMail.attachment ? {
+          url: selectedMail.attachment.startsWith('http') ? selectedMail.attachment : getStorageUrl(selectedMail.attachment),
+          fileName: selectedMail.attachment.startsWith('http') ? 'Buka Link' : 'Download Attachment'
+        } : undefined;
 
-      {selectedMail && type === "outgoing" && (
-        <OutgoingOffcanvasDetail
-          mail={selectedMail as OutgoingMail}
-          onClose={() => setSelectedMail(null)}
-          onAction={handleActionClick}
-        />
-      )}
+        if (type === "incoming") {
+          const mail = selectedMail as IncomingMail;
+          title = "Detail Surat Masuk";
+          const getBadge = (s: number, f: number) => {
+            if (s === 2 && f === 2) return { label: "Proses", color: "bg-yellow-100 text-yellow-800" };
+            const m: any = { 1: { l: statusMap[1], c: "bg-secondary text-white" }, 2: { l: statusMap[2], c: "bg-blue-100 text-blue-800" }, 3: { l: statusMap[3], c: "bg-green-100 text-green-800" } };
+            const d = m[s] || { l: "Unknown", c: "bg-gray-100 text-gray-800" };
+            return { label: d.l, color: d.c };
+          };
+          const b = getBadge(mail.status, mail.follow_status);
+          items = [
+            { label: "Nomor Surat", value: mail.number },
+            { label: "Tanggal", value: formatDate(mail.date) },
+            { label: "Kategori", value: mail.category_name },
+            { label: "Oleh", value: mail.user_name || '-' },
+            { label: "Status", value: <span className={`px-2 py-1 rounded-sm text-xs font-semibold ${b.color}`}>{b.label}</span> },
+            { label: "Divisi", value: mail.division_name || '-' },
+            { label: "Perihal", value: mail.desc }
+          ];
+        } else if (type === "outgoing") {
+          const mail = selectedMail as OutgoingMail;
+          title = "Detail Surat Keluar";
+          items = [
+            { label: "Nomor Surat", value: mail.number },
+            { label: "Tanggal", value: formatDate(mail.date) },
+            { label: "Kategori", value: mail.category_name },
+            { label: "Oleh", value: mail.user_name },
+            { label: "Instansi", value: mail.institute },
+            { label: "Alamat", value: mail.address },
+            { label: "Status", value: <Badge value={String(mail.status)} map={outgoingStatusMap} /> },
+            { label: "Tujuan", value: mail.purpose },
+            { label: "Perihal", value: mail.desc }
+          ];
 
-      {selectedMail && type === "decision" && (
-        <DecisionOffcanvasDetail
-          mail={selectedMail as DecisionMail}
-          onClose={() => setSelectedMail(null)}
-          onAction={handleActionClick}
-        />
-      )}
+          // Validation Logic
+          if (roleId === 2 && mail.status === '1') {
+            extraFooter = (
+              <div className="flex flex-col gap-2 mb-2 p-3 bg-secondary/5 rounded-lg border border-secondary/10">
+                <p className="text-xs font-semibold text-secondary">Validasi Sekum</p>
+                <div className="flex gap-2">
+                  <div className="flex-1">
+                    <Select
+                      options={[
+                        { value: '2', label: 'Perlu Perbaikan' },
+                        { value: '3', label: 'Disetujui' },
+                        { value: '4', label: 'Ditolak' }
+                      ]}
+                      value={validationStatus}
+                      onChange={(e) => setValidationStatus(e.target.value)}
+                      placeholder="Pilih Status"
+                      className="text-xs h-9 py-1"
+                    />
+                  </div>
+                  <Button
+                    onClick={async () => {
+                      if (!validationStatus) return;
+                      if (confirm(`Ubah status ke ${outgoingStatusMap[Number(validationStatus)]?.label || validationStatus}?`)) {
+                        const res = await validateOutgoingMail(Number(mail.id), validationStatus);
+                        if (res.ok) { alert('Berhasil'); window.location.reload(); }
+                        else { alert('Gagal'); }
+                      }
+                    }}
+                    disabled={!validationStatus}
+                    className="bg-primary text-white hover:bg-primary/90 text-xs h-9 px-3"
+                  >
+                    <FiSave className="mr-1" /> Simpan
+                  </Button>
+                </div>
+              </div>
+            );
+          }
+        } else if (type === "decision") {
+          const mail = selectedMail as DecisionMail;
+          title = "Detail Surat Keputusan";
+          items = [
+            { label: "Nomor Surat", value: mail.number },
+            { label: "Tanggal", value: formatDate(mail.date) },
+            { label: "Kategori", value: mail.category_name },
+            { label: "Oleh", value: mail.user_name || '-' },
+            { label: "Judul", value: mail.title },
+            { label: "Deskripsi", value: mail.desc }
+          ];
+        }
+
+        return (
+          <DataDetailSheet
+            title={title}
+            items={items}
+            onClose={() => { setSelectedMail(null); setValidationStatus(''); }}
+            attachment={attachment}
+            actions={[
+              { label: "Edit", onClick: (e) => handleActionClick(e, 'Edit', String(selectedMail.id)), variant: 'primary', icon: FiEdit },
+              { label: "Delete", onClick: (e) => handleActionClick(e, 'Delete', String(selectedMail.id)), variant: 'danger', icon: FiTrash2 }
+            ]}
+            extraFooter={extraFooter}
+          />
+        );
+      })()}
     </>
   );
 };

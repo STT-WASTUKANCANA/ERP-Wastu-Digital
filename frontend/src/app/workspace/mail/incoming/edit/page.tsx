@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { FiCornerDownLeft } from "react-icons/fi";
 import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
-import IncomingForm from "@/components/features/mails/incomingMail/incoming-form";
+import IncomingForm from "@/components/features/mails/incoming-mail/incoming-form";
 import { useMailPageData } from "@/hooks/features/mail/useMailPageData";
 
 export default function Page() {

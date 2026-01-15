@@ -2,7 +2,7 @@ import { FiCornerDownLeft } from "react-icons/fi";
 import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
 import { getMailCategories } from "@/lib/api/mails/decision";
-import DecisionForm from "@/components/features/mails/decisionMail/decision-form";
+import DecisionForm from "@/components/features/mails/decision-mail/decision-form";
 
 export default async function Page() {
         const res = await getMailCategories();
