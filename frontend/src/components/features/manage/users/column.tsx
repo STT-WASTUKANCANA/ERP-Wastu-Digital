@@ -17,14 +17,14 @@ export const getUserColumns = (
             mobile: true,
         },
         {
-            header: 'Email',
-            accessorKey: 'email',
-        },
-        {
             header: 'Role',
             accessorKey: 'role_name',
             mobile: true,
             cell: (row) => row.role_name || 'Administrator',
+        },
+        {
+            header: 'Email',
+            accessorKey: 'email',
         },
         {
             header: 'Divisi',

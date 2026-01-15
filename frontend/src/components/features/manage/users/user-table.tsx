@@ -14,6 +14,8 @@ import { HiOutlineUpload } from "react-icons/hi";
 import { User } from "@/types/user-props";
 import { UserOffcanvasDetail } from "./offcanvas-detail";
 
+import { ColumnSelectorModal } from "@/components/shared/column-selector-modal";
+
 const UserTable = ({ users, onUserUpdated, isLoading }: UserTableProps) => {
     const router = useRouter();
 
@@ -21,6 +23,9 @@ const UserTable = ({ users, onUserUpdated, isLoading }: UserTableProps) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [searchTerm, setSearchTerm] = useState("");
+
+    const [hiddenColumns, setHiddenColumns] = useState<string[]>([]);
+    const [showColumnModal, setShowColumnModal] = useState(false);
 
     const handleActionClick = async (e: MouseEvent, action: string, userId: string) => {
         e?.stopPropagation();
@@ -50,6 +55,24 @@ const UserTable = ({ users, onUserUpdated, isLoading }: UserTableProps) => {
         () => getUserColumns(handleActionClick),
         []
     );
+
+    const visibleColumns = useMemo(() => {
+        return columns.filter((col) => {
+            const key = (col.accessorKey || col.id || col.header) as string;
+            return !hiddenColumns.includes(key);
+        });
+    }, [columns, hiddenColumns]);
+
+    const allColumnsForModal = useMemo(() => {
+        return columns.map(col => ({
+            key: (col.accessorKey || col.id || col.header) as string,
+            label: (col.header as string) || "Aksi"
+        })).filter(c => c.label !== "");
+    }, [columns]);
+
+    const handleSaveColumns = (newHidden: string[]) => {
+        setHiddenColumns(newHidden);
+    };
 
     const filteredUsers = useMemo(() => {
         if (!searchTerm) return users;
@@ -104,6 +127,7 @@ const UserTable = ({ users, onUserUpdated, isLoading }: UserTableProps) => {
 
             <TableContainer
                 onSearchChange={handleSearch}
+                onModifyColumnClick={() => setShowColumnModal(true)}
                 onEntriesChange={handleEntriesChange}
                 page={currentPage}
                 total={filteredUsers.length}
@@ -111,13 +135,22 @@ const UserTable = ({ users, onUserUpdated, isLoading }: UserTableProps) => {
                 onPageChange={setCurrentPage}
             >
                 <DataTable
-                    columns={columns}
+                    columns={visibleColumns}
                     data={paginatedData}
                     emptyStateMessage="Tidak ada data pengguna."
                     isLoading={isLoading}
                     onRowClick={handleRowClick}
                 />
             </TableContainer>
+
+            <ColumnSelectorModal
+                isOpen={showColumnModal}
+                onClose={() => setShowColumnModal(false)}
+                columns={allColumnsForModal}
+                hiddenColumns={hiddenColumns}
+                mandatoryColumns={["name", "role_name", "actions"]}
+                onSave={handleSaveColumns}
+            />
 
             {selectedUser && (
                 <UserOffcanvasDetail

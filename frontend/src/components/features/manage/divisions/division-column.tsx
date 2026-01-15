@@ -13,15 +13,15 @@ export const getDivisionColumns = (
             mobile: true,
         },
         {
-            header: "Deskripsi",
-            accessorKey: "description",
-            cell: (row) => row.description || "-",
-        },
-        {
             header: "Kepala Bidang",
             accessorKey: "leader_name",
             mobile: true,
             cell: (row) => row.leader_name || <span className="text-gray-400 italic">Belum ditentukan</span>,
+        },
+        {
+            header: "Deskripsi",
+            accessorKey: "description",
+            cell: (row) => row.description || "-",
         },
         {
             header: "",

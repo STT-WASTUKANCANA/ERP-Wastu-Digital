@@ -13,6 +13,8 @@ import { HiOutlineUpload } from "react-icons/hi";
 
 import { DivisionOffcanvasDetail } from "./offcanvas-detail";
 
+import { ColumnSelectorModal } from "@/components/shared/column-selector-modal";
+
 export default function DivisionTable() {
     const router = useRouter();
     const [originalData, setOriginalData] = useState<Division[]>([]);
@@ -22,6 +24,9 @@ export default function DivisionTable() {
     const [entries, setEntries] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedDivision, setSelectedDivision] = useState<Division | null>(null);
+
+    const [hiddenColumns, setHiddenColumns] = useState<string[]>([]);
+    const [showColumnModal, setShowColumnModal] = useState(false);
 
     const fetchData = async () => {
         setLoading(true);
@@ -104,6 +109,24 @@ export default function DivisionTable() {
 
     const columns = useMemo(() => getDivisionColumns(handleActionClick), []);
 
+    const visibleColumns = useMemo(() => {
+        return columns.filter((col) => {
+            const key = (col.accessorKey || col.id || col.header) as string;
+            return !hiddenColumns.includes(key);
+        });
+    }, [columns, hiddenColumns]);
+
+    const allColumnsForModal = useMemo(() => {
+        return columns.map(col => ({
+            key: (col.accessorKey || col.id || col.header) as string,
+            label: (col.header as string) || "Aksi"
+        })).filter(c => c.label !== "");
+    }, [columns]);
+
+    const handleSaveColumns = (newHidden: string[]) => {
+        setHiddenColumns(newHidden);
+    };
+
     return (
         <>
             <PageHeader title="Manajemen Divisi" description="Kelola data divisi dan kepala bidang dengan efisien.">
@@ -122,6 +145,7 @@ export default function DivisionTable() {
 
             <TableContainer
                 onSearchChange={handleSearch}
+                onModifyColumnClick={() => setShowColumnModal(true)}
                 onEntriesChange={handleEntriesChange}
                 page={currentPage}
                 total={filteredData.length}
@@ -129,13 +153,22 @@ export default function DivisionTable() {
                 onPageChange={setCurrentPage}
             >
                 <DataTable
-                    columns={columns}
+                    columns={visibleColumns}
                     data={paginatedData}
                     isLoading={loading}
                     emptyStateMessage="Belum ada data divisi"
                     onRowClick={handleRowClick}
                 />
             </TableContainer>
+
+            <ColumnSelectorModal
+                isOpen={showColumnModal}
+                onClose={() => setShowColumnModal(false)}
+                columns={allColumnsForModal}
+                hiddenColumns={hiddenColumns}
+                mandatoryColumns={["name", "leader_name", "actions"]}
+                onSave={handleSaveColumns}
+            />
 
             {selectedDivision && (
                 <DivisionOffcanvasDetail

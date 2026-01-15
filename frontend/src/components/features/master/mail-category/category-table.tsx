@@ -12,6 +12,8 @@ import { Button } from "@/components/ui/button";
 import { CategoryOffcanvasDetail } from "./offcanvas-detail";
 import { HiOutlineUpload } from "react-icons/hi";
 
+import { ColumnSelectorModal } from "@/components/shared/column-selector-modal";
+
 export default function CategoryTable() {
     const router = useRouter();
     const [originalData, setOriginalData] = useState<MailCategory[]>([]);
@@ -20,6 +22,9 @@ export default function CategoryTable() {
     const [entries, setEntries] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedCategory, setSelectedCategory] = useState<MailCategory | null>(null);
+
+    const [hiddenColumns, setHiddenColumns] = useState<string[]>([]);
+    const [showColumnModal, setShowColumnModal] = useState(false);
 
     const fetchData = async () => {
         setLoading(true);
@@ -102,6 +107,24 @@ export default function CategoryTable() {
 
     const columns = useMemo(() => getMailCategoryColumns(handleActionClick), []);
 
+    const visibleColumns = useMemo(() => {
+        return columns.filter((col) => {
+            const key = (col.accessorKey || col.id || col.header) as string;
+            return !hiddenColumns.includes(key);
+        });
+    }, [columns, hiddenColumns]);
+
+    const allColumnsForModal = useMemo(() => {
+        return columns.map(col => ({
+            key: (col.accessorKey || col.id || col.header) as string,
+            label: (col.header as string) || "Aksi"
+        })).filter(c => c.label !== "");
+    }, [columns]);
+
+    const handleSaveColumns = (newHidden: string[]) => {
+        setHiddenColumns(newHidden);
+    };
+
     return (
         <>
             <PageHeader title="Kategori Surat" description="Kelola kategori surat masuk, keluar, dan keputusan.">
@@ -119,6 +142,7 @@ export default function CategoryTable() {
 
             <TableContainer
                 onSearchChange={handleSearch}
+                onModifyColumnClick={() => setShowColumnModal(true)}
                 onEntriesChange={handleEntriesChange}
                 page={currentPage}
                 total={filteredData.length}
@@ -126,13 +150,22 @@ export default function CategoryTable() {
                 onPageChange={setCurrentPage}
             >
                 <DataTable
-                    columns={columns}
+                    columns={visibleColumns}
                     data={paginatedData}
                     isLoading={loading}
                     emptyStateMessage="Belum ada kategori surat"
                     onRowClick={handleRowClick}
                 />
             </TableContainer>
+
+            <ColumnSelectorModal
+                isOpen={showColumnModal}
+                onClose={() => setShowColumnModal(false)}
+                columns={allColumnsForModal}
+                hiddenColumns={hiddenColumns}
+                mandatoryColumns={["name", "type_label", "actions"]}
+                onSave={handleSaveColumns}
+            />
 
             {selectedCategory && (
                 <CategoryOffcanvasDetail

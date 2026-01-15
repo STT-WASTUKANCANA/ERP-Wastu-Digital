@@ -18,6 +18,7 @@ import { DecisionOffcanvasDetail } from "@/components/features/mails/decisionMai
 import { useRole } from "@/contexts/role";
 import { mailConfig } from "@/lib/config/mail-config";
 import { HiOutlineUpload } from "react-icons/hi";
+import { ColumnSelectorModal } from "@/components/shared/column-selector-modal";
 
 type MailTypes = IncomingMail | OutgoingMail | DecisionMail;
 
@@ -87,10 +88,36 @@ const MailTable = <T extends MailTypes>({
     }
   };
 
+  const [hiddenColumns, setHiddenColumns] = useState<string[]>([]);
+  const [showColumnModal, setShowColumnModal] = useState(false);
+
+  // ... (previous code)
+
   const columns = useMemo(
     () => config.getColumns(handleActionClick, roleId, userId),
     [roleId, userId]
   );
+
+  const visibleColumns = useMemo(() => {
+    return columns.filter((col) => {
+      // AccessorKey fallback for ID if needed, or use ID directly if available.
+      // The modal needs a key.
+      const key = (col.accessorKey || col.id || col.header) as string;
+      return !hiddenColumns.includes(key);
+    });
+  }, [columns, hiddenColumns]);
+
+  const allColumnsForModal = useMemo(() => {
+    return columns.map(col => ({
+      key: (col.accessorKey || col.id || col.header) as string,
+      label: (col.header as string) || "Aksi" // Fallback label
+    })).filter(c => c.label !== ""); // Filter out empty headers if any (usually actions has empty header, handle carefully)
+  }, [columns]);
+
+  // Handle saving columns
+  const handleSaveColumns = (newHidden: string[]) => {
+    setHiddenColumns(newHidden);
+  };
 
   const canCreate =
     (roleId === 1 && type === "incoming") ||
@@ -124,19 +151,30 @@ const MailTable = <T extends MailTypes>({
       <TableContainer
         onSearchChange={onSearch}
         onEntriesChange={handleEntriesChange}
+        onModifyColumnClick={() => setShowColumnModal(true)}
         page={currentPage}
         total={mails.length}
         pageSize={entries}
         onPageChange={setCurrentPage}
       >
         <DataTable
-          columns={columns}
+          columns={visibleColumns}
           data={paginatedMails}
           onRowClick={handleRowClick}
           emptyStateMessage={`Tidak ada data ${type}.`}
           isLoading={isLoading}
         />
       </TableContainer>
+
+      {/* Column Selector Modal */}
+      <ColumnSelectorModal
+        isOpen={showColumnModal}
+        onClose={() => setShowColumnModal(false)}
+        columns={allColumnsForModal}
+        hiddenColumns={hiddenColumns}
+        mandatoryColumns={["number", "actions"]}
+        onSave={handleSaveColumns}
+      />
 
       {selectedMail && type === "incoming" && (
         <OffcanvasDetail
