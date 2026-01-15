@@ -10,11 +10,12 @@ Route::middleware('auth:api')
     ->name('manage.')
     ->group(function () {
 
-        // Simple role list for dropdown
+        // Daftar role sederhana untuk dropdown
         Route::get('/role', function () {
             return response()->json(['data' => Role::all()]);
         })->name('role.index');
 
+        // Manajemen Divisi
         Route::prefix('division')
             ->name('division.')
             ->controller(DivisionController::class)
@@ -27,6 +28,7 @@ Route::middleware('auth:api')
                 Route::delete('/{id}', 'destroy')->name('destroy');
             });
 
+        // Manajemen Pengguna
         Route::prefix('users')
             ->name('users.')
             ->controller(UserController::class)

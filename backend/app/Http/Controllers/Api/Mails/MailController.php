@@ -21,7 +21,8 @@ class MailController extends Controller
                 $this->service = $service;
         }
 
-        private function getTypeFromRoute(Request $request): int
+        // Helper untuk mendapatkan tipe surat dari nama rute
+    private function getTypeFromRoute(Request $request): int
         {
                 $name = $request->route()->getName();
 
@@ -34,7 +35,8 @@ class MailController extends Controller
         }
 
 
-        public function index(Request $request)
+    // Menampilkan daftar surat berdasarkan filter
+    public function index(Request $request)
         {
                 try {
                         $type = $this->getTypeFromRoute($request);
@@ -57,10 +59,10 @@ class MailController extends Controller
                         $validatedData = $request->validated();
                         $validatedData['user_id'] = Auth::id();
 
-                        // ambil type dari route (1 = incoming, 2 = outgoing, 3 = decision)
+                        // Ambil tipe surat dari rute (1=masuk, 2=keluar, 3=keputusan)
                         $type = $this->getTypeFromRoute($request);
                         
-                        // Decision Letter (Type 3) Restriction: Only Pulahta (Role ID 3)
+                        // Batasan Surat Keputusan (Tipe 3): Hanya Role Pulahta
                         if ($type === 3 && Auth::user()->role_id !== 3) {
                             return response()->json([
                                 'status' => false,
@@ -80,7 +82,7 @@ class MailController extends Controller
                                 $month = date('m');
                                 $day   = date('d');
 
-                                // mapping folder berdasarkan type
+                                // Mapping folder berdasarkan tipe
                                 $folder = match ($type) {
                                         1 => 'incoming',
                                         2 => 'outgoing',
@@ -210,7 +212,8 @@ class MailController extends Controller
                 }
         }
 
-        public function review(MailRequest $request, $id)
+    // Menangani proses review surat masuk
+    public function review(MailRequest $request, $id)
         {
                 try {
                         $type = $this->getTypeFromRoute($request);
@@ -242,7 +245,8 @@ class MailController extends Controller
         }
 
 
-        public function validateOutgoing(Request $request, $id)
+    // Menangani proses validasi surat keluar
+    public function validateOutgoing(Request $request, $id)
         {
                 try {
                         $type = $this->getTypeFromRoute($request);

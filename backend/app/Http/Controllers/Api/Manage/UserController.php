@@ -19,9 +19,7 @@ class UserController extends Controller
         $this->service = $service;
     }
 
-    /**
-     * Display a listing of users.
-     */
+    // Menampilkan daftar pengguna
     public function index(Request $request)
     {
         try {
@@ -34,9 +32,7 @@ class UserController extends Controller
         }
     }
 
-    /**
-     * Store a newly created user.
-     */
+    // Membuat pengguna baru
     public function store(UserRequest $request)
     {
         try {
@@ -53,9 +49,7 @@ class UserController extends Controller
         }
     }
 
-    /**
-     * Display the specified user.
-     */
+    // Menampilkan detail pengguna
     public function show(Request $request, $id)
     {
         try {
@@ -72,9 +66,7 @@ class UserController extends Controller
         }
     }
 
-    /**
-     * Update the specified user.
-     */
+    // Memperbarui data pengguna
     public function update(UserRequest $request, $id)
     {
         try {
@@ -95,9 +87,7 @@ class UserController extends Controller
         }
     }
 
-    /**
-     * Remove the specified user.
-     */
+    // Menghapus pengguna
     public function destroy(Request $request, $id)
     {
         try {

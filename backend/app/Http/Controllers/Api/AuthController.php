@@ -19,6 +19,7 @@ class AuthController extends Controller
         $this->authService = $authService;
     }
 
+    // Menangani pendaftaran pengguna baru
     public function signup(AuthRequest $request)
     {
         try {
@@ -43,6 +44,7 @@ class AuthController extends Controller
         }
     }
 
+    // Menangani proses login dan penerbitan token
     public function signin(AuthRequest $request)
     {
         $credentials = $request->only('email', 'password');
@@ -64,6 +66,7 @@ class AuthController extends Controller
         return $this->respondWithTokens($tokens['access_token'], $tokens['refresh_token']);
     }
 
+    // Mengambil data profil pengguna yang sedang login
     public function profile()
     {
         $user = $this->authService->currentUser();
@@ -76,6 +79,7 @@ class AuthController extends Controller
         return new UserResource($user);
     }
 
+    // Menangani proses logout dan invalidasi token
     public function signout(Request $request)
     {
         // Mengambil refresh token dari cookie
@@ -94,6 +98,7 @@ class AuthController extends Controller
             ->withoutCookie('access_token');
     }
 
+    // Memperbarui akses token menggunakan refresh token
     public function refresh(Request $request)
     {
         $refreshToken = $request->cookie('refresh_token');
@@ -123,6 +128,7 @@ class AuthController extends Controller
         }
     }
 
+    // Helper untuk merespons dengan token akses dan refresh
     protected function respondWithTokens($accessToken, $refreshToken)
     {
         $response = [

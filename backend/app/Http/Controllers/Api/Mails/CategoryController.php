@@ -21,6 +21,7 @@ class CategoryController extends Controller
         $this->service = $service;
     }
 
+    // Menampilkan daftar kategori surat
     public function index(Request $request)
     {
         $type = null;
@@ -47,6 +48,7 @@ class CategoryController extends Controller
     }
 
 
+    // Membuat kategori surat baru
     public function store(CategoryRequest $request)
     {
         try {
@@ -67,6 +69,7 @@ class CategoryController extends Controller
         }
     }
 
+    // Menampilkan detail kategori
     public function show($id)
     {
         try {
@@ -77,6 +80,7 @@ class CategoryController extends Controller
         }
     }
 
+    // Memperbarui kategori
     public function update(CategoryRequest $request, $id)
     {
         try {
@@ -95,6 +99,7 @@ class CategoryController extends Controller
         }
     }
 
+    // Menghapus kategori
     public function destroy($id)
     {
         try {

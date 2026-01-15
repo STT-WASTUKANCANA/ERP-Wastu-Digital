@@ -20,6 +20,7 @@ class DivisionController extends Controller
         $this->service = $service;
     }
 
+    // Menampilkan daftar divisi
     public function index()
     {
         $divisions = $this->service->all();
@@ -32,6 +33,7 @@ class DivisionController extends Controller
         ]);
     }
 
+    // Membuat divisi baru
     public function store(DivisionRequest $request)
     {
         try {
@@ -50,6 +52,7 @@ class DivisionController extends Controller
         }
     }
 
+    // Menampilkan detail divisi
     public function show($id)
     {
         try {
@@ -60,6 +63,7 @@ class DivisionController extends Controller
         }
     }
 
+    // Memperbarui data divisi
     public function update(DivisionRequest $request, $id)
     {
         try {
@@ -78,6 +82,7 @@ class DivisionController extends Controller
         }
     }
 
+    // Menghapus divisi
     public function destroy($id)
     {
         try {

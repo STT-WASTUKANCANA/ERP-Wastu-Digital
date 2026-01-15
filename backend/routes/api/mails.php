@@ -17,12 +17,14 @@ Route::middleware('auth:api')
             Route::delete('/{category}', [CategoryController::class, 'destroy'])->name('destroy');
         });
 
+        // Tipe-tipe surat yang didukung
         $types = [
             'incoming',
             'outgoing',
             'decision',
         ];
 
+        // Loop untuk membuat rute dinamis per tipe surat
         foreach ($types as $type) {
             Route::prefix($type)
                 ->name($type . '.')
@@ -40,11 +42,13 @@ Route::middleware('auth:api')
                         Route::delete('/{id}', 'destroy')->name('destroy');
 
                         if ($type === 'incoming') {
+                            // Rute khusus review surat masuk
                             Route::put('/review/{id}', 'review')->name('review');
                             Route::put('/division-review/{id}', 'review')->name('divisionReview');
                         }
                         
                         if ($type === 'outgoing') {
+                            // Rute validasi surat keluar
                             Route::put('/validate/{id}', 'validateOutgoing')->name('validate');
                         }
                     });
