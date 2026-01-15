@@ -25,9 +25,15 @@ class UserController extends Controller
         try {
             $filters = $request->all();
             $users = $this->service->all($filters);
+
+            Log::info('[MANAGE] USER LIST: Mengambil daftar pengguna', [
+                'count' => $users->count(),
+                'user_id' => auth()->id()
+            ]);
+
             return UserResource::collection($users);
         } catch (Throwable $e) {
-            Log::error('UserController: index failed', ['error' => $e->getMessage()]);
+            Log::error('[MANAGE] USER LIST: Gagal mengambil daftar pengguna', ['error' => $e->getMessage()]);
             return response()->json(['error' => 'Failed to fetch users'], 500);
         }
     }
@@ -38,13 +44,15 @@ class UserController extends Controller
         try {
             $data = $request->validated();
             $user = $this->service->create($data);
+
+            Log::info('[MANAGE] USER CREATE: Pengguna baru berhasil dibuat', ['new_user_id' => $user->id, 'creator_id' => auth()->id()]);
             
             return response()->json([
                 'message' => 'User created successfully',
                 'data' => new UserResource($user)
             ], 201);
         } catch (Throwable $e) {
-            Log::error('UserController: store failed', ['error' => $e->getMessage()]);
+            Log::error('[MANAGE] USER CREATE: Gagal membuat pengguna', ['error' => $e->getMessage()]);
             return response()->json(['error' => 'Failed to create user'], 500);
         }
     }
@@ -58,10 +66,12 @@ class UserController extends Controller
             if (!$user) {
                 return response()->json(['error' => 'User not found'], 404);
             }
+
+            Log::info('[MANAGE] USER SHOW: Menampilkan detail pengguna', ['user_id' => $id, 'viewer_id' => auth()->id()]);
             
             return new UserResource($user);
         } catch (Throwable $e) {
-            Log::error('UserController: show failed', ['id' => $id, 'error' => $e->getMessage()]);
+            Log::error('[MANAGE] USER SHOW: Gagal menampilkan detail pengguna', ['id' => $id, 'error' => $e->getMessage()]);
             return response()->json(['error' => 'Failed to fetch user'], 500);
         }
     }
@@ -76,13 +86,15 @@ class UserController extends Controller
             if (!$user) {
                 return response()->json(['error' => 'User not found'], 404);
             }
+
+            Log::info('[MANAGE] USER UPDATE: Pengguna berhasil diperbarui', ['user_id' => $id, 'updater_id' => auth()->id()]);
             
             return response()->json([
                 'message' => 'User updated successfully',
                 'data' => new UserResource($user)
             ], 200);
         } catch (Throwable $e) {
-            Log::error('UserController: update failed', ['id' => $id, 'error' => $e->getMessage()]);
+            Log::error('[MANAGE] USER UPDATE: Gagal memperbarui pengguna', ['id' => $id, 'error' => $e->getMessage()]);
             return response()->json(['error' => 'Failed to update user'], 500);
         }
     }
@@ -96,10 +108,12 @@ class UserController extends Controller
             if (!$result) {
                 return response()->json(['error' => 'User not found'], 404);
             }
+
+            Log::info('[MANAGE] USER DELETE: Pengguna berhasil dihapus', ['user_id' => $id, 'deleter_id' => auth()->id()]);
             
             return response()->json(['message' => 'User deleted successfully'], 200);
         } catch (Throwable $e) {
-            Log::error('UserController: destroy failed', ['id' => $id, 'error' => $e->getMessage()]);
+            Log::error('[MANAGE] USER DELETE: Gagal menghapus pengguna', ['id' => $id, 'error' => $e->getMessage()]);
             return response()->json(['error' => 'Failed to delete user'], 500);
         }
     }

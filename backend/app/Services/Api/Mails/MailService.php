@@ -97,8 +97,6 @@ class MailService
             }
         }
 
-        $data = $query->get();
-        Log::info('Mail: fetched all', ['count' => $data->count(), 'type' => $type, 'search' => $search]);
         return $data;
     }
 
@@ -129,10 +127,7 @@ class MailService
                     }
                 }
 
-                Log::info('Mail: Created Data', [
-                    'type' => $type,
-                    'data' => $data,
-                ]);
+                // Log::info('Mail: Created Data', ['type' => $type, 'data' => $data]);
                 $model = $this->getModel($type);
                 $mail = $model::create($data);
 
@@ -154,10 +149,9 @@ class MailService
                     'desc'    => $data['desc'] ?? null,
                 ]);
 
-                Log::info('Mail: created', ['id' => $mail->id, 'type' => $type]);
                 return $mail;
             } catch (\Throwable $e) {
-                Log::error('Mail: creation failed', [
+                Log::error('[SERVICE] MAIL CREATE: Gagal membuat surat', [
                     'error' => $e->getMessage(),
                     'type'  => $type,
                     'data'  => $data
@@ -191,7 +185,6 @@ class MailService
             'desc'    => $data['note'] ?? 'Status validation by ' . $user->name,
         ]);
 
-        Log::info('Mail: validated', ['id' => $id, 'status' => $data['status']]);
         return $mail;
     }
 
@@ -219,7 +212,7 @@ class MailService
         $mail = $this->find($id, $type);
 
         if (!$mail) {
-            Log::warning('Mail: update failed, mail not found', [
+            Log::warning('[SERVICE] MAIL UPDATE: Gagal, surat tidak ditemukan', [
                 'id' => $id,
                 'type' => $type,
                 'payload' => $data
@@ -248,7 +241,7 @@ class MailService
 
                 if ($mailLog) {
                     $mailLog->update(['desc' => $data['desc']]);
-                    Log::info('MailLog: desc updated', [
+                    Log::info('[SERVICE] MAIL LOG: Deskripsi diperbarui', [
                         'mail_id' => $mail->id,
                         'type' => 1,
                         'status' => $mail->status
@@ -256,14 +249,11 @@ class MailService
                 }
             }
 
-            Log::info('Mail: updated successfully', [
-                'id' => $id,
-                'type' => $type
-            ]);
+
 
             return $mail;
         } catch (\Throwable $e) {
-            Log::error('Mail: update failed', [
+            Log::error('[SERVICE] MAIL UPDATE: Gagal memperbarui surat', [
                 'id' => $id,
                 'type' => $type,
                 'payload' => $data,
@@ -278,7 +268,6 @@ class MailService
         $mail = $this->find($id, $type);
         if (!$mail) return false;
         $mail->delete();
-        Log::info('Mail: deleted', ['id' => $id, 'type' => $type]);
         return true;
     }
 
@@ -290,11 +279,7 @@ class MailService
         $diff = $prev > 0 ? (($curr - $prev) / $prev) * 100 : ($curr > 0 ? 100 : 0);
         $status = $diff > 0 ? 'increase' : ($diff < 0 ? 'decrease' : 'unchanged');
 
-        Log::info('Mail: monthly summary', [
-            'curr' => $curr,
-            'prev' => $prev,
-            'diff' => round($diff, 2)
-        ]);
+
 
         return [
             'current_month_total' => $curr,
@@ -369,11 +354,11 @@ class MailService
                     ]
                 );
 
-                Log::info('MailService: reviewed successfully', compact('id', 'type'));
+                // Log::info('MailService: reviewed successfully', compact('id', 'type'));
 
                 return $mail->load('mail_log');
             } catch (\Throwable $e) {
-                Log::error('MailService: review failed', [
+                Log::error('[SERVICE] MAIL REVIEW: Gagal review', [
                     'id' => $id,
                     'type' => $type,
                     'payload' => $data,
@@ -392,12 +377,12 @@ class MailService
                 if ($leader && $leader->email) {
                     \Illuminate\Support\Facades\Mail::to($leader->email)
                         ->send(new \App\Mail\DispositionNotification($updatedMail, $data['sekum_desc'] ?? ''));
-                    Log::info('MailService: notification sent', ['email' => $leader->email]);
+                    Log::info('[MAIL SERVICE] NOTIFIKASI: Email disposisi dikirim', ['email' => $leader->email]);
                 } else {
-                     Log::warning('MailService: notification skipped - no leader email found', ['division_id' => $updatedMail->division_id]);
+                     Log::warning('[MAIL SERVICE] NOTIFIKASI: Gagal kirim email (tidak ada email leader)', ['division_id' => $updatedMail->division_id]);
                 }
             } catch (\Exception $e) {
-                Log::error('MailService: failed to send email notification', ['error' => $e->getMessage()]);
+                Log::error('[MAIL SERVICE] NOTIFIKASI: Gagal mengirim email', ['error' => $e->getMessage()]);
                 // Don't throw, just log. Transaction is already committed.
             }
         }

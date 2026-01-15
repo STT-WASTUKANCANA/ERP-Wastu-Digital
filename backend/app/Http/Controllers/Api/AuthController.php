@@ -25,9 +25,10 @@ class AuthController extends Controller
         try {
             $user = $this->authService->signup($request->validated());
 
-            Log::info('[API] Pendaftaran pengguna baru berhasil', [
+            Log::info('[AUTH] DAFTAR: Pengguna baru berhasil mendaftar', [
                 'email' => $user->email,
                 'ip' => request()->ip(),
+                'user_id' => $user->id
             ]);
 
             return response()->json([
@@ -35,9 +36,9 @@ class AuthController extends Controller
                 'user'    => new UserResource($user),
             ], 201);
         } catch (Throwable $e) {
-            Log::error('[API] Pendaftaran gagal: Terjadi kesalahan server', [
+            Log::error('[AUTH] DAFTAR: Gagal mendaftar karena kesalahan server', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
+                'ip' => request()->ip()
             ]);
 
             return response()->json(['error' => 'Signup failed'], 500);
@@ -51,14 +52,14 @@ class AuthController extends Controller
         $tokens = $this->authService->signin($credentials);
 
         if (!$tokens) {
-            Log::warning('[API] Percobaan login ditolak: Kredensial tidak valid', [
+            Log::warning('[AUTH] MASUK: Percobaan login gagal (kredensial tidak valid)', [
                 'email' => $credentials['email'] ?? null,
                 'ip' => request()->ip(),
             ]);
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        Log::info('[API] Login berhasil: Token diterbitkan', [
+        Log::info('[AUTH] MASUK: Pengguna berhasil masuk', [
             'email' => $credentials['email'],
             'ip' => request()->ip(),
         ]);
@@ -71,8 +72,9 @@ class AuthController extends Controller
     {
         $user = $this->authService->currentUser();
 
-        Log::info('[API] Data profil diakses', [
-            'email' => $user?->email,
+        Log::info('[AUTH] PROFIL: Mengakses data profil', [
+            'user_id' => $user->id ?? null,
+            'email' => $user->email ?? null,
             'ip' => request()->ip(),
         ]);
 
@@ -87,8 +89,9 @@ class AuthController extends Controller
         $this->authService->signout($refreshToken);
 
         $user = $this->authService->currentUser();
-        Log::info('[API] Logout berhasil', [
-            'email' => $user?->email,
+        Log::info('[AUTH] KELUAR: Pengguna berhasil keluar', [
+            'user_id' => $user->id ?? null,
+            'email' => $user->email ?? null,
             'ip' => request()->ip(),
         ]);
 
@@ -107,19 +110,19 @@ class AuthController extends Controller
             $newAccessToken = $this->authService->refresh($refreshToken);
 
             if (!$newAccessToken) {
-                Log::warning('[API] Refresh token gagal: Token tidak valid atau sesi habis', [
+                Log::warning('[AUTH] REFRESH: Gagal memperbarui token (tidak valid/kadaluarsa)', [
                     'ip' => request()->ip()
                 ]);
                 return response()->json(['error' => 'Invalid or expired refresh token'], 401);
             }
 
-            Log::info('[API] Refresh token sukses: Mengirim akses token baru', [
+            Log::info('[AUTH] REFRESH: Token berhasil diperbarui', [
                 'ip' => request()->ip(),
             ]);
 
             return $this->respondWithAccessToken($newAccessToken);
         } catch (Throwable $e) {
-            Log::error('[API] Refresh token error sistem', [
+            Log::error('[AUTH] REFRESH: Gagal memperbarui token karena sistem', [
                 'error' => $e->getMessage(),
                 'ip' => request()->ip(),
             ]);

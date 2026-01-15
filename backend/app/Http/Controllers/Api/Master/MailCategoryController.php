@@ -30,6 +30,11 @@ class MailCategoryController extends Controller
 
         $categories = $query->orderBy('type')->orderBy('name')->get();
 
+        Log::info('[MASTER] MAIL KATEGORI LIST: Mengambil daftar kategori', [
+            'count' => $categories->count(),
+            'user_id' => Auth::id()
+        ]);
+
         return response()->json([
             'status' => true,
             'data' => MailCategoryResource::collection($categories)
@@ -44,14 +49,14 @@ class MailCategoryController extends Controller
 
             $category = MailCategory::create($data);
 
-            Log::info('MailCategory:store', ['user_id' => Auth::id(), 'category_id' => $category->id]);
+            Log::info('[MASTER] MAIL KATEGORI CREATE: Kategori berhasil dibuat', ['user_id' => Auth::id(), 'category_id' => $category->id]);
 
             return response()->json([
                 'status' => true,
                 'data' => new MailCategoryResource($category)
             ], 201);
         } catch (Throwable $e) {
-            Log::error('MailCategory:store failed', ['user_id' => Auth::id(), 'error' => $e->getMessage()]);
+            Log::error('[MASTER] MAIL KATEGORI CREATE: Gagal membuat kategori', ['user_id' => Auth::id(), 'error' => $e->getMessage()]);
             return response()->json(['status' => false, 'message' => $e->getMessage()], 500);
         }
     }
@@ -68,6 +73,8 @@ class MailCategoryController extends Controller
             $category = MailCategory::findOrFail($id);
             $category->update($request->validated());
 
+            Log::info('[MASTER] MAIL KATEGORI UPDATE: Kategori berhasil diperbarui', ['category_id' => $id, 'user_id' => Auth::id()]);
+
             return response()->json([
                 'status' => true,
                 'data' => new MailCategoryResource($category)
@@ -82,6 +89,8 @@ class MailCategoryController extends Controller
         try {
             $category = MailCategory::findOrFail($id);
             $category->delete();
+
+            Log::info('[MASTER] MAIL KATEGORI DELETE: Kategori berhasil dihapus', ['category_id' => $id, 'user_id' => Auth::id()]);
 
             return response()->json(['status' => true, 'message' => 'Category deleted']);
         } catch (Throwable $e) {

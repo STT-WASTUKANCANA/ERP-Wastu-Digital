@@ -45,7 +45,6 @@ class UserService
         }
 
         $data = $query->get();
-        Log::info('User: fetched all', ['count' => $data->count(), 'filters' => $filters]);
         return $data;
     }
 
@@ -64,10 +63,11 @@ class UserService
 
                 $user = User::create($data);
 
-                Log::info('User: created', ['id' => $user->id, 'email' => $user->email]);
+                $user = User::create($data);
+
                 return $user->load('role', 'division');
             } catch (\Throwable $e) {
-                Log::error('User: creation failed', [
+                Log::error('[SERVICE] USER CREATE: Gagal membuat data pengguna', [
                     'error' => $e->getMessage(),
                     'data' => $data
                 ]);
@@ -81,7 +81,7 @@ class UserService
         $user = $this->find($id);
 
         if (!$user) {
-            Log::warning('User: update failed, user not found', ['id' => $id]);
+            Log::warning('[SERVICE] USER UPDATE: Gagal, pengguna tidak ditemukan', ['id' => $id]);
             return null;
         }
 
@@ -96,10 +96,11 @@ class UserService
 
             $user->update($data);
 
-            Log::info('User: updated successfully', ['id' => $id, 'email' => $user->email]);
+            $user->update($data);
+
             return $user->load('role', 'division');
         } catch (\Throwable $e) {
-            Log::error('User: update failed', [
+            Log::error('[SERVICE] USER UPDATE: Gagal memperbarui pengguna', [
                 'id' => $id,
                 'error' => $e->getMessage()
             ]);
@@ -111,12 +112,12 @@ class UserService
     {
         $user = $this->find($id);
         if (!$user) {
-            Log::warning('User: delete failed, user not found', ['id' => $id]);
+            Log::warning('[SERVICE] USER DELETE: Gagal, pengguna tidak ditemukan', ['id' => $id]);
             return false;
         }
 
         $user->delete();
-        Log::info('User: deleted', ['id' => $id, 'email' => $user->email]);
+        $user->delete();
         return true;
     }
 }

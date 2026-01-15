@@ -22,21 +22,18 @@ class CategoryService
     public function create(array $data): MailCategory
     {
         $category = MailCategory::create($data);
-        Log::info('MailCategory: created', ['id' => $category->id]);
         return $category;
     }
 
     public function update(MailCategory $category, array $data): MailCategory
     {
         $category->update($data);
-        Log::info('MailCategory: updated', ['id' => $category->id]);
         return $category;
     }
 
     public function delete(MailCategory $category): bool
     {
         $category->delete();
-        Log::info('MailCategory: deleted', ['id' => $category->id]);
         return true;
     }
 }

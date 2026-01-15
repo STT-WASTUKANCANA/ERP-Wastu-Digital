@@ -35,7 +35,7 @@ class CategoryController extends Controller
 
         $categories = $this->service->all($type);
 
-        Log::info('Category:index', [
+        Log::info('[MAIL] KATEGORI LIST: Mengambil daftar kategori', [
             'user_id' => Auth::id(),
             'type' => $type,
             'count' => $categories->count()
@@ -57,14 +57,14 @@ class CategoryController extends Controller
 
             $category = $this->service->create($data);
 
-            Log::info('Category:store', ['user_id' => Auth::id(), 'category_id' => $category->id]);
+            Log::info('[MAIL] KATEGORI CREATE: Kategori berhasil dibuat', ['user_id' => Auth::id(), 'category_id' => $category->id]);
 
             return response()->json([
                 'status' => true,
                 'data' => new CategoryResource($category)
             ], 201);
         } catch (Throwable $e) {
-            Log::error('Category:store failed', ['user_id' => Auth::id(), 'error' => $e->getMessage()]);
+            Log::error('[MAIL] KATEGORI CREATE: Gagal membuat kategori', ['user_id' => Auth::id(), 'error' => $e->getMessage()]);
             return response()->json(['status' => false, 'message' => $e->getMessage()], 500);
         }
     }
@@ -87,14 +87,14 @@ class CategoryController extends Controller
             $category = MailCategory::where('user_id', auth()->id())->findOrFail($id);
             $updatedCategory = $this->service->update($category, $request->validated());
 
-            Log::info('Category:update', ['user_id' => Auth::id(), 'category_id' => $updatedCategory->id]);
+            Log::info('[MAIL] KATEGORI UPDATE: Kategori berhasil diperbarui', ['user_id' => Auth::id(), 'category_id' => $updatedCategory->id]);
 
             return response()->json([
                 'status' => true,
                 'data' => new CategoryResource($updatedCategory)
             ]);
         } catch (Throwable $e) {
-            Log::error('Category:update failed', ['user_id' => Auth::id(), 'category_id' => $id, 'error' => $e->getMessage()]);
+            Log::error('[MAIL] KATEGORI UPDATE: Gagal memperbarui kategori', ['user_id' => Auth::id(), 'category_id' => $id, 'error' => $e->getMessage()]);
             return response()->json(['status' => false, 'message' => 'Update failed or category not found.'], 500);
         }
     }
@@ -106,11 +106,11 @@ class CategoryController extends Controller
             $category = MailCategory::where('user_id', auth()->id())->findOrFail($id);
             $this->service->delete($category);
 
-            Log::info('Category:destroy', ['user_id' => Auth::id(), 'category_id' => $id]);
+            Log::info('[MAIL] KATEGORI DELETE: Kategori berhasil dihapus', ['user_id' => Auth::id(), 'category_id' => $id]);
 
             return response()->json(['status' => true, 'message' => 'Category deleted successfully'], 200);
         } catch (Throwable $e) {
-            Log::error('Category:destroy failed', ['user_id' => Auth::id(), 'category_id' => $id, 'error' => $e->getMessage()]);
+            Log::error('[MAIL] KATEGORI DELETE: Gagal menghapus kategori', ['user_id' => Auth::id(), 'category_id' => $id, 'error' => $e->getMessage()]);
             return response()->json(['status' => false, 'message' => 'Delete failed or category not found.'], 500);
         }
     }

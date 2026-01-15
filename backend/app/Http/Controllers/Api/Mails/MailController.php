@@ -45,10 +45,10 @@ class MailController extends Controller
 
                         $data = $this->service->all($type, $filters);
 
-                        Log::info('Mail:index', ['count' => count($data), 'type' => $type, 'search' => $search]);
+                        Log::info('[MAIL] LIST: Mengambil daftar surat', ['type' => $type, 'count' => count($data), 'search' => $search, 'user_id' => Auth::id()]);
                         return response()->json(['status' => true, 'data' => MailResource::collection($data)]);
                 } catch (Throwable $e) {
-                        Log::error('Mail:index', ['msg' => $e->getMessage()]);
+                        Log::error('[MAIL] LIST: Gagal mengambil daftar surat', ['msg' => $e->getMessage()]);
                         return response()->json(['status' => false], 500);
                 }
         }
@@ -70,11 +70,10 @@ class MailController extends Controller
                             ], 403);
                         }
 
-                        Log::debug('Mail:store started', [
+                        Log::debug('[MAIL] CREATE: Memulai pembuatan surat', [
                                 'type' => $type,
                                 'user_id' => Auth::id(),
                                 'has_attachment' => $request->hasFile('attachment'),
-                                'request_data' => $request->except(['attachment']),
                         ]);
 
                         if ($request->hasFile('attachment')) {
@@ -102,24 +101,22 @@ class MailController extends Controller
                                 $filePath = $file->store($dynamicPath, 'public');
                                 $validatedData['attachment'] = $filePath;
                                 
-                                Log::debug('Mail:store attachment saved', ['path' => $filePath]);
+                                Log::debug('[MAIL] CREATE: Lampiran tersimpan', ['path' => $filePath]);
                         }
 
                         $mail = $this->service->create($validatedData, $type);
 
-                        Log::info('Mail:store success', ['id' => $mail->id, 'type' => $type]);
+                        Log::info('[MAIL] CREATE: Surat berhasil dibuat', ['id' => $mail->id, 'type' => $type, 'user_id' => Auth::id()]);
 
                         return response()->json([
                                 'status' => true,
                                 'data'   => new MailResource($mail)
                         ], 201);
                 } catch (Throwable $e) {
-                        Log::error('Mail:store FAILED', [
+                        Log::error('[MAIL] CREATE: Gagal membuat surat', [
                                 'message' => $e->getMessage(),
                                 'file' => $e->getFile(),
                                 'line' => $e->getLine(),
-                                'trace' => $e->getTraceAsString(),
-                                'request_data' => $request->except(['attachment']),
                                 'user_id' => Auth::id(),
                         ]);
                         return response()->json(['status' => false, 'message' => 'Internal Server Error: ' . $e->getMessage()], 500);
@@ -132,11 +129,11 @@ class MailController extends Controller
                 $mail = $this->service->find($id, $type);
 
                 if (!$mail) {
-                        Log::warning('Mail:show notfound', ['id' => $id, 'type' => $type]);
+                        Log::warning('[MAIL] SHOW: Surat tidak ditemukan', ['id' => $id, 'type' => $type]);
                         return response()->json(['status' => false], 404);
                 }
 
-                Log::info('Mail:show', ['id' => $id, 'type' => $type]);
+                Log::info('[MAIL] SHOW: Menampilkan detail surat', ['id' => $id, 'type' => $type, 'user_id' => Auth::id()]);
                 return response()->json(['status' => true, 'data' => new MailResource($mail)]);
         }
 
@@ -168,16 +165,13 @@ class MailController extends Controller
 
                         $updatedMail = $this->service->update($id, $validatedData, $type);
 
-                        Log::info('Mail:update success', ['id' => $id, 'type' => $type]);
+                        Log::info('[MAIL] UPDATE: Surat berhasil diperbarui', ['id' => $id, 'type' => $type, 'user_id' => Auth::id()]);
                         return response()->json(['status' => true, 'data' => new MailResource($updatedMail)]);
                 } catch (Throwable $e) {
-                        Log::error('Mail:update FAILED', [
+                        Log::error('[MAIL] UPDATE: Gagal memperbarui surat', [
                                 'id' => $id,
                                 'message' => $e->getMessage(),
-                                'file' => $e->getFile(),
-                                'line' => $e->getLine(),
-                                'trace' => $e->getTraceAsString(),
-                                'request_data' => $request->except(['attachment']),
+                                'user_id' => Auth::id(),
                         ]);
                         return response()->json(['status' => false, 'message' => 'Update failed: ' . $e->getMessage()], 500);
                 }
@@ -190,11 +184,11 @@ class MailController extends Controller
                 $deleted = $this->service->delete($id, $type);
 
                 if (!$deleted) {
-                        Log::warning('Mail:destroy notfound', ['id' => $id, 'type' => $type]);
+                        Log::warning('[MAIL] DELETE: Surat tidak ditemukan untuk dihapus', ['id' => $id, 'type' => $type]);
                         return response()->json(['status' => false], 404);
                 }
 
-                Log::info('Mail:destroy', ['id' => $id, 'type' => $type]);
+                Log::info('[MAIL] DELETE: Surat berhasil dihapus', ['id' => $id, 'type' => $type, 'user_id' => Auth::id()]);
                 return response()->json(['status' => true]);
         }
 
@@ -204,10 +198,10 @@ class MailController extends Controller
                         $type = $this->getTypeFromRoute($request);
                         $stats = $this->service->getMonthlySummary($type);
 
-                        Log::info('Mail:summary', ['type' => $type, 'stats' => $stats]);
+                        Log::info('[MAIL] SUMMARY: Mengambil ringkasan bulanan', ['type' => $type, 'stats' => $stats, 'user_id' => Auth::id()]);
                         return response()->json(['status' => true, 'data' => $stats]);
                 } catch (Throwable $e) {
-                        Log::error('Mail:summary', ['msg' => $e->getMessage()]);
+                        Log::error('[MAIL] SUMMARY: Gagal mengambil ringkasan', ['msg' => $e->getMessage()]);
                         return response()->json(['status' => false], 500);
                 }
         }
@@ -229,11 +223,11 @@ class MailController extends Controller
                         $reviewedMail = $this->service->reviewIncomingMail($id, $validatedData, $type);
 
                         if (!$reviewedMail) {
-                                Log::warning('Mail:review notfound', ['id' => $id, 'type' => $type]);
+                                Log::warning('[MAIL] REVIEW: Surat tidak ditemukan', ['id' => $id, 'type' => $type]);
                                 return response()->json(['status' => false, 'message' => 'Mail not found'], 404);
                         }
 
-                        Log::info('Mail:review success', ['id' => $id, 'type' => $type]);
+                        Log::info('[MAIL] REVIEW: Surat masuk berhasil direview', ['id' => $id, 'type' => $type, 'user_id' => Auth::id()]);
                         return response()->json([
                                 'status' => true,
                                 'data' => new MailResource($reviewedMail)
@@ -266,10 +260,10 @@ class MailController extends Controller
                                 return response()->json(['status' => false, 'message' => 'Mail not found'], 404);
                         }
 
-                        Log::info('Mail:validateOutgoing success', ['id' => $id]);
+                        Log::info('[MAIL] VALIDATE: Surat keluar berhasil divalidasi', ['id' => $id, 'user_id' => Auth::id(), 'status' => $data['status']]);
                         return response()->json(['status' => true, 'data' => new MailResource($mail)]);
                 } catch (Throwable $e) {
-                        Log::error('Mail:validateOutgoing failed', ['msg' => $e->getMessage()]);
+                        Log::error('[MAIL] VALIDATE: Gagal memvalidasi surat', ['msg' => $e->getMessage()]);
                         return response()->json(['status' => false, 'message' => $e->getMessage()], 500);
                 }
         }

@@ -25,7 +25,10 @@ class DivisionController extends Controller
     {
         $divisions = $this->service->all();
 
-        Log::info('Division:index', ['count' => $divisions->count()]);
+        Log::info('[MANAGE] DIVISI LIST: Mengambil daftar divisi', [
+            'count' => $divisions->count(),
+            'user_id' => auth()->id() // jika ada auth
+        ]);
 
         return response()->json([
             'status' => true,
@@ -40,14 +43,14 @@ class DivisionController extends Controller
             $data = $request->validated();
             $division = $this->service->create($data);
 
-            Log::info('Division:store', ['division_id' => $division->id]);
+            Log::info('[MANAGE] DIVISI CREATE: Divisi berhasil dibuat', ['division_id' => $division->id, 'user_id' => auth()->id()]);
 
             return response()->json([
                 'status' => true,
                 'data' => new DivisionResource($division)
             ], 201);
         } catch (Throwable $e) {
-            Log::error('Division:store failed', ['error' => $e->getMessage()]);
+            Log::error('[MANAGE] DIVISI CREATE: Gagal membuat divisi', ['error' => $e->getMessage()]);
             return response()->json(['status' => false, 'message' => $e->getMessage()], 500);
         }
     }
@@ -70,14 +73,14 @@ class DivisionController extends Controller
             $division = Division::findOrFail($id);
             $updatedDivision = $this->service->update($division, $request->validated());
 
-            Log::info('Division:update', ['division_id' => $updatedDivision->id]);
+            Log::info('[MANAGE] DIVISI UPDATE: Divisi berhasil diperbarui', ['division_id' => $updatedDivision->id, 'user_id' => auth()->id()]);
 
             return response()->json([
                 'status' => true,
                 'data' => new DivisionResource($updatedDivision)
             ]);
         } catch (Throwable $e) {
-            Log::error('Division:update failed', ['division_id' => $id, 'error' => $e->getMessage()]);
+            Log::error('[MANAGE] DIVISI UPDATE: Gagal memperbarui divisi', ['division_id' => $id, 'error' => $e->getMessage()]);
             return response()->json(['status' => false, 'message' => 'Update failed or division not found.'], 500);
         }
     }
@@ -89,11 +92,11 @@ class DivisionController extends Controller
             $division = Division::findOrFail($id);
             $this->service->delete($division);
 
-            Log::info('Division:destroy', ['division_id' => $id]);
+            Log::info('[MANAGE] DIVISI DELETE: Divisi berhasil dihapus', ['division_id' => $id, 'user_id' => auth()->id()]);
 
             return response()->json(['status' => true, 'message' => 'Division deleted successfully'], 200);
         } catch (Throwable $e) {
-            Log::error('Division:destroy failed', ['division_id' => $id, 'error' => $e->getMessage()]);
+            Log::error('[MANAGE] DIVISI DELETE: Gagal menghapus divisi', ['division_id' => $id, 'error' => $e->getMessage()]);
             return response()->json(['status' => false, 'message' => 'Delete failed or division not found.'], 500);
         }
     }
