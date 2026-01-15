@@ -38,9 +38,10 @@ class MailController extends Controller
         {
                 try {
                         $type = $this->getTypeFromRoute($request);
+                        $filters = $request->all();
                         $search = $request->input('search');
 
-                        $data = $this->service->all($type, $search);
+                        $data = $this->service->all($type, $filters);
 
                         Log::info('Mail:index', ['count' => count($data), 'type' => $type, 'search' => $search]);
                         return response()->json(['status' => true, 'data' => MailResource::collection($data)]);

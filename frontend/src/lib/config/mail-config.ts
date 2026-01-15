@@ -1,8 +1,8 @@
 import { getIncomingMailColumns } from "@/components/features/mails/incomingMail/column";
 import { getOutgoingMailColumns } from "@/components/features/mails/outgoingMail/column";
-import { deleteIncomingMail } from "@/lib/api/mails/incoming";
-import { deleteOutgoingMail } from "@/lib/api/mails/outgoing";
-import { deleteDecisionMail } from "@/lib/api/mails/decision";
+import { deleteIncomingMail, getMailCategories as getIncomingCategories } from "@/lib/api/mails/incoming";
+import { deleteOutgoingMail, getMailCategories as getOutgoingCategories } from "@/lib/api/mails/outgoing";
+import { deleteDecisionMail, getMailCategories as getDecisionCategories } from "@/lib/api/mails/decision";
 import { ColumnDef } from "@/types/ui-props";
 import { getDecisionMailColumns } from "@/components/features/mails/decisionMail/column";
 
@@ -20,6 +20,7 @@ export const mailConfig = {
                         userId: string | null
                 ): ColumnDef<any>[] => getIncomingMailColumns(handler, roleId, userId),
                 delete: (id: number) => deleteIncomingMail(id),
+                getCategories: () => getIncomingCategories(),
         },
 
         outgoing: {
@@ -35,6 +36,7 @@ export const mailConfig = {
                         userId: string | null
                 ): ColumnDef<any>[] => getOutgoingMailColumns(handler, roleId, userId),
                 delete: (id: number) => deleteOutgoingMail(id),
+                getCategories: () => getOutgoingCategories(),
         },
 
         decision: {
@@ -50,5 +52,6 @@ export const mailConfig = {
                         userId: string | null
                 ): ColumnDef<any>[] => getDecisionMailColumns(handler, roleId, userId),
                 delete: (id: number) => deleteDecisionMail(id),
+                getCategories: () => getDecisionCategories(),
         },
 };

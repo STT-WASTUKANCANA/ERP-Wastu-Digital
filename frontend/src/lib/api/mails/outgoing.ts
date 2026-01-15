@@ -4,9 +4,28 @@ export async function getOutgoingMailSummary() {
         return await fetchWithAuth('/mails/outgoing/summary', { method: "GET" });
 }
 
-export async function getOutgoingMailList(search?: string) {
-        const query = search ? `?search=${encodeURIComponent(search)}` : '';
-        return await fetchWithAuth(`/mails/outgoing${query}`, { method: "GET" });
+export interface OutgoingMailFilterParams {
+        search?: string;
+        start_date?: string;
+        end_date?: string;
+        category_id?: string;
+        status?: string;
+        destination?: string;
+}
+
+export async function getOutgoingMailList(params?: OutgoingMailFilterParams) {
+        const queryParams = new URLSearchParams();
+
+        if (params?.search) queryParams.append('search', params.search);
+        if (params?.start_date) queryParams.append('start_date', params.start_date);
+        if (params?.end_date) queryParams.append('end_date', params.end_date);
+        if (params?.category_id) queryParams.append('category_id', params.category_id);
+        if (params?.status) queryParams.append('status', params.status);
+        if (params?.destination) queryParams.append('destination', params.destination);
+
+        const queryString = queryParams.toString();
+        const url = `/mails/outgoing${queryString ? `?${queryString}` : ''}`;
+        return await fetchWithAuth(url, { method: "GET" });
 }
 
 export async function getMailCategories() {

@@ -55,13 +55,15 @@ export const TableContainer = ({
                                 </div>
 
                                 <div className="flex items-center gap-2 justify-end lg:justify-start">
-                                        <Button
-                                                onClick={onFilterClick}
-                                                className="text-foreground/70 text-sm cursor-pointer px-4 py-2 hidden lg:flex justify-center items-center gap-2 border border-secondary/20 bg-background"
-                                        >
-                                                <GoFilter />
-                                                <span>Filter</span>
-                                        </Button>
+                                        {onFilterClick && (
+                                                <Button
+                                                        onClick={onFilterClick}
+                                                        className="text-foreground/70 text-sm cursor-pointer px-4 py-2 hidden lg:flex justify-center items-center gap-2 border border-secondary/20 bg-background"
+                                                >
+                                                        <GoFilter />
+                                                        <span>Filter</span>
+                                                </Button>
+                                        )}
                                         <Button
                                                 onClick={onModifyColumnClick}
                                                 className="text-foreground/70 text-sm cursor-pointer px-4 py-2 hidden lg:flex justify-center items-center gap-2 border border-secondary/20 bg-background"
@@ -86,16 +88,18 @@ export const TableContainer = ({
                                                                 padding="p-2"
                                                         >
                                                                 <div className="flex flex-col gap-1">
-                                                                        <Button
-                                                                                onClick={(e) => {
-                                                                                        setToolsDropdown(false);
-                                                                                        onFilterClick?.(e);
-                                                                                }}
-                                                                                className="w-full justify-start text-foreground/80 text-sm px-4 py-2 hover:bg-muted flex items-center gap-2 rounded-md bg-transparent border-none"
-                                                                        >
-                                                                                <GoFilter />
-                                                                                <span>Filter</span>
-                                                                        </Button>
+                                                                        {onFilterClick && (
+                                                                                <Button
+                                                                                        onClick={(e) => {
+                                                                                                setToolsDropdown(false);
+                                                                                                onFilterClick?.(e);
+                                                                                        }}
+                                                                                        className="w-full justify-start text-foreground/80 text-sm px-4 py-2 hover:bg-muted flex items-center gap-2 rounded-md bg-transparent border-none"
+                                                                                >
+                                                                                        <GoFilter />
+                                                                                        <span>Filter</span>
+                                                                                </Button>
+                                                                        )}
                                                                         <Button
                                                                                 onClick={(e) => {
                                                                                         setToolsDropdown(false);

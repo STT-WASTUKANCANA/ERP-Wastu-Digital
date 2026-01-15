@@ -4,9 +4,24 @@ export async function getDecisionMailSummary() {
         return await fetchWithAuth('/mails/decision/summary', { method: "GET" });
 }
 
-export async function getDecisionMailList(search?: string) {
-        const query = search ? `?search=${encodeURIComponent(search)}` : '';
-        return await fetchWithAuth(`/mails/decision${query}`, { method: "GET" });
+export interface DecisionMailFilterParams {
+        search?: string;
+        start_date?: string;
+        end_date?: string;
+        category_id?: string;
+}
+
+export async function getDecisionMailList(params?: DecisionMailFilterParams) {
+        const queryParams = new URLSearchParams();
+
+        if (params?.search) queryParams.append('search', params.search);
+        if (params?.start_date) queryParams.append('start_date', params.start_date);
+        if (params?.end_date) queryParams.append('end_date', params.end_date);
+        if (params?.category_id) queryParams.append('category_id', params.category_id);
+
+        const queryString = queryParams.toString();
+        const url = `/mails/decision${queryString ? `?${queryString}` : ''}`;
+        return await fetchWithAuth(url, { method: "GET" });
 }
 
 export async function getMailCategories() {

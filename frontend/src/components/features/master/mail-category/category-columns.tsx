@@ -23,7 +23,7 @@ export const getMailCategoryColumns = (
         {
             accessorKey: "description",
             header: "Deskripsi",
-            cell: (row) => <div>{row.description || "-"}</div>,
+            cell: (row) => <div>{row.description || <span className="text-gray-400 italic">Tidak ada deskripsi</span>}</div>,
         },
         {
             id: "actions",

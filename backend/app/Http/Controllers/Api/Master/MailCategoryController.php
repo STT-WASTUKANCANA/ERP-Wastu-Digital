@@ -15,12 +15,17 @@ class MailCategoryController extends Controller
 {
     public function index(Request $request)
     {
-        // Simple CRUD for Master: List all categories
-        // Optional: Filter by type via query param ?type=1
+        // CRUD for Master: List all categories
+        // Supports: Filter by type (?type=1) and Search (?search=name)
         $query = MailCategory::query();
 
-        if ($request->has('type')) {
+        if ($request->filled('type')) {
             $query->where('type', $request->type);
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where('name', 'like', "%{$search}%");
         }
 
         $categories = $query->orderBy('type')->orderBy('name')->get();

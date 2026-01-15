@@ -6,15 +6,16 @@ import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/shared/page-header";
 import { TableContainer } from "@/components/shared/table-container";
 import { DataTable } from "@/components/shared/datatable";
-import { UserTableProps } from "@/types/user-props";
+import { UserTableProps, User } from "@/types/user-props";
 import { getUserColumns } from "./column";
 import { deleteUser } from "@/lib/api/manage/users";
 import { HiOutlineUpload } from "react-icons/hi";
 
-import { User } from "@/types/user-props";
 import { UserOffcanvasDetail } from "./offcanvas-detail";
 
 import { ColumnSelectorModal } from "@/components/shared/column-selector-modal";
+import { FilterModal } from "@/components/shared/filter-modal";
+import { Select } from "@/components/ui/select";
 
 const UserTable = ({ users, onUserUpdated, isLoading }: UserTableProps) => {
     const router = useRouter();
@@ -26,6 +27,15 @@ const UserTable = ({ users, onUserUpdated, isLoading }: UserTableProps) => {
 
     const [hiddenColumns, setHiddenColumns] = useState<string[]>([]);
     const [showColumnModal, setShowColumnModal] = useState(false);
+
+    // Filter States
+    const [selectedRole, setSelectedRole] = useState("");
+    const [selectedDivision, setSelectedDivision] = useState("");
+    const [showFilterModal, setShowFilterModal] = useState(false);
+
+    // Temp Modal States
+    const [modalRole, setModalRole] = useState("");
+    const [modalDivision, setModalDivision] = useState("");
 
     const handleActionClick = async (e: MouseEvent, action: string, userId: string) => {
         e?.stopPropagation();
@@ -75,15 +85,31 @@ const UserTable = ({ users, onUserUpdated, isLoading }: UserTableProps) => {
     };
 
     const filteredUsers = useMemo(() => {
-        if (!searchTerm) return users;
-        const lower = searchTerm.toLowerCase();
-        return users.filter((user) =>
-            user.name.toLowerCase().includes(lower) ||
-            user.email.toLowerCase().includes(lower) ||
-            (user.role_name && user.role_name.toLowerCase().includes(lower)) ||
-            (user.division_name && user.division_name.toLowerCase().includes(lower))
-        );
-    }, [users, searchTerm]);
+        let data = users;
+
+        // Search
+        if (searchTerm) {
+            const lower = searchTerm.toLowerCase();
+            data = data.filter((user) =>
+                user.name.toLowerCase().includes(lower) ||
+                user.email.toLowerCase().includes(lower) ||
+                (user.role_name && user.role_name.toLowerCase().includes(lower)) ||
+                (user.division_name && user.division_name.toLowerCase().includes(lower))
+            );
+        }
+
+        // Filter Role
+        if (selectedRole) {
+            data = data.filter(user => user.role_name === selectedRole);
+        }
+
+        // Filter Division
+        if (selectedDivision) {
+            data = data.filter(user => user.division_name === selectedDivision);
+        }
+
+        return data;
+    }, [users, searchTerm, selectedRole, selectedDivision]);
 
     const paginatedData = useMemo(() => {
         const start = (currentPage - 1) * entries;
@@ -107,6 +133,39 @@ const UserTable = ({ users, onUserUpdated, isLoading }: UserTableProps) => {
         }
     };
 
+    // Filter Options & Handlers
+    const roleOptions = useMemo(() => {
+        const unique = new Set(users.map(u => u.role_name).filter(Boolean));
+        return Array.from(unique).map(r => ({ label: r as string, value: r as string }));
+    }, [users]);
+
+    const divisionOptions = useMemo(() => {
+        const unique = new Set(users.map(u => u.division_name).filter(Boolean));
+        return Array.from(unique).map(d => ({ label: d as string, value: d as string }));
+    }, [users]);
+
+    const handleOpenFilter = () => {
+        setModalRole(selectedRole);
+        setModalDivision(selectedDivision);
+        setShowFilterModal(true);
+    };
+
+    const handleApplyFilter = () => {
+        setSelectedRole(modalRole);
+        setSelectedDivision(modalDivision);
+        setShowFilterModal(false);
+        setCurrentPage(1);
+    };
+
+    const handleResetFilter = () => {
+        setModalRole("");
+        setModalDivision("");
+        setSelectedRole("");
+        setSelectedDivision("");
+        setShowFilterModal(false);
+        setCurrentPage(1);
+    };
+
     return (
         <>
             <PageHeader
@@ -128,6 +187,7 @@ const UserTable = ({ users, onUserUpdated, isLoading }: UserTableProps) => {
             <TableContainer
                 onSearchChange={handleSearch}
                 onModifyColumnClick={() => setShowColumnModal(true)}
+                onFilterClick={handleOpenFilter}
                 onEntriesChange={handleEntriesChange}
                 page={currentPage}
                 total={filteredUsers.length}
@@ -142,6 +202,31 @@ const UserTable = ({ users, onUserUpdated, isLoading }: UserTableProps) => {
                     onRowClick={handleRowClick}
                 />
             </TableContainer>
+
+            <FilterModal
+                isOpen={showFilterModal}
+                onClose={() => setShowFilterModal(false)}
+                onApply={handleApplyFilter}
+                onReset={handleResetFilter}
+                title="Filter Pengguna"
+            >
+                <div className="flex flex-col gap-4">
+                    <Select
+                        label="Role"
+                        placeholder="Semua Role"
+                        options={roleOptions}
+                        value={modalRole}
+                        onChange={(e) => setModalRole(e.target.value)}
+                    />
+                    <Select
+                        label="Divisi"
+                        placeholder="Semua Divisi"
+                        options={divisionOptions}
+                        value={modalDivision}
+                        onChange={(e) => setModalDivision(e.target.value)}
+                    />
+                </div>
+            </FilterModal>
 
             <ColumnSelectorModal
                 isOpen={showColumnModal}

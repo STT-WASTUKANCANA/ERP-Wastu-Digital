@@ -13,10 +13,11 @@ import { CategoryOffcanvasDetail } from "./offcanvas-detail";
 import { HiOutlineUpload } from "react-icons/hi";
 
 import { ColumnSelectorModal } from "@/components/shared/column-selector-modal";
+import { FilterModal } from "@/components/shared/filter-modal";
+import { Select } from "@/components/ui/select";
 
 export default function CategoryTable() {
     const router = useRouter();
-    const [originalData, setOriginalData] = useState<MailCategory[]>([]);
     const [filteredData, setFilteredData] = useState<MailCategory[]>([]);
     const [loading, setLoading] = useState(true);
     const [entries, setEntries] = useState(10);
@@ -26,16 +27,36 @@ export default function CategoryTable() {
     const [hiddenColumns, setHiddenColumns] = useState<string[]>([]);
     const [showColumnModal, setShowColumnModal] = useState(false);
 
+    // Filter States
+    const [showFilterModal, setShowFilterModal] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [debouncedTerm, setDebouncedTerm] = useState("");
+    const [selectedType, setSelectedType] = useState(""); // Active filter
+    const [modalType, setModalType] = useState(""); // Temp modal state
+
+    // Debounce Search
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedTerm(searchTerm);
+        }, 500);
+        return () => clearTimeout(handler);
+    }, [searchTerm]);
+
+    // Fetch Data (Server Side Filtering)
     const fetchData = async () => {
         setLoading(true);
         try {
-            const res = await getMailCategoryList();
-            if (res?.ok && res?.data?.status) {
-                setOriginalData(res.data.data);
-                setFilteredData(res.data.data);
+            const res = await getMailCategoryList(selectedType, debouncedTerm);
+            if (res?.ok && res?.data) {
+                // API returns { status: true, data: [...] }
+                const items = res.data.data || [];
+                setFilteredData(items);
+            } else {
+                setFilteredData([]);
             }
         } catch (error) {
             console.error(error);
+            setFilteredData([]);
         } finally {
             setLoading(false);
         }
@@ -43,23 +64,10 @@ export default function CategoryTable() {
 
     useEffect(() => {
         fetchData();
-    }, []);
+        setCurrentPage(1); // Reset page on filter change
+    }, [debouncedTerm, selectedType]);
 
-    const handleSearch = (term: string) => {
-        if (!term) {
-            setFilteredData(originalData);
-            return;
-        }
-        const lower = term.toLowerCase();
-        const filtered = originalData.filter(
-            (item) =>
-                item.name.toLowerCase().includes(lower) ||
-                item.type_label.toLowerCase().includes(lower)
-        );
-        setFilteredData(filtered);
-        setCurrentPage(1);
-    };
-
+    // Client-side pagination of server filtered results
     const paginatedData = useMemo(() => {
         const start = (currentPage - 1) * entries;
         const end = start + entries;
@@ -73,12 +81,12 @@ export default function CategoryTable() {
 
     const handleActionClick = async (e: React.MouseEvent, action: string, id: string) => {
         e?.preventDefault();
-        e?.stopPropagation(); // Prevent row click
+        e?.stopPropagation();
 
         if (action === "Edit") {
             sessionStorage.setItem("editingCategoryId", id);
             router.push(`/workspace/master/mail-category/edit`);
-            setSelectedCategory(null); // Close offcanvas
+            setSelectedCategory(null);
         } else if (action === "Delete") {
             const confirmed = window.confirm("Hapus Kategori? Data yang dihapus tidak dapat dikembalikan.");
 
@@ -88,7 +96,7 @@ export default function CategoryTable() {
                     if (res?.data?.status) {
                         alert("Kategori berhasil dihapus");
                         fetchData();
-                        setSelectedCategory(null); // Close offcanvas
+                        setSelectedCategory(null);
                     } else {
                         alert(res?.data?.message || "Terjadi kesalahan");
                     }
@@ -125,6 +133,29 @@ export default function CategoryTable() {
         setHiddenColumns(newHidden);
     };
 
+    // Filter Handlers
+    const typeOptions = useMemo(() => [
+        { label: "Surat Masuk", value: "1" },
+        { label: "Surat Keluar", value: "2" },
+        { label: "Surat Keputusan", value: "3" },
+    ], []);
+
+    const handleOpenFilter = () => {
+        setModalType(selectedType);
+        setShowFilterModal(true);
+    };
+
+    const handleApplyFilter = () => {
+        setSelectedType(modalType);
+        setShowFilterModal(false);
+    };
+
+    const handleResetFilter = () => {
+        setModalType("");
+        setSelectedType("");
+        setShowFilterModal(false);
+    };
+
     return (
         <>
             <PageHeader title="Kategori Surat" description="Kelola kategori surat masuk, keluar, dan keputusan.">
@@ -141,8 +172,9 @@ export default function CategoryTable() {
             </PageHeader>
 
             <TableContainer
-                onSearchChange={handleSearch}
+                onSearchChange={setSearchTerm}
                 onModifyColumnClick={() => setShowColumnModal(true)}
+                onFilterClick={handleOpenFilter}
                 onEntriesChange={handleEntriesChange}
                 page={currentPage}
                 total={filteredData.length}
@@ -157,6 +189,22 @@ export default function CategoryTable() {
                     onRowClick={handleRowClick}
                 />
             </TableContainer>
+
+            <FilterModal
+                isOpen={showFilterModal}
+                onClose={() => setShowFilterModal(false)}
+                onApply={handleApplyFilter}
+                onReset={handleResetFilter}
+                title="Filter Kategori"
+            >
+                <Select
+                    label="Jenis Surat"
+                    placeholder="Semua Jenis"
+                    options={typeOptions}
+                    value={modalType}
+                    onChange={(e) => setModalType(e.target.value)}
+                />
+            </FilterModal>
 
             <ColumnSelectorModal
                 isOpen={showColumnModal}

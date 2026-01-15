@@ -21,7 +21,7 @@ export const getDivisionColumns = (
         {
             header: "Deskripsi",
             accessorKey: "description",
-            cell: (row) => row.description || "-",
+            cell: (row) => row.description || <span className="text-gray-400 italic">Tidak ada deskripsi</span>,
         },
         {
             header: "",

@@ -21,8 +21,10 @@ class MailService
         };
     }
 
-    public function all(int $type, ?string $search = null)
+    public function all(int $type, $filters = [])
     {
+        $search = is_string($filters) ? $filters : ($filters['search'] ?? null);
+
         $model = $this->getModel($type);
         $relations = ['mail_category', 'mail_log'];
         if ($type === 1) {
@@ -48,6 +50,31 @@ class MailService
                      $q->orWhere('title', 'like', "%{$search}%");
                 }
             });
+        }
+
+        // Apply Advanced Filters
+        if (is_array($filters)) {
+            if (!empty($filters['start_date']) && !empty($filters['end_date'])) {
+                 $query->whereBetween('date', [$filters['start_date'], $filters['end_date']]);
+            }
+            if (!empty($filters['category_id'])) {
+                 $query->where('category_id', $filters['category_id']);
+            }
+            if (!empty($filters['status'])) {
+                 $query->where('status', (string) $filters['status']);
+            }
+            // Outgoing - Destination
+            if ($type === 2 && !empty($filters['destination'])) {
+                 $query->where('institute', 'like', "%{$filters['destination']}%");
+            }
+            // Incoming - View Status
+            if ($type === 1 && !empty($filters['view_status'])) {
+                 if ($filters['view_status'] === 'read') {
+                      $query->whereNotNull('user_view_id');
+                 } elseif ($filters['view_status'] === 'unread') {
+                      $query->whereNull('user_view_id');
+                 }
+            }
         }
 
         if ($type === 2) { // Outgoing Mail Logic

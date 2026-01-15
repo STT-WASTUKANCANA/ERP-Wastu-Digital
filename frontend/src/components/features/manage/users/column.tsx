@@ -29,7 +29,7 @@ export const getUserColumns = (
         {
             header: 'Divisi',
             accessorKey: 'division_name',
-            cell: (row) => row.division_name || '-',
+            cell: (row) => row.division_name || <span className="text-gray-400 italic">Belum ditentukan</span>,
         },
         {
             header: '',

@@ -16,12 +16,12 @@ export interface MailCategoryFormData {
     description: string;
 }
 
-export async function getMailCategoryList(type?: number) {
-    let url = '/master/mail-category';
-    if (type) {
-        url += `?type=${type}`;
-    }
-    return await fetchWithAuth(url, { method: "GET" });
+export async function getMailCategoryList(type?: number | string, search?: string) {
+    const params = new URLSearchParams();
+    if (type) params.append('type', String(type));
+    if (search) params.append('search', search);
+
+    return await fetchWithAuth(`/master/mail-category?${params.toString()}`, { method: "GET" });
 }
 
 export async function getMailCategory(id: string) {

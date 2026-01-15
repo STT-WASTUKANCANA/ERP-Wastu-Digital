@@ -21,6 +21,7 @@ const MailsClient = () => {
 
         const [searchQuery, setSearchQuery] = useState("");
         const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+        const [filterParams, setFilterParams] = useState<any>({});
 
         // Debounce Logic
         useEffect(() => {
@@ -36,13 +37,15 @@ const MailsClient = () => {
         const fetchMails = async (search: string = "") => {
                 setIsLoading(true);
 
+                const params = { search, ...filterParams };
+
                 let result;
                 if (type === "incoming") {
-                        result = await getIncomingMailList(search);
+                        result = await getIncomingMailList(params);
                 } else if (type === "outgoing") {
-                        result = await getOutgoingMailList(search);
+                        result = await getOutgoingMailList(params);
                 } else {
-                        result = await getDecisionMailList(search);
+                        result = await getDecisionMailList(params);
                 }
 
                 if (result.ok && result.data && Array.isArray(result.data.data)) {
@@ -60,12 +63,12 @@ const MailsClient = () => {
                 effectRan.current = true;
         }, []);
 
-        // Refetch when debounced search changes
+        // Refetch when debounced search or filters change
         useEffect(() => {
                 if (effectRan.current) {
                         fetchMails(debouncedSearchQuery);
                 }
-        }, [debouncedSearchQuery]);
+        }, [debouncedSearchQuery, filterParams]);
 
         const handleMailCreated = () => {
                 fetchMails(debouncedSearchQuery);
@@ -78,6 +81,7 @@ const MailsClient = () => {
                         isLoading={isLoading}
                         type={type}
                         onSearch={(q) => setSearchQuery(q)}
+                        onFilterApply={(filters) => setFilterParams(filters)}
                 />
         );
 };

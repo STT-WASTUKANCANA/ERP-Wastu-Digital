@@ -1,7 +1,12 @@
 import { fetchWithAuth } from "../api";
 
-export async function getUserList() {
-    return await fetchWithAuth('/manage/users', { method: "GET" });
+export async function getUserList(search?: string, role?: string, division?: string) {
+    const params = new URLSearchParams();
+    if (search) params.append('search', search);
+    if (role) params.append('role', role);
+    if (division) params.append('division', division);
+
+    return await fetchWithAuth(`/manage/users?${params.toString()}`, { method: "GET" });
 }
 
 export async function detailUser(id: number) {

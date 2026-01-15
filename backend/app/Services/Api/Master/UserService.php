@@ -9,10 +9,43 @@ use Illuminate\Support\Facades\Log;
 
 class UserService
 {
-    public function all()
+    public function all(array $filters = [])
     {
-        $data = User::with('role', 'division')->latest()->get();
-        Log::info('User: fetched all', ['count' => $data->count()]);
+        $query = User::with('role', 'division')->latest();
+
+        // Search
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhereHas('role', function($q) use ($search){
+                      $q->where('name', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('division', function($q) use ($search){
+                      $q->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        // Filter by Role Name
+        if (!empty($filters['role'])) {
+            $roleName = $filters['role'];
+            $query->whereHas('role', function($q) use ($roleName) {
+                $q->where('name', $roleName);
+            });
+        }
+
+        // Filter by Division Name
+        if (!empty($filters['division'])) {
+            $divName = $filters['division'];
+            $query->whereHas('division', function($q) use ($divName) {
+                $q->where('name', $divName);
+            });
+        }
+
+        $data = $query->get();
+        Log::info('User: fetched all', ['count' => $data->count(), 'filters' => $filters]);
         return $data;
     }
 
