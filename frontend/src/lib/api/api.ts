@@ -13,12 +13,11 @@ export async function fetchWithAuth(endpoint: string, options: FetchOptions = {}
                 throw new Error("API URL is not defined");
         }
 
-        // 1. Prioritaskan token dari Headers (yang dikirim oleh Middleware jika baru direfresh)
-        // Middleware menaruh 'Authorization: Bearer <token>'
+        // 1. Ambil token dari Header (prioritas)
         const headerStore = await headers();
         let accessToken = headerStore.get('authorization')?.split(' ')[1];
 
-        // 2. Jika tidak ada di header, ambil dari Cookie biasa
+        // 2. Ambil dari Cookie jika header kosong
         if (!accessToken) {
                 const cookieStore = await cookies();
                 accessToken = cookieStore.get('access_token')?.value;
@@ -44,13 +43,9 @@ export async function fetchWithAuth(endpoint: string, options: FetchOptions = {}
                 },
         });
 
-        // Jika 401, berarti Access Token expired DAN Refresh Token juga gagal/expired (karena Middleware sudah lolos)
-        // Atau token dicabut di server.
-        // Kita tidak bisa refresh di sini tanpa crash (Server Component readonly cookie).
-        // Jadi kita biarkan error atau redirect.
+        // Tangani 401: Token kadaluarsa atau tidak valid
         if (res.status === 401) {
                 console.error("[fetchWithAuth] Unauthorized (401). Token likely invalid or expired beyond refresh.");
-                // Opsional: Throw error atau biarkan UI menangani
         }
 
         if (res.status === 204) {

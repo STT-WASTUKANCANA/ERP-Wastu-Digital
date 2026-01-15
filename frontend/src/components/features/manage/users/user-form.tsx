@@ -32,18 +32,20 @@ export default function UserForm({
         division_id: null,
     });
 
+    // Inisialisasi data form
     useEffect(() => {
         if (initialData) {
             setFormData({
                 name: initialData.name || "",
                 email: initialData.email || "",
-                password: "", // Don't populate password for security
+                password: "", // Jangan tampilkan password untuk keamanan
                 role_id: initialData.role_id || null,
                 division_id: initialData.division_id || null,
             });
         }
     }, [initialData]);
 
+    // Handle perubahan input
     const handleChange = (
         e: React.ChangeEvent<
             HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -56,12 +58,13 @@ export default function UserForm({
         });
     };
 
+    // Handle submit form
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setLoading(true);
 
         try {
-            // Prepare payload - remove password if empty on edit
+            // Persiapkan payload - hapus password jika kosong saat edit
             const payload = { ...formData };
             if (mode === "edit" && !payload.password) {
                 delete payload.password;

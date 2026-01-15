@@ -7,7 +7,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL
 export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl
 
-    // 1. PROTECTED ROUTES: Workspace
+    // 1. RUTE TERPROTEKSI: Workspace
     if (pathname.startsWith('/workspace')) {
         const accessToken = request.cookies.get('access_token')?.value
         const refreshToken = request.cookies.get('refresh_token')?.value
@@ -37,7 +37,7 @@ export async function middleware(request: NextRequest) {
         let newAccessToken = ''
         let newExpiresIn = 0
 
-        // Refresh token logic
+        // Logika refresh token
         if (!accessToken || isTokenExpired(accessToken)) {
             try {
                 const refreshRes = await fetch(`${API_URL}/auth/refresh`, {
@@ -60,7 +60,7 @@ export async function middleware(request: NextRequest) {
             }
         }
 
-        // Role-Based Access Control
+        // Kontrol akses berbasis aturan (RBAC)
         if (validToken) {
             try {
                 const decoded: any = jwtDecode(validToken)
@@ -68,7 +68,7 @@ export async function middleware(request: NextRequest) {
                 const isAdminRoute = pathname.startsWith('/workspace/manage') || pathname.startsWith('/workspace/master')
 
                 if (isAdminRoute && roleId !== 5) {
-                    // Unauthorized: Rewrite to /unauthorized to let client handle "Back"
+                    // Tidak otorisasi: Tulis ulang ke /unauthorized untuk penanganan sisi klien
                     const response = NextResponse.rewrite(new URL('/unauthorized', request.url))
 
                     if (needsCookieUpdate) {
@@ -86,7 +86,7 @@ export async function middleware(request: NextRequest) {
             }
         }
 
-        // Pass valid token to headers
+        // Teruskan token valid ke headers
         const requestHeaders = new Headers(request.headers)
         if (validToken) {
             requestHeaders.set('Authorization', `Bearer ${validToken}`)
@@ -98,7 +98,7 @@ export async function middleware(request: NextRequest) {
             },
         })
 
-        // Set cookie if refreshed
+        // Set cookie jika token diperbarui
         if (needsCookieUpdate) {
             response.cookies.set('access_token', newAccessToken, {
                 httpOnly: true,
@@ -111,11 +111,11 @@ export async function middleware(request: NextRequest) {
         return response
     }
 
-    // 2. GUEST ROUTES: Auth (Signin/Signup)
+    // 2. RUTE TAMU: Auth (Masuk/Daftar)
     if (pathname.startsWith('/auth')) {
         const refreshToken = request.cookies.get('refresh_token')?.value
 
-        // Provide seamless Back navigation for logged-in users visiting auth pages
+        // Navigasi kembali yang mulus untuk user yang sudah login
         if (refreshToken) {
             return NextResponse.rewrite(new URL('/unauthorized', request.url))
         }

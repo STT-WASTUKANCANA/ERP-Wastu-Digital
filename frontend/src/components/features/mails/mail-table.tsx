@@ -47,7 +47,7 @@ const MailTable = <T extends MailTypes>({
   const [entries, setEntries] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Filter States
+  // State untuk filter
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [categories, setCategories] = useState<{ label: string, value: string }[]>([]);
   const [startDate, setStartDate] = useState("");
@@ -58,7 +58,7 @@ const MailTable = <T extends MailTypes>({
   const [viewStatus, setViewStatus] = useState(""); // Incoming
   const [validationStatus, setValidationStatus] = useState<string>(''); // Outgoing Validation
 
-  // Fetch categories
+  // Ambil data kategori
   useEffect(() => {
     const fetchCats = async () => {
       const res = await config.getCategories();
@@ -93,7 +93,7 @@ const MailTable = <T extends MailTypes>({
     setShowFilterModal(false);
   };
 
-  // Reset page when switching mail types
+  // Reset halaman saat tipe surat berubah
   useEffect(() => {
     setCurrentPage(1);
     setStartDate("");
@@ -354,7 +354,7 @@ const MailTable = <T extends MailTypes>({
             { label: "Perihal", value: mail.desc }
           ];
 
-          // Validation Logic
+          // Logika validasi untuk Surat Keluar (Sekum)
           if (roleId === 2 && mail.status === '1') {
             extraFooter = (
               <div className="flex flex-col gap-2 mb-2 p-3 bg-secondary/5 rounded-lg border border-secondary/10">

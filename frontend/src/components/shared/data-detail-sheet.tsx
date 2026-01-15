@@ -11,6 +11,7 @@ export interface DataDetailItem {
     value: React.ReactNode | string;
 }
 
+// Definisi tipe aksi tombol
 export interface DataDetailAction {
     label: string;
     onClick: (e: React.MouseEvent) => void;
@@ -26,10 +27,11 @@ interface DataDetailSheetProps {
         url: string;
         fileName?: string;
     };
+    extraFooter?: React.ReactNode;
     onClose: () => void;
 }
 
-export const DataDetailSheet = ({ title, items, actions, attachment, onClose }: DataDetailSheetProps) => {
+export const DataDetailSheet = ({ title, items, actions, attachment, extraFooter, onClose }: DataDetailSheetProps) => {
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
@@ -78,6 +80,9 @@ export const DataDetailSheet = ({ title, items, actions, attachment, onClose }: 
                 </main>
 
                 <footer className="flex-shrink-0 p-4 border-t border-secondary/20 space-y-3">
+                    {/* Footer Tambahan (Custom) */}
+                    {extraFooter}
+
                     {attachment && (
                         <a
                             href={attachment.url}

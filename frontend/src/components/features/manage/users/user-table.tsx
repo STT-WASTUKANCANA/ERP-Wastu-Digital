@@ -29,15 +29,16 @@ const UserTable = ({ users, onUserUpdated, isLoading }: UserTableProps) => {
     const [hiddenColumns, setHiddenColumns] = useState<string[]>([]);
     const [showColumnModal, setShowColumnModal] = useState(false);
 
-    // Filter States
+    // State untuk filter
     const [selectedRole, setSelectedRole] = useState("");
     const [selectedDivision, setSelectedDivision] = useState("");
     const [showFilterModal, setShowFilterModal] = useState(false);
 
-    // Temp Modal States
+    // State sementara untuk modal filter
     const [modalRole, setModalRole] = useState("");
     const [modalDivision, setModalDivision] = useState("");
 
+    // Penanganan aksi tombol (Edit/Delete)
     const handleActionClick = async (e: MouseEvent, action: string, userId: string) => {
         e?.stopPropagation();
 
@@ -88,7 +89,7 @@ const UserTable = ({ users, onUserUpdated, isLoading }: UserTableProps) => {
     const filteredUsers = useMemo(() => {
         let data = users;
 
-        // Search
+        // Pencarian
         if (searchTerm) {
             const lower = searchTerm.toLowerCase();
             data = data.filter((user) =>
@@ -99,12 +100,12 @@ const UserTable = ({ users, onUserUpdated, isLoading }: UserTableProps) => {
             );
         }
 
-        // Filter Role
+        // Filter berdasarkan Role
         if (selectedRole) {
             data = data.filter(user => user.role_name === selectedRole);
         }
 
-        // Filter Division
+        // Filter berdasarkan Divisi
         if (selectedDivision) {
             data = data.filter(user => user.division_name === selectedDivision);
         }
@@ -134,7 +135,7 @@ const UserTable = ({ users, onUserUpdated, isLoading }: UserTableProps) => {
         }
     };
 
-    // Filter Options & Handlers
+    // Opsi dan penanganan filter
     const roleOptions = useMemo(() => {
         const unique = new Set(users.map(u => u.role_name).filter(Boolean));
         return Array.from(unique).map(r => ({ label: r as string, value: r as string }));

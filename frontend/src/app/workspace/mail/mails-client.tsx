@@ -23,7 +23,7 @@ const MailsClient = () => {
         const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
         const [filterParams, setFilterParams] = useState<any>({});
 
-        // Debounce Logic
+        // Logika debounce untuk pencarian
         useEffect(() => {
                 const handler = setTimeout(() => {
                         setDebouncedSearchQuery(searchQuery);
@@ -63,7 +63,7 @@ const MailsClient = () => {
                 effectRan.current = true;
         }, []);
 
-        // Refetch when debounced search or filters change
+        // Ambil ulang data saat pencarian atau filter berubah
         useEffect(() => {
                 if (effectRan.current) {
                         fetchMails(debouncedSearchQuery);

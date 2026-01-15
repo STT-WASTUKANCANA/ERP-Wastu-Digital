@@ -18,6 +18,7 @@ export default function SigninForm() {
 
   const TOAST_DURATION = 1500
 
+  // Proses login & tampilkan feedback
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)

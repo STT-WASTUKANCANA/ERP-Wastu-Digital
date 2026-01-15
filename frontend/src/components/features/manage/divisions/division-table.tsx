@@ -28,6 +28,7 @@ export default function DivisionTable() {
     const [hiddenColumns, setHiddenColumns] = useState<string[]>([]);
     const [showColumnModal, setShowColumnModal] = useState(false);
 
+    // Ambil data divisi dari API
     const fetchData = async () => {
         setLoading(true);
         try {
@@ -47,6 +48,7 @@ export default function DivisionTable() {
         fetchData();
     }, []);
 
+    // Pencarian sisi klien (local filtering)
     const handleSearch = (term: string) => {
         if (!term) {
             setFilteredData(originalData);
@@ -73,6 +75,7 @@ export default function DivisionTable() {
         setCurrentPage(1);
     };
 
+    // Penanganan aksi tombol (Edit/Delete)
     const handleActionClick = async (e: React.MouseEvent, action: string, id: string) => {
         e?.preventDefault();
         e?.stopPropagation();
