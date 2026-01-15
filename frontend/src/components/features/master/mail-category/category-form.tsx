@@ -93,7 +93,7 @@ export default function CategoryForm({ id }: CategoryFormProps) {
 
     return (
         <FormWrapper onSubmit={handleSubmit}>
-            <div className="col-span-1">
+            <div className="col-span-full lg:col-span-1 w-full">
                 <Input
                     label="Nama Kategori"
                     value={formData.name}
@@ -104,7 +104,7 @@ export default function CategoryForm({ id }: CategoryFormProps) {
                 />
             </div>
 
-            <div className="col-span-1">
+            <div className="col-span-full lg:col-span-1 w-full">
                 <Select
                     label="Jenis Surat"
                     options={typeOptions}
@@ -115,7 +115,7 @@ export default function CategoryForm({ id }: CategoryFormProps) {
                 />
             </div>
 
-            <div className="col-span-2">
+            <div className="col-span-full">
                 <TextareaField
                     label="Deskripsi"
                     name="description"
@@ -125,7 +125,7 @@ export default function CategoryForm({ id }: CategoryFormProps) {
                 />
             </div>
 
-            <div className="col-span-2">
+            <div className="col-span-full">
                 <SubmitButton
                     loading={loading}
                     submitText="Simpan"

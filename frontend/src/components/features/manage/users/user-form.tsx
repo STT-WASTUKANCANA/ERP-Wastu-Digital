@@ -94,7 +94,7 @@ export default function UserForm({
 
     return (
         <FormWrapper onSubmit={handleSubmit}>
-            <div className="col-span-1">
+            <div className="col-span-full lg:col-span-1 w-full">
                 <Input
                     label="Nama Lengkap"
                     id="name"
@@ -107,7 +107,7 @@ export default function UserForm({
                 />
             </div>
 
-            <div className="col-span-1">
+            <div className="col-span-full lg:col-span-1 w-full">
                 <Input
                     label="Email"
                     id="email"
@@ -120,7 +120,7 @@ export default function UserForm({
                 />
             </div>
 
-            <div>
+            <div className="col-span-full lg:col-span-1 w-full">
                 <Select
                     label="Role"
                     id="role_id"
@@ -135,7 +135,7 @@ export default function UserForm({
                 />
             </div>
 
-            <div>
+            <div className="col-span-full lg:col-span-1 w-full">
                 <Select
                     label="Divisi"
                     id="division_id"
@@ -150,7 +150,7 @@ export default function UserForm({
                 />
             </div>
 
-            <div className="col-span-2">
+            <div className="col-span-full">
                 <SubmitButton
                     loading={loading}
                     submitText="Simpan"
