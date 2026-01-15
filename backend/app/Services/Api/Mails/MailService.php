@@ -97,6 +97,7 @@ class MailService
             }
         }
 
+        $data = $query->get();
         return $data;
     }
 
