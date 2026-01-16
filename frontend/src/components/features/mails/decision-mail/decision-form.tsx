@@ -11,13 +11,7 @@ import { TextareaField } from "@/components/ui/textarea-field";
 import { PdfPreview } from "@/components/ui/pdf-preview";
 import { SubmitButton } from "@/components/ui/submit-button";
 
-interface DecisionFormProps {
-  categories: any[];
-  divisions?: any[];
-  initialData?: any;
-  mode?: "create" | "edit";
-  roleId?: number;
-}
+import { DecisionFormProps } from "@/types/features/mail/decision";
 
 export default function DecisionForm({
   categories,

@@ -19,3 +19,11 @@ export interface DecisionOffcanvasDetailProps {
     onClose: () => void;
     onAction: (e: React.MouseEvent, action: string, mailId: string) => void | Promise<void>;
 }
+
+export interface DecisionFormProps {
+    categories: any[];
+    divisions?: any[];
+    initialData?: any;
+    mode?: "create" | "edit";
+    roleId?: number;
+}
