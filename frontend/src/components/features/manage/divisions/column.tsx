@@ -13,6 +13,18 @@ export const getDivisionColumns = (
             mobile: true,
         },
         {
+            header: "Status",
+            accessorKey: "active",
+            cell: (row) => (
+                <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${row.active === 1 || row.active === true
+                        ? "bg-emerald-100 text-emerald-800"
+                        : "bg-red-100 text-red-800"
+                    }`}>
+                    {row.active === 1 || row.active === true ? "Aktif" : "Nonaktif"}
+                </div>
+            ),
+        },
+        {
             header: "Kepala Bidang",
             accessorKey: "leader_name",
             mobile: true,
@@ -32,6 +44,8 @@ export const getDivisionColumns = (
                     onAction={handleActionClick}
                     showEdit={true}
                     showDelete={true}
+                    showActivate={row.active === 0 || row.active === false}
+                    showDeactivate={row.active === 1 || row.active === true}
                 />
             ),
         },

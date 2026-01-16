@@ -71,6 +71,7 @@ class DivisionController extends Controller
     {
         try {
             $division = Division::findOrFail($id);
+            
             $updatedDivision = $this->service->update($division, $request->validated());
 
             Log::info('[MANAGE] DIVISI UPDATE: Divisi berhasil diperbarui', ['division_id' => $updatedDivision->id, 'user_id' => auth()->id()]);

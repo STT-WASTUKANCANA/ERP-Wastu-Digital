@@ -53,5 +53,6 @@ export async function fetchWithAuth(endpoint: string, options: FetchOptions = {}
         }
 
         const data = await res.json().catch(() => ({}));
+
         return { ok: res.ok, status: res.status, data };
 }

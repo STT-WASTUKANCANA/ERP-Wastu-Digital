@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { getDivisionList, deleteDivision } from "@/lib/api/manage/division";
+import { getDivisionList, deleteDivision, updateDivision } from "@/lib/api/manage/division";
 import { Division } from "@/types/division-props";
 import { getDivisionColumns } from "./column";
 import { DataTable } from "@/components/shared/datatable";
@@ -11,7 +11,7 @@ import { TableContainer } from "@/components/shared/table-container";
 import { Button } from "@/components/ui/button";
 import { HiOutlineUpload } from "react-icons/hi";
 import { DataDetailSheet } from "@/components/shared/data-detail-sheet";
-import { FiEdit, FiTrash2 } from "react-icons/fi";
+import { FiEdit, FiTrash2, FiCheckCircle, FiXCircle } from "react-icons/fi";
 
 import { ColumnSelectorModal } from "@/components/shared/column-selector-modal";
 
@@ -101,6 +101,44 @@ export default function DivisionTable() {
                     alert("Error menghubungi server");
                 }
             }
+        } else if (action === "Activate" || action === "Deactivate") {
+            const isActivate = action === "Activate";
+            const confirmMsg = isActivate ? "Aktifkan Divisi ini?" : "Nonaktifkan Divisi ini?";
+
+            if (window.confirm(confirmMsg)) {
+                try {
+                    // Prepare data for update. Ideally we should fetch full data first or just send partial if allowed.
+                    // Assuming we need to send full body or at least required fields.
+                    // Since we don't have full data here easily without fetching, 
+                    // and update usually requires full body validation in this app's pattern,
+                    // let's try to find the item in local state first.
+                    const item = originalData.find(d => String(d.id) === id);
+                    if (!item) {
+                        alert(`Error: Item with ID ${id} not found in local data.`);
+                        console.error('Item not found', { id, originalDataLength: originalData.length });
+                    }
+                    if (item) {
+                        // Only send the active field to avoid validation errors on other fields (e.g. leader_id)
+                        const payload: any = {
+                            active: isActivate
+                        };
+
+                        // alert(`Debug: Updating ID ${id} to active=${isActivate}`);
+
+                        const res = await updateDivision(id, payload);
+                        if (res?.data?.status) {
+                            alert(`Divisi berhasil ${isActivate ? 'diaktifkan' : 'dinonaktifkan'}`);
+                            fetchData();
+                        } else {
+                            console.error("Update failed:", res);
+                            alert(res?.data?.message || "Gagal memperbarui status");
+                        }
+                    }
+                } catch (error) {
+                    console.error(error);
+                    alert("Error updating status");
+                }
+            }
         }
     };
 
@@ -110,7 +148,7 @@ export default function DivisionTable() {
         }
     };
 
-    const columns = useMemo(() => getDivisionColumns(handleActionClick), []);
+    const columns = useMemo(() => getDivisionColumns(handleActionClick), [handleActionClick]);
 
     const visibleColumns = useMemo(() => {
         return columns.filter((col) => {
@@ -183,10 +221,33 @@ export default function DivisionTable() {
                             label: "Kepala Bidang",
                             value: selectedDivision.leader_name || <span className="text-gray-400 italic">Belum ditentukan</span>
                         },
-                        { label: "Deskripsi", value: selectedDivision.description || "-" }
+                        { label: "Deskripsi", value: selectedDivision.description || "-" },
+                        {
+                            label: "Status",
+                            value: (selectedDivision.active === 1 || selectedDivision.active === true)
+                                ? <span className="text-emerald-600 font-bold">Aktif</span>
+                                : <span className="text-red-600 font-bold">Nonaktif</span>
+                        }
                     ]}
                     actions={[
                         { label: "Edit", onClick: (e) => handleActionClick(e, 'Edit', String(selectedDivision.id)), variant: 'primary', icon: FiEdit },
+
+                        // Condition for Activate
+                        ...((selectedDivision.active === 0 || selectedDivision.active === false) ? [{
+                            label: "Aktifkan",
+                            onClick: (e: any) => handleActionClick(e, 'Activate', String(selectedDivision.id)),
+                            variant: 'outline' as const,
+                            icon: FiCheckCircle
+                        }] : []),
+
+                        // Condition for Deactivate
+                        ...((selectedDivision.active === 1 || selectedDivision.active === true) ? [{
+                            label: "Nonaktifkan",
+                            onClick: (e: any) => handleActionClick(e, 'Deactivate', String(selectedDivision.id)),
+                            variant: 'outline' as const,
+                            icon: FiXCircle
+                        }] : []),
+
                         { label: "Hapus", onClick: (e) => handleActionClick(e, 'Delete', String(selectedDivision.id)), variant: 'danger', icon: FiTrash2 }
                     ]}
                 />

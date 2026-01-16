@@ -6,6 +6,7 @@ export type Division = {
     leader_name: string | null;
     created_at?: string;
     updated_at?: string;
+    active?: boolean | number;
 };
 
 export type DivisionFormData = {

@@ -2,7 +2,7 @@
 
 import { MouseEvent } from 'react';
 import { Button } from '@/components/ui/button';
-import { FiDownload, FiEdit, FiTrash2 } from 'react-icons/fi';
+
 import { BsEye } from 'react-icons/bs';
 
 export interface ActionButtonsProps {
@@ -15,7 +15,10 @@ export interface ActionButtonsProps {
     showView?: boolean;
     downloadUrl?: string;
     viewLabel?: string;
+    showActivate?: boolean;
+    showDeactivate?: boolean;
 }
+import { FiDownload, FiEdit, FiTrash2, FiCheckCircle, FiXCircle } from 'react-icons/fi';
 
 export function ActionButtons({
     id,
@@ -27,6 +30,8 @@ export function ActionButtons({
     showView = false,
     downloadUrl,
     viewLabel = 'View',
+    showActivate = false,
+    showDeactivate = false,
 }: ActionButtonsProps) {
     return (
         <div className="flex justify-start items-center gap-2">
@@ -68,6 +73,27 @@ export function ActionButtons({
                     className="p-2 bg-background hover:bg-muted border border-secondary/20 cursor-pointer"
                 >
                     <FiTrash2 className="w-3.5 h-3.5 text-red-600" />
+                </Button>
+            )}
+            {showActivate && (
+                <Button
+                    rounded="rounded-md"
+                    onClick={(e) => onAction(e, 'Activate', id)}
+                    className="p-2 bg-background hover:bg-muted border border-secondary/20 cursor-pointer text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                    title="Aktifkan"
+                >
+                    <FiCheckCircle className="w-3.5 h-3.5" />
+                </Button>
+            )}
+
+            {showDeactivate && (
+                <Button
+                    rounded="rounded-md"
+                    onClick={(e) => onAction(e, 'Deactivate', id)}
+                    className="p-2 bg-background hover:bg-muted border border-secondary/20 cursor-pointer text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                    title="Nonaktifkan"
+                >
+                    <FiXCircle className="w-3.5 h-3.5" />
                 </Button>
             )}
         </div>

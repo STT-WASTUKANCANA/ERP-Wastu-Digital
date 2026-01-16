@@ -2,7 +2,10 @@ import { fetchWithAuth } from "../api";
 import { DivisionFormData } from "@/types/division-props";
 
 export async function getDivisionList() {
-        return await fetchWithAuth('/manage/division', { method: "GET" });
+        return await fetchWithAuth('/manage/division', {
+                method: "GET",
+                cache: "no-store"
+        });
 }
 
 export async function getDivision(id: string) {

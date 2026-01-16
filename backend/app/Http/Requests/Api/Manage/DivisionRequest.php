@@ -19,6 +19,7 @@ class DivisionRequest extends FormRequest
                     'name' => ['required', 'string', 'max:50', 'unique:divisions,name'],
                     'description' => ['nullable', 'string'],
                     'leader_id' => ['nullable', 'exists:users,id'],
+                    'active' => ['sometimes', 'boolean'],
                 ];
 
             case 'PUT':
@@ -28,6 +29,7 @@ class DivisionRequest extends FormRequest
                     'name' => ['sometimes', 'required', 'string', 'max:50', \Illuminate\Validation\Rule::unique('divisions','name')->ignore($divisionId)],
                     'description' => ['nullable', 'string'],
                     'leader_id' => ['nullable', 'exists:users,id'],
+                    'active' => ['sometimes', 'boolean'],
                 ];
 
             default:
