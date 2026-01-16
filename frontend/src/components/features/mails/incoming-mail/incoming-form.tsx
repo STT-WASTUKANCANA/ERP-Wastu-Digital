@@ -14,6 +14,7 @@ import {
 import { TextareaField } from "@/components/ui/textarea-field";
 import { PdfPreview } from "@/components/ui/pdf-preview";
 import { SubmitButton } from "@/components/ui/submit-button";
+import { FormCard } from "@/components/ui/form-card";
 
 interface IncomingFormProps {
   categories: any[];
@@ -157,7 +158,7 @@ export default function IncomingForm({
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="bg-white p-8 rounded-lg shadow space-y-8">
+      <FormCard>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-8">
           <div className="col-span-2">
             <Input
@@ -242,10 +243,10 @@ export default function IncomingForm({
             </div>
           )}
         </div>
-      </div>
+      </FormCard>
 
       {mode === "review" && (
-        <div className="bg-white p-8 rounded-lg shadow space-y-8 mt-4">
+        <FormCard className="mt-4">
           <div className="col-span-2">
             <Select
               label="Bagikan ke Bagian"
@@ -274,11 +275,11 @@ export default function IncomingForm({
           <div className="col-span-2">
             <SubmitButton loading={loading} submitText="Simpan" />
           </div>
-        </div>
+        </FormCard>
       )}
 
       {mode === "division_review" && (
-        <div className="bg-white p-8 rounded-lg shadow space-y-8 mt-4">
+        <FormCard className="mt-4">
           <div className="col-span-2">
             <Select
               label="Status Proses"
@@ -308,7 +309,7 @@ export default function IncomingForm({
           <div className="col-span-2">
             <SubmitButton loading={loading} submitText="Simpan" />
           </div>
-        </div>
+        </FormCard>
       )}
     </form>
   );

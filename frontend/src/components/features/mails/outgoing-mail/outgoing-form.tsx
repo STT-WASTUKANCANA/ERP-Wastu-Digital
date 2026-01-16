@@ -10,6 +10,7 @@ import { FormWrapper } from "@/components/ui/form-wrapper";
 import { TextareaField } from "@/components/ui/textarea-field";
 import { PdfPreview } from "@/components/ui/pdf-preview";
 import { SubmitButton } from "@/components/ui/submit-button";
+import { FormCard } from "@/components/ui/form-card";
 
 interface OutgoingFormProps {
   categories: any[];
@@ -156,7 +157,7 @@ export default function OutgoingForm({
     <form onSubmit={handleSubmit} className="space-y-8" >
       {/* Helper Card for Creator if Status is 'Perlu Perbaikan' */}
       {roleId !== 2 && (initialData?.status === 2 || initialData?.status === '2') && initialData?.validation_note && (
-        <div className="bg-white p-8 rounded-lg shadow space-y-8 mb-8">
+        <FormCard className="mb-8">
           <div className="space-y-8">
             <Select
               label="Status"
@@ -179,10 +180,10 @@ export default function OutgoingForm({
               onChange={() => { }}
             />
           </div>
-        </div>
+        </FormCard>
       )}
 
-      <div className="bg-white p-8 rounded-lg shadow space-y-8">
+      <FormCard>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-8">
           <div className="col-span-2">
             <Input
@@ -312,11 +313,11 @@ export default function OutgoingForm({
             </div>
           )}
         </div>
-      </div>
+      </FormCard>
 
       {
         isSekumVerification && (
-          <div className="bg-white p-8 rounded-lg shadow space-y-8 mt-4">
+          <FormCard className="mt-4">
             <div className="space-y-8">
               <div>
                 <Select
@@ -355,7 +356,7 @@ export default function OutgoingForm({
                 )}
               </div>
             </div>
-          </div>
+          </FormCard>
         )
       }
 
