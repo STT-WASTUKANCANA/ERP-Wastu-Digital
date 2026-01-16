@@ -24,7 +24,8 @@ import { FilterModal } from "@/components/shared/filter-modal";
 import { Select } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { getMailDetailItems } from "@/lib/helpers/detail-helpers";
-import { outgoingStatusMap } from "@/types/mail-props"; // Still needed for validation logic in MailTable
+import { outgoingStatusMap } from "@/types/mail-props";
+import { useMailFilter } from "@/hooks/features/mail/use-mail-filter";
 
 type MailTypes = IncomingMail | OutgoingMail | DecisionMail;
 
@@ -46,62 +47,27 @@ const MailTable = <T extends MailTypes>({
   const [entries, setEntries] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
 
-  // State untuk filter
-  const [showFilterModal, setShowFilterModal] = useState(false);
-  const [categories, setCategories] = useState<{ label: string, value: string }[]>([]);
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [status, setStatus] = useState("");
-  const [destination, setDestination] = useState(""); // Outgoing
-  const [viewStatus, setViewStatus] = useState(""); // Incoming
-  const [validationStatus, setValidationStatus] = useState<string>(''); // Outgoing Validation
-
-  // Ambil data kategori
-  useEffect(() => {
-    const fetchCats = async () => {
-      const res = await config.getCategories();
-      if (res?.ok && res?.data?.data && Array.isArray(res.data.data)) {
-        setCategories(res.data.data.map((c: any) => ({ label: c.name, value: String(c.id) })));
-      }
-    };
-    fetchCats();
-  }, [type, config]);
-
-  const handleApplyFilter = () => {
-    const filters: any = {};
-    if (startDate) filters.start_date = startDate;
-    if (endDate) filters.end_date = endDate;
-    if (selectedCategory) filters.category_id = selectedCategory;
-    if (status) filters.status = status;
-    if (destination) filters.destination = destination;
-    if (viewStatus) filters.user_view_id = viewStatus;
-
-    onFilterApply?.(filters);
-    setShowFilterModal(false);
-  };
-
-  const handleResetFilter = () => {
-    setStartDate("");
-    setEndDate("");
-    setSelectedCategory("");
-    setStatus("");
-    setDestination("");
-    setViewStatus("");
-    onFilterApply?.({});
-    setShowFilterModal(false);
-  };
-
-  // Reset halaman saat tipe surat berubah
-  useEffect(() => {
-    setCurrentPage(1);
-    setStartDate("");
-    setEndDate("");
-    setSelectedCategory("");
-    setStatus("");
-    setDestination("");
-    setViewStatus("");
-  }, [type, mails]);
+  const {
+    showFilterModal,
+    setShowFilterModal,
+    categories,
+    startDate,
+    setStartDate,
+    endDate,
+    setEndDate,
+    selectedCategory,
+    setSelectedCategory,
+    status,
+    setStatus,
+    destination,
+    setDestination,
+    viewStatus,
+    setViewStatus,
+    validationStatus,
+    setValidationStatus,
+    handleApplyFilter,
+    handleResetFilter
+  } = useMailFilter({ type, config, mails, onFilterApply });
 
   const paginatedMails = useMemo(() => {
     const start = (currentPage - 1) * entries;
