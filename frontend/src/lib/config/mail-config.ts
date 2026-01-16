@@ -3,7 +3,7 @@ import { getOutgoingMailColumns } from "@/components/features/mails/outgoing-mai
 import { deleteIncomingMail, getMailCategories as getIncomingCategories } from "@/lib/api/mails/incoming";
 import { deleteOutgoingMail, getMailCategories as getOutgoingCategories } from "@/lib/api/mails/outgoing";
 import { deleteDecisionMail, getMailCategories as getDecisionCategories } from "@/lib/api/mails/decision";
-import { DataDetailAction, ColumnDef } from "@/types/ui-props";
+import { DataDetailAction, ColumnDef } from "@/types/shared/ui";
 import { getDecisionMailColumns } from "@/components/features/mails/decision-mail/column";
 import { FiEdit, FiTrash2, FiDownload } from "react-icons/fi";
 import { BsEye } from "react-icons/bs";

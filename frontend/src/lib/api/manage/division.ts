@@ -1,5 +1,5 @@
 import { fetchWithAuth } from "../api";
-import { DivisionFormData } from "@/types/division-props";
+import { DivisionFormData } from "@/types/features/division";
 
 export async function getDivisionList() {
         return await fetchWithAuth('/manage/division', {

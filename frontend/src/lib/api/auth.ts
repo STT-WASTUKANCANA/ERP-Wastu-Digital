@@ -1,4 +1,4 @@
-import { SigninPayload } from "@/types/auth-props"
+import { SigninPayload } from "@/types/features/auth"
 import { jwtDecode } from "jwt-decode"
 
 
