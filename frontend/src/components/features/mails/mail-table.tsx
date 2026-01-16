@@ -11,12 +11,9 @@ import {
   OutgoingMail,
   DecisionMail,
   MailTableProps,
-  statusMap,
-  outgoingStatusMap,
 } from "@/types/mail-props";
 import { DataDetailSheet } from "@/components/shared/data-detail-sheet";
-import { Badge } from "@/components/ui/badge";
-import { formatDate, getStorageUrl } from "@/lib/utils";
+import { getStorageUrl } from "@/lib/utils";
 import { FiEdit, FiTrash2, FiSave, FiDownload } from "react-icons/fi";
 import { validateOutgoingMail } from "@/lib/api/mails/outgoing";
 import { useRole } from "@/contexts/role";
@@ -26,6 +23,8 @@ import { ColumnSelectorModal } from "@/components/shared/column-selector-modal";
 import { FilterModal } from "@/components/shared/filter-modal";
 import { Select } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { getMailDetailItems } from "@/lib/helpers/detail-helpers";
+import { outgoingStatusMap } from "@/types/mail-props"; // Still needed for validation logic in MailTable
 
 type MailTypes = IncomingMail | OutgoingMail | DecisionMail;
 
@@ -312,48 +311,15 @@ const MailTable = <T extends MailTypes>({
       />
 
       {selectedMail && (() => {
-        let title = "Detail Surat";
-        let items: any[] = [];
+        const { title, items } = getMailDetailItems(type, selectedMail);
         let extraFooter: React.ReactNode = null;
         let attachment = selectedMail.attachment ? {
           url: selectedMail.attachment.startsWith('http') ? selectedMail.attachment : getStorageUrl(selectedMail.attachment),
           fileName: selectedMail.attachment.startsWith('http') ? 'Buka Link' : 'Unduh Dokumen'
         } : undefined;
 
-        if (type === "incoming") {
-          const mail = selectedMail as IncomingMail;
-          title = "Detail Surat Masuk";
-          const getBadge = (s: number, f: number) => {
-            if (s === 2 && f === 2) return { label: "Proses", color: "bg-yellow-100 text-yellow-800" };
-            const m: any = { 1: { l: statusMap[1], c: "bg-secondary text-white" }, 2: { l: statusMap[2], c: "bg-blue-100 text-blue-800" }, 3: { l: statusMap[3], c: "bg-green-100 text-green-800" } };
-            const d = m[s] || { l: "Unknown", c: "bg-gray-100 text-gray-800" };
-            return { label: d.l, color: d.c };
-          };
-          const b = getBadge(mail.status, mail.follow_status);
-          items = [
-            { label: "Nomor Surat", value: mail.number },
-            { label: "Tanggal", value: formatDate(mail.date) },
-            { label: "Kategori", value: mail.category_name },
-            { label: "Oleh", value: mail.user_name || '-' },
-            { label: "Status", value: <span className={`px-2 py-1 rounded-sm text-xs font-semibold ${b.color}`}>{b.label}</span> },
-            { label: "Divisi", value: mail.division_name || '-' },
-            { label: "Perihal", value: mail.desc }
-          ];
-        } else if (type === "outgoing") {
+        if (type === "outgoing") {
           const mail = selectedMail as OutgoingMail;
-          title = "Detail Surat Keluar";
-          items = [
-            { label: "Nomor Surat", value: mail.number },
-            { label: "Tanggal", value: formatDate(mail.date) },
-            { label: "Kategori", value: mail.category_name },
-            { label: "Oleh", value: mail.user_name },
-            { label: "Instansi", value: mail.institute },
-            { label: "Alamat", value: mail.address },
-            { label: "Status", value: <Badge value={String(mail.status)} map={outgoingStatusMap} /> },
-            { label: "Tujuan", value: mail.purpose },
-            { label: "Perihal", value: mail.desc }
-          ];
-
           // Logika validasi untuk Surat Keluar (Sekum)
           if (roleId === 2 && mail.status === '1') {
             extraFooter = (
@@ -391,17 +357,6 @@ const MailTable = <T extends MailTypes>({
               </div>
             );
           }
-        } else if (type === "decision") {
-          const mail = selectedMail as DecisionMail;
-          title = "Detail Surat Keputusan";
-          items = [
-            { label: "Nomor Surat", value: mail.number },
-            { label: "Tanggal", value: formatDate(mail.date) },
-            { label: "Kategori", value: mail.category_name },
-            { label: "Oleh", value: mail.user_name || '-' },
-            { label: "Judul", value: mail.title },
-            { label: "Deskripsi", value: mail.desc }
-          ];
         }
 
         return (
