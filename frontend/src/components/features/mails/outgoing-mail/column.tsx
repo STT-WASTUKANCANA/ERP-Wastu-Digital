@@ -4,7 +4,7 @@ import { OutgoingMail, outgoingStatusMap } from '@/types/mail-props';
 import { ColumnDef } from '@/types/ui-props';
 import { getStorageUrl, formatDate } from '@/lib/utils';
 import { ActionButtons } from '@/components/ui/action-buttons';
-import { Badge } from '@/components/ui/badge';
+import { StatusBadge } from '@/components/ui/status-badge';
 
 type HandleActionClickFn = (e: MouseEvent, action: string, mailId: string, roleId?: number) => void;
 
@@ -42,7 +42,7 @@ export const getOutgoingMailColumns = (
                 {
                         header: 'Status',
                         accessorKey: 'status',
-                        cell: (row) => <Badge value={String(row.status)} map={outgoingStatusMap} />,
+                        cell: (row) => <StatusBadge value={String(row.status)} map={outgoingStatusMap} />,
                 },
                 {
                         header: '',

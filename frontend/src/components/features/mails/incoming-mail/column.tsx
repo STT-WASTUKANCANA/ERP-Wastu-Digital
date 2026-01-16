@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { IncomingMail, statusMap } from '@/types/mail-props';
 import { ColumnDef } from '@/types/ui-props';
 import { getStorageUrl, formatDate } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
+import { StatusBadge } from '@/components/ui/status-badge';
 import { BsEye } from 'react-icons/bs';
 import { FiEdit } from 'react-icons/fi';
 import { ActionButtons } from '@/components/ui/action-buttons';
@@ -44,39 +44,46 @@ export const getIncomingMailColumns = (
                         accessorKey: 'status',
                         mobile: false,
                         cell: (row) => {
+                                let val: string | number = row.status;
+                                let color = "bg-gray-100 text-gray-800";
+                                let label = statusMap[row.status] || "Unknown";
+
                                 if (row.status == 1) {
-                                        return <Badge value={1} map={{ 1: { label: statusMap[1], color: "bg-secondary text-white" } }} />;
-                                }
-
-                                if (row.status == 2) {
+                                        color = "bg-orange-100 text-orange-800"; // Menunggu / Peninjauan
+                                } else if (row.status == 2) {
                                         if (row.follow_status == 2) {
-                                                return <Badge value="Proses" map={{ "Proses": { label: "Proses", color: "bg-yellow-100 text-yellow-800" } }} />;
+                                                val = "Proses";
+                                                label = "Proses";
+                                                color = "bg-yellow-100 text-yellow-800";
+                                        } else {
+                                                color = "bg-blue-100 text-blue-800"; // Disposisi
                                         }
-
-                                        return <Badge value={2} map={{ 2: { label: statusMap[2], color: "bg-blue-100 text-blue-800" } }} />;
+                                } else if (row.status == 3) {
+                                        label = "Selesai";
+                                        color = "bg-green-100 text-green-800";
                                 }
 
-                                return <Badge value={3} map={{ 3: { label: "Selesai", color: "bg-green-100 text-green-800" } }} />;
+                                return <StatusBadge
+                                        value={val}
+                                        map={{
+                                                [val]: { label, color }
+                                        }}
+                                />;
                         },
                 },
                 {
                         header: 'Divisi',
                         accessorKey: 'division_name',
-                        cell: (row) => row.division_name || '-',
+                        cell: (row) => row.division_name || <span className="text-gray-400 italic text-xs">Belum ditentukan</span>,
                 },
                 {
                         header: 'Dilihat',
                         accessorKey: 'user_view_id',
                         cell: (row) => {
-                                // Only relevant if Disposition (Status 2) or Done (Status 3)
-                                if (row.status >= 2) {
-                                        if (row.user_view_id) {
-                                                return <span className="text-green-600 italic text-xs">Sudah Dilihat</span>;
-                                        } else {
-                                                return <span className="text-gray-400 italic text-xs">Belum Dilihat</span>;
-                                        }
+                                if (row.user_view_id) {
+                                        return <span className="text-green-600 italic text-xs">Sudah Dilihat</span>;
                                 }
-                                return <span className="text-gray-300">-</span>;
+                                return <span className="text-gray-400 italic text-xs">Belum Dilihat</span>;
                         }
                 },
                 {

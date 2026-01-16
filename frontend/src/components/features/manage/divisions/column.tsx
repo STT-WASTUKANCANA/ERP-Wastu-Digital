@@ -3,6 +3,7 @@
 import { ColumnDef } from "@/types/ui-props";
 import { Division } from "@/types/division-props";
 import { ActionButtons } from "@/components/ui/action-buttons";
+import { StatusBadge } from "@/components/ui/status-badge";
 
 export const getDivisionColumns = (
     handleActionClick: (e: React.MouseEvent, action: string, id: string) => void
@@ -16,12 +17,15 @@ export const getDivisionColumns = (
             header: "Status",
             accessorKey: "active",
             cell: (row) => (
-                <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${row.active === 1 || row.active === true
-                        ? "bg-emerald-100 text-emerald-800"
-                        : "bg-red-100 text-red-800"
-                    }`}>
-                    {row.active === 1 || row.active === true ? "Aktif" : "Nonaktif"}
-                </div>
+                <StatusBadge
+                    value={row.active}
+                    map={{
+                        "true": { label: "Aktif", color: "bg-emerald-100 text-emerald-800" },
+                        "1": { label: "Aktif", color: "bg-emerald-100 text-emerald-800" },
+                        "false": { label: "Nonaktif", color: "bg-red-100 text-red-800" },
+                        "0": { label: "Nonaktif", color: "bg-red-100 text-red-800" }
+                    }}
+                />
             ),
         },
         {
