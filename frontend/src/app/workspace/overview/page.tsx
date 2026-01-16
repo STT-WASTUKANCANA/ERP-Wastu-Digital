@@ -50,7 +50,7 @@ const Page = async () => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-      <Card title="Pengguna" value={usersValue} icon={LuUsers} />
+      {/* <Card title="Pengguna" value={usersValue} icon={LuUsers} /> */}
       <Card
         title="Surat Masuk"
         value={incomingMailValue.toString()}

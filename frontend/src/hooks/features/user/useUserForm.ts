@@ -30,7 +30,9 @@ export function useUserForm({ userId, isEdit = false }: UseUserFormOptions = {})
                 const [rolesRes, divisionsRes, userRes] = await Promise.all(promises);
 
                 setRoles(rolesRes.data?.data || rolesRes.data || []);
-                setDivisions(divisionsRes.data?.data || divisionsRes.data || []);
+                const allDivisions = divisionsRes.data?.data || divisionsRes.data || [];
+                const activeDivisions = allDivisions.filter((d: any) => d.active === 1 || d.active === true || d.active === "1");
+                setDivisions(activeDivisions);
 
                 if (userRes) {
                     setUser(userRes.data?.data || userRes.data || null);

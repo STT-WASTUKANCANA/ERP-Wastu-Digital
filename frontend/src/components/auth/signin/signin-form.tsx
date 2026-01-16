@@ -61,7 +61,7 @@ export default function SigninForm() {
     <>
       <div className="w-full max-w-md space-y-8 md:space-y-12 px-4 md:px-0">
         <div className="space-y-2 text-center">
-          <h1 className="font-semibold text-2xl md:text-3xl lg:text-4xl">Selamat Datang Kembali</h1>
+          <h1 className="font-semibold text-2xl md:text-3xl lg:text-4xl">Selamat Datang</h1>
           <h6 className="text-secondary text-sm md:text-base">
             Masukkan email dan kata sandi untuk mengakses akun Anda.
           </h6>

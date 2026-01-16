@@ -204,12 +204,12 @@ export default function IncomingForm({
           </div>
 
           <TextareaField
-            label="Deskripsi"
+            label="Perihal"
             id="desc"
             name="desc"
             value={formData.desc}
             onChange={handleChange}
-            placeholder="Tulis deskripsi surat..."
+            placeholder="Tulis perihal surat..."
             disabled={isFieldDisabled}
             className="col-span-2"
           />

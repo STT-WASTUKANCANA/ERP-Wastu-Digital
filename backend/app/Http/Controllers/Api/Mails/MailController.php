@@ -61,7 +61,7 @@ class MailController extends Controller
 
                         // Ambil tipe surat dari rute (1=masuk, 2=keluar, 3=keputusan)
                         $type = $this->getTypeFromRoute($request);
-                        
+
                         // Batasan Surat Keputusan (Tipe 3): Hanya Role Pulahta
                         if ($type === 3 && Auth::user()->role_id !== 3) {
                             return response()->json([
@@ -89,7 +89,7 @@ class MailController extends Controller
                                 };
 
                                 $dynamicPath = "mails/{$folder}/{$year}/{$month}/{$day}";
-                                
+
                                 $file = $request->file('attachment');
                                 Log::debug('Mail:store attachment info', [
                                         'original_name' => $file->getClientOriginalName(),
@@ -97,10 +97,10 @@ class MailController extends Controller
                                         'mime_type' => $file->getMimeType(),
                                         'path' => $dynamicPath,
                                 ]);
-                                
+
                                 $filePath = $file->store($dynamicPath, 'public');
                                 $validatedData['attachment'] = $filePath;
-                                
+
                                 Log::debug('[MAIL] CREATE: Lampiran tersimpan', ['path' => $filePath]);
                         }
 
@@ -250,7 +250,7 @@ class MailController extends Controller
 
 
                         $data = $request->validate([
-                            'status' => ['required', \Illuminate\Validation\Rule::in(['approved', 'rejected', '1', '2', '3', '4', 1, 2, 3, 4])], 
+                            'status' => ['required', \Illuminate\Validation\Rule::in(['approved', 'rejected', '1', '2', '3', '4', 1, 2, 3, 4])],
                             'note'   => 'nullable|string'
                         ]);
 

@@ -20,6 +20,7 @@ export interface ButtonProps {
   disabled?: boolean;
   type?: "button" | "submit" | "reset";
   onClick?: MouseEventHandler<HTMLButtonElement>;
+  title?: string;
 }
 export interface PatternLogoProps {
   className?: string;
