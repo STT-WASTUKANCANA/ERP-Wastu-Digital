@@ -15,6 +15,7 @@ class DivisionResource extends JsonResource
             'description' => $this->description,
             'leader_id'   => $this->leader_id,
             'leader_name' => $this->leader?->name,
+            'active'      => $this->active,
             'created_at'  => $this->created_at?->format('Y-m-d H:i:s'),
             'updated_at'  => $this->updated_at?->format('Y-m-d H:i:s'),
         ];

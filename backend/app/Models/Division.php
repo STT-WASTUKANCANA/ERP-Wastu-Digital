@@ -10,6 +10,10 @@ class Division extends Model
     use SoftDeletes;
     protected $table = "divisions";
     protected $guarded = ["id"];
+    
+    protected $casts = [
+        'active' => 'boolean',
+    ];
 
     public function leader()
     {
