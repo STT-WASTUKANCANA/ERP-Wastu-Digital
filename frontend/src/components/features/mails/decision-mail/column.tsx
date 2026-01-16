@@ -1,8 +1,8 @@
 "use client";
 
 import { MouseEvent } from 'react';
-import { DecisionMail } from '@/types/mail-props';
-import { ColumnDef } from '@/types/ui-props';
+import { DecisionMail } from '@/types/features/mail/decision';
+import { ColumnDef } from '@/types/shared/ui';
 import { getStorageUrl, formatDate } from '@/lib/utils';
 import { ActionButtons } from '@/components/ui/action-buttons';
 

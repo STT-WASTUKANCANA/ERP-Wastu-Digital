@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { getUserList } from "@/lib/api/manage/users";
-import { User } from "@/types/user-props";
+import { User } from "@/types/features/user";
 
 export function useUsers() {
     const [users, setUsers] = useState<User[]>([]);

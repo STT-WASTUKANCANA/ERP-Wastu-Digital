@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/shared/page-header";
 import { TableContainer } from "@/components/shared/table-container";
 import { DataTable } from "@/components/shared/datatable";
-import { UserTableProps, User } from "@/types/user-props";
+import { UserTableProps, User } from "@/types/features/user";
 import { getUserColumns } from "./column";
 import { deleteUser } from "@/lib/api/manage/users";
 import { HiOutlineUpload } from "react-icons/hi";

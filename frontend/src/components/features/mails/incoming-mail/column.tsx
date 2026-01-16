@@ -2,8 +2,9 @@
 
 import { MouseEvent } from 'react';
 import { Button } from '@/components/ui/button';
-import { IncomingMail, statusMap } from '@/types/mail-props';
-import { ColumnDef } from '@/types/ui-props';
+import { IncomingMail } from '@/types/features/mail/incoming';
+import { statusMap } from '@/lib/constants/mail';
+import { ColumnDef } from '@/types/shared/ui';
 import { getStorageUrl, formatDate } from '@/lib/utils';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { BsEye } from 'react-icons/bs';

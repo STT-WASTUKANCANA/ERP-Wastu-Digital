@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { getDivisionList, deleteDivision, updateDivision } from "@/lib/api/manage/division";
-import { Division } from "@/types/division-props";
+import { Division } from "@/types/features/division";
 import { getDivisionColumns } from "./column";
 import { DataTable } from "@/components/shared/datatable";
 import { PageHeader } from "@/components/shared/page-header";

@@ -1,6 +1,6 @@
 "use client";
 
-import { ColumnDef } from "@/types/ui-props";
+import { ColumnDef } from "@/types/shared/ui";
 import { MailCategory } from "@/lib/api/master/mail-category";
 import { ActionButtons } from "@/components/ui/action-buttons";
 

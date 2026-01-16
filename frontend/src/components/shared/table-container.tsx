@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { TbColumns2, TbDotsVertical } from 'react-icons/tb';
 import { IoChevronDown } from 'react-icons/io5';
 import { GoFilter } from 'react-icons/go';
-import { TableContainerProps } from '@/types/ui-props';
+import { TableContainerProps } from '@/types/shared/ui';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
 export const TableContainer = ({

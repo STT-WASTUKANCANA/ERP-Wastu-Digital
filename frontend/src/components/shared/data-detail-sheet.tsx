@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { IoClose } from "react-icons/io5";
 import { FiDownload } from "react-icons/fi";
 import { Button } from '@/components/ui/button';
-import { DataDetailAction } from '@/types/ui-props';
+import { DataDetailAction } from '@/types/shared/ui';
 
 export interface DataDetailItem {
     label: string;

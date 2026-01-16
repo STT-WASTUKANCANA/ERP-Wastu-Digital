@@ -1,7 +1,8 @@
 
 import { MouseEvent } from 'react';
-import { OutgoingMail, outgoingStatusMap } from '@/types/mail-props';
-import { ColumnDef } from '@/types/ui-props';
+import { OutgoingMail } from '@/types/features/mail/outgoing';
+import { outgoingStatusMap } from '@/lib/constants/mail';
+import { ColumnDef } from '@/types/shared/ui';
 import { getStorageUrl, formatDate } from '@/lib/utils';
 import { ActionButtons } from '@/components/ui/action-buttons';
 import { StatusBadge } from '@/components/ui/status-badge';

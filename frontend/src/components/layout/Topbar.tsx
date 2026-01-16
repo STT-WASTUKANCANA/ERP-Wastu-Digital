@@ -1,4 +1,4 @@
-import { TopbarProps } from "@/types/ui-props";
+import { TopbarProps } from "@/types/shared/ui";
 import React from "react";
 import { FaRegBell } from "react-icons/fa";
 import { LuAlignJustify } from "react-icons/lu";

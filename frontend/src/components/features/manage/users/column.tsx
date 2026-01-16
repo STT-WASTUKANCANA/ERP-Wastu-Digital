@@ -1,8 +1,8 @@
 "use client";
 
 import { MouseEvent } from 'react';
-import { User } from '@/types/user-props';
-import { ColumnDef } from '@/types/ui-props';
+import { User } from '@/types/features/user';
+import { ColumnDef } from '@/types/shared/ui';
 import { ActionButtons } from '@/components/ui/action-buttons';
 
 type HandleActionClickFn = (e: MouseEvent, action: string, userId: string) => void;

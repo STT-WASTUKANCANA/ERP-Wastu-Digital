@@ -1,5 +1,8 @@
 import React from 'react';
-import { IncomingMail, OutgoingMail, DecisionMail, statusMap, outgoingStatusMap } from '@/types/mail-props';
+import { IncomingMail } from '@/types/features/mail/incoming';
+import { OutgoingMail } from '@/types/features/mail/outgoing';
+import { DecisionMail } from '@/types/features/mail/decision';
+import { statusMap, outgoingStatusMap } from '@/lib/constants/mail';
 import { formatDate } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { StatusBadge } from '@/components/ui/status-badge';

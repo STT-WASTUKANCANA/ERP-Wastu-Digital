@@ -1,6 +1,6 @@
 import { CSSProperties, MouseEventHandler, ReactNode } from "react";
 import { IconType } from "react-icons";
-import { IncomingMail } from "./mail-props";
+import { IncomingMail } from "../features/mail/incoming";
 
 export interface InputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {

@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { NotificationDropdownProps } from "@/types/ui-props";
+import { NotificationDropdownProps } from "@/types/shared/ui";
 import { Button } from "../ui/button";
 import { Dropdown } from "../ui/dropdown";
 import { CgClose } from "react-icons/cg";

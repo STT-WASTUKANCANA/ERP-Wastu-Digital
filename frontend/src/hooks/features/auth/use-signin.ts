@@ -1,6 +1,6 @@
 "use client"
 import { useState } from "react"
-import { Errors, SigninPayload } from "@/types/auth-props"
+import { Errors, SigninPayload } from "@/types/features/auth"
 
 export function useSignin() {
   const [loading, setLoading] = useState(false)

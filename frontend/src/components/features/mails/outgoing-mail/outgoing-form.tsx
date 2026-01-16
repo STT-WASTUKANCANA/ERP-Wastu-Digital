@@ -12,13 +12,7 @@ import { PdfPreview } from "@/components/ui/pdf-preview";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { FormCard } from "@/components/ui/form-card";
 
-interface OutgoingFormProps {
-  categories: any[];
-  divisions?: any[];
-  initialData?: any;
-  mode?: "create" | "edit";
-  roleId?: number;
-}
+import { OutgoingFormProps } from "@/types/features/mail/outgoing";
 
 export default function OutgoingForm({
   categories,

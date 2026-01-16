@@ -1,5 +1,5 @@
 "use client";
-import { DataTableProps } from "@/types/ui-props";
+import { DataTableProps } from "@/types/shared/ui";
 import React from "react";
 
 export const DataTable = <T extends { id: string | number }>({

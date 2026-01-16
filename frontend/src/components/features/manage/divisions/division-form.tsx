@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { DivisionFormData } from "@/types/division-props";
-import { User } from "@/types/user-props";
+import { DivisionFormData } from "@/types/features/division";
+import { User } from "@/types/features/user";
 import { createDivision, updateDivision, getDivision } from "@/lib/api/manage/division";
 import { getUserList } from "@/lib/api/manage/users";
 import { Button } from "@/components/ui/button";

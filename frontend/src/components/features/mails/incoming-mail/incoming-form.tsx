@@ -16,13 +16,7 @@ import { PdfPreview } from "@/components/ui/pdf-preview";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { FormCard } from "@/components/ui/form-card";
 
-interface IncomingFormProps {
-  categories: any[];
-  divisions?: any[];
-  initialData?: any;
-  mode?: "create" | "edit" | "review" | "division_review";
-  roleId?: number;
-}
+import { IncomingFormProps } from "@/types/features/mail/incoming";
 
 export default function IncomingForm({
   categories,

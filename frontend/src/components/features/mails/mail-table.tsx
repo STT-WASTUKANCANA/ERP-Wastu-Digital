@@ -6,12 +6,10 @@ import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/shared/page-header";
 import { TableContainer } from "@/components/shared/table-container";
 import { DataTable } from "@/components/shared/datatable";
-import {
-  IncomingMail,
-  OutgoingMail,
-  DecisionMail,
-  MailTableProps,
-} from "@/types/mail-props";
+import { IncomingMail } from "@/types/features/mail/incoming";
+import { OutgoingMail } from "@/types/features/mail/outgoing";
+import { DecisionMail } from "@/types/features/mail/decision";
+import { MailTableProps } from "@/types/features/mail/common";
 import { DataDetailSheet } from "@/components/shared/data-detail-sheet";
 import { getStorageUrl } from "@/lib/utils";
 import { FiEdit, FiTrash2, FiSave, FiDownload } from "react-icons/fi";
@@ -24,7 +22,7 @@ import { FilterModal } from "@/components/shared/filter-modal";
 import { Select } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { getMailDetailItems } from "@/lib/helpers/detail-helpers";
-import { outgoingStatusMap } from "@/types/mail-props";
+import { outgoingStatusMap } from "@/lib/constants/mail";
 import { useMailFilter } from "@/hooks/features/mail/use-mail-filter";
 
 type MailTypes = IncomingMail | OutgoingMail | DecisionMail;

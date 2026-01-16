@@ -1,4 +1,4 @@
-import { InputProps } from "@/types/ui-props";
+import { InputProps } from "@/types/shared/ui";
 import * as React from "react";
 
 export const Input: React.FC<InputProps> = ({

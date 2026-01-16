@@ -1,6 +1,6 @@
 "use client";
 
-import { ButtonProps } from "@/types/ui-props";
+import { ButtonProps } from "@/types/shared/ui";
 import { useRouter } from "next/navigation";
 import * as React from "react";
 

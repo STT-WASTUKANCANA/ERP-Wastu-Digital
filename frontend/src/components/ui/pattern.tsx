@@ -1,4 +1,4 @@
-import { PatternLogoProps } from "@/types/ui-props";
+import { PatternLogoProps } from "@/types/shared/ui";
 
 export const PatternLogo: React.FC<PatternLogoProps> = ({ className, style }) => {
 

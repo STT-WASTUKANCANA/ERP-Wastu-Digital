@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { createUser, updateUser } from "@/lib/api/manage/users";
-import { UserFormData, Role, Division, User } from "@/types/user-props";
+import { UserFormData, Role, Division, User } from "@/types/features/user";
 import { FormWrapper } from "@/components/ui/form-wrapper";
 import { SubmitButton } from "@/components/ui/submit-button";
 

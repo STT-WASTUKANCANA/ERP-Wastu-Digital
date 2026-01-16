@@ -1,7 +1,7 @@
 "use client";
 
-import { ColumnDef } from "@/types/ui-props";
-import { Division } from "@/types/division-props";
+import { ColumnDef } from "@/types/shared/ui";
+import { Division } from "@/types/features/division";
 import { ActionButtons } from "@/components/ui/action-buttons";
 import { StatusBadge } from "@/components/ui/status-badge";
 

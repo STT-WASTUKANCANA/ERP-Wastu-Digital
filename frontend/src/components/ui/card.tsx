@@ -2,7 +2,7 @@ import React from 'react'
 import { BiInfoCircle } from 'react-icons/bi'
 import { CgArrowTopRight, CgArrowBottomLeft } from 'react-icons/cg'
 import { Button } from './button'
-import { CardProps } from '@/types/ui-props'
+import { CardProps } from '@/types/shared/ui'
 
 export const Card: React.FC<CardProps> = ({ title, value, percent, icon: Icon }) => {
         const isNegative = percent !== undefined && percent < 0;

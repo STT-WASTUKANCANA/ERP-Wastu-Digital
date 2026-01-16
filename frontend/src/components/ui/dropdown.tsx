@@ -1,4 +1,4 @@
-import { DropdownProps } from "@/types/ui-props";
+import { DropdownProps } from "@/types/shared/ui";
 import React from "react";
 
 export const Dropdown: React.FC<DropdownProps> = ({

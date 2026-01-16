@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { detailUser } from "@/lib/api/manage/users";
 import { getRoleList } from "@/lib/api/manage/role";
 import { getDivisionList } from "@/lib/api/manage/division";
-import { Role, Division, User } from "@/types/user-props";
+import { Role, Division, User } from "@/types/features/user";
 
 interface UseUserFormOptions {
     userId?: string | null;
