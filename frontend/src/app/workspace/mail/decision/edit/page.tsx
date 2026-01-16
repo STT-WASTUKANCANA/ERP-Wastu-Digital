@@ -3,7 +3,7 @@
 import { FiCornerDownLeft } from "react-icons/fi";
 import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
-import { useMailPageData } from "@/hooks/features/mail/useMailPageData";
+import { useMailPageData } from "@/hooks/features/mail/use-mail-page-data";
 import DecisionForm from "@/components/features/mails/decision-mail/decision-form";
 
 export default function Page() {

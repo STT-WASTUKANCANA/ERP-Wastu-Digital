@@ -3,7 +3,7 @@
 import IncomingForm from "@/components/features/mails/incoming-mail/incoming-form";
 import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
-import { useMailPageData } from "@/hooks/features/mail/useMailPageData";
+import { useMailPageData } from "@/hooks/features/mail/use-mail-page-data";
 import { FiCornerDownLeft } from "react-icons/fi";
 
 export default function Page() {

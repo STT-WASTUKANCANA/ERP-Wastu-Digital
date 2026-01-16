@@ -5,7 +5,7 @@ import { FiCornerDownLeft } from "react-icons/fi";
 import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
 import IncomingForm from "@/components/features/mails/incoming-mail/incoming-form";
-import { useMailPageData } from "@/hooks/features/mail/useMailPageData";
+import { useMailPageData } from "@/hooks/features/mail/use-mail-page-data";
 
 export default function Page() {
   const { categories, mail, isLoading, divisions } = useMailPageData({
@@ -13,7 +13,7 @@ export default function Page() {
     mailType: "incoming",
     fetchDivisions: true
   });
-  
+
   if (isLoading) {
     return <div>Loading mail data...</div>;
   }
