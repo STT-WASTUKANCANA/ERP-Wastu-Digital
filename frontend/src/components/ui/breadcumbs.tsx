@@ -10,6 +10,7 @@ const pathMap: { [key: string]: string } = {
         decision: "Surat Keputusan",
         master: "Master Data",
         "mail-category": "Kategori Surat",
+        "division-review": "Verifikasi Bidang",
         manage: "Manajemen",
         division: "Divisi",
         user: "Pengguna",
