@@ -13,7 +13,11 @@ export async function middleware(request: NextRequest) {
         const refreshToken = request.cookies.get('refresh_token')?.value
 
         const redirectToLogin = () => {
-            const response = NextResponse.redirect(new URL('/auth/signin', request.url))
+            // Jika user di root, biarkan mereka melihat form login
+            if (pathname === '/') return NextResponse.next()
+
+            // Redirect ke root (yang sekarang adalah login page)
+            const response = NextResponse.redirect(new URL('/', request.url))
             response.cookies.delete('access_token')
             response.cookies.delete('refresh_token')
             return response
@@ -111,19 +115,25 @@ export async function middleware(request: NextRequest) {
         return response
     }
 
-    // 2. RUTE TAMU: Auth (Masuk/Daftar)
-    if (pathname.startsWith('/auth')) {
+    // 2. ROOT PATH: Logic untuk /
+    if (pathname === '/') {
         const refreshToken = request.cookies.get('refresh_token')?.value
-
-        // Navigasi kembali yang mulus untuk user yang sudah login
+        // Jika sudah login, redirect ke workspace
         if (refreshToken) {
-            return NextResponse.rewrite(new URL('/unauthorized', request.url))
+            return NextResponse.redirect(new URL('/workspace/overview', request.url))
         }
+        // Jika belum login, biarkan render page.tsx (Login form)
+        return NextResponse.next()
+    }
+
+    // 3. RUTE TAMU: Auth (Masuk/Daftar) - Redirect ke / jika diakses
+    if (pathname.startsWith('/auth')) {
+        return NextResponse.redirect(new URL('/', request.url))
     }
 
     return NextResponse.next()
 }
 
 export const config = {
-    matcher: ['/workspace/:path*', '/auth/:path*'],
+    matcher: ['/', '/workspace/:path*', '/auth/:path*'],
 }
