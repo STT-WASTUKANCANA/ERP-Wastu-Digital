@@ -81,7 +81,25 @@ class MailRequest extends FormRequest
                     'number' => 'sometimes|string|max:100',
                     'category_id' => 'sometimes|exists:mail_categories,id',
                     'date' => 'sometimes|date',
-                    'attachment' => 'nullable|file|mimes:pdf|max:10240', // max 10MB
+                    'attachment' => $isDecision ? 'nullable|string|url' : [
+                        'nullable',
+                        function ($attribute, $value, $fail) {
+                             if (request()->hasFile($attribute)) {
+                                  $file = request()->file($attribute);
+                                  if ($file->getMimeType() != 'application/pdf') {
+                                      $fail('File harus berformat PDF.');
+                                  }
+                                  if ($file->getSize() > 10240 * 1024) { // 10MB
+                                      $fail('Ukuran file terlalu besar. Maksimal 10MB.');
+                                  }
+                             } else {
+                                  // Saat update, value bisa string (URL lama/baru) atau null
+                                  if (!is_null($value) && !is_string($value)) {
+                                      $fail('Lampiran harus berupa file PDF atau Link Google Drive.');
+                                  }
+                             }
+                        }
+                    ],
                     'desc' => 'nullable|string',
                 ];
 
