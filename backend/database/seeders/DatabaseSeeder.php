@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
             ['id' => 1, 'name' => 'Tata Laksana', 'description' => 'Role Tata Laksana'],
             ['id' => 2, 'name' => 'Sekum', 'description' => 'Role Sekum'],
             ['id' => 3, 'name' => 'Pulahta', 'description' => 'Role Pulahta'],
-            ['id' => 4, 'name' => 'Kabid', 'description' => 'Role Kepala Bidang'],
+            ['id' => 4, 'name' => 'Pegawai', 'description' => 'Role Pegawai'],
             ['id' => 5, 'name' => 'Admin', 'description' => 'Administrator System'],
         ];
 
