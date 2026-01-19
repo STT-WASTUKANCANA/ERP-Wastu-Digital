@@ -63,8 +63,6 @@ class UserService
 
                 $user = User::create($data);
 
-                $user = User::create($data);
-
                 return $user->load('role', 'division');
             } catch (\Throwable $e) {
                 Log::error('[SERVICE] USER CREATE: Gagal membuat data pengguna', [
@@ -96,8 +94,6 @@ class UserService
 
             $user->update($data);
 
-            $user->update($data);
-
             return $user->load('role', 'division');
         } catch (\Throwable $e) {
             Log::error('[SERVICE] USER UPDATE: Gagal memperbarui pengguna', [
@@ -116,7 +112,6 @@ class UserService
             return false;
         }
 
-        $user->delete();
         $user->delete();
         return true;
     }
