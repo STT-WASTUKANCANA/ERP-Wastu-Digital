@@ -153,8 +153,8 @@ export default function IncomingForm({
   return (
     <form onSubmit={handleSubmit}>
       <FormCard>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-8">
-          <div className="col-span-2">
+        <div className="flex flex-col xl:grid xl:grid-cols-2 gap-x-4 gap-y-8">
+          <div className="w-full xl:col-span-2">
             <Input
               label="Nomor Surat"
               id="number"
@@ -273,37 +273,52 @@ export default function IncomingForm({
       )}
 
       {mode === "division_review" && (
-        <FormCard className="mt-4">
-          <div className="col-span-2">
-            <Select
-              label="Status Proses"
-              id="follow_status"
-              name="follow_status"
-              value={formData.follow_status}
+        <>
+          <FormCard className="mt-4">
+            <div className="col-span-2">
+              <TextareaField
+                label="Catatan Sekretaris Umum"
+                id="sekum_desc_review"
+                name="sekum_desc"
+                value={formData.sekum_desc}
+                disabled={true} // Read only
+                onChange={() => { }} // Read only
+              />
+            </div>
+          </FormCard>
+
+          <FormCard className="mt-4">
+            <div className="col-span-2">
+              <Select
+                label="Status Proses"
+                id="follow_status"
+                name="follow_status"
+                value={formData.follow_status}
+                onChange={handleChange}
+                placeholder="Pilih status proses"
+                options={[
+                  { value: 1, label: "Pending" },
+                  { value: 2, label: "Proses" },
+                  { value: 3, label: "Selesai" },
+                ]}
+              />
+            </div>
+
+            <TextareaField
+              label="Deskripsi Bidang"
+              id="division_desc"
+              name="division_desc"
+              value={formData.division_desc}
               onChange={handleChange}
-              placeholder="Pilih status proses"
-              options={[
-                { value: 1, label: "Pending" },
-                { value: 2, label: "Proses" },
-                { value: 3, label: "Selesai" },
-              ]}
+              placeholder="Tulis deskripsi..."
+              className="col-span-2"
             />
-          </div>
 
-          <TextareaField
-            label="Deskripsi Bidang"
-            id="division_desc"
-            name="division_desc"
-            value={formData.division_desc}
-            onChange={handleChange}
-            placeholder="Tulis deskripsi..."
-            className="col-span-2"
-          />
-
-          <div className="col-span-2">
-            <SubmitButton loading={loading} submitText="Simpan" />
-          </div>
-        </FormCard>
+            <div className="col-span-2">
+              <SubmitButton loading={loading} submitText="Simpan" />
+            </div>
+          </FormCard>
+        </>
       )}
     </form>
   );
