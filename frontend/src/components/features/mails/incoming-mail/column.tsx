@@ -54,7 +54,7 @@ export const getIncomingMailColumns = (
                                 } else if (row.status == 2) {
                                         if (row.follow_status == 2) {
                                                 val = "Proses";
-                                                label = "Proses";
+                                                label = "Diproses";
                                                 color = "bg-yellow-100 text-yellow-800";
                                         } else {
                                                 color = "bg-blue-100 text-blue-800"; // Disposisi

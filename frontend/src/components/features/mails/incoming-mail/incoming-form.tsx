@@ -290,15 +290,15 @@ export default function IncomingForm({
           <FormCard className="mt-4">
             <div className="col-span-2">
               <Select
-                label="Status Proses"
+                label="Status tindak lanjut"
                 id="follow_status"
                 name="follow_status"
                 value={formData.follow_status}
                 onChange={handleChange}
-                placeholder="Pilih status proses"
+                placeholder="Pilih status tindak lanjut"
                 options={[
                   { value: 1, label: "Pending" },
-                  { value: 2, label: "Proses" },
+                  { value: 2, label: "Diproses" },
                   { value: 3, label: "Selesai" },
                 ]}
               />
