@@ -31,7 +31,7 @@ export default function SigninForm() {
     const hasFieldErrors = result.data?.errors && Object.keys(result.data.errors).length > 0
 
     if (result.ok) {
-      setToastTitle("Success")
+      setToastTitle("Berhasil")
       setToastMessage(result.data?.message || "Berhasil masuk")
       setToastVariant("success")
 
