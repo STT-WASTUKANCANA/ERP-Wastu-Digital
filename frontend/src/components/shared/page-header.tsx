@@ -2,8 +2,8 @@ import React from 'react';
 
 interface PageHeaderProps {
   title: string;
-  description: string;
-  children?: React.ReactNode; 
+  description?: string;
+  children?: React.ReactNode;
 }
 
 export const PageHeader = ({ title, description, children }: PageHeaderProps) => {
@@ -12,7 +12,7 @@ export const PageHeader = ({ title, description, children }: PageHeaderProps) =>
       <div className="flex justify-center lg:justify-start w-full">
         <div className="text-center lg:text-start space-y-4 lg:space-y-2 w-full lg:max-w-[1200px]">
           <h3 className="font-semibold text-lg">{title}</h3>
-          <span className="text-secondary mb-0">{description}</span>
+          {description && <span className="text-secondary mb-0">{description}</span>}
         </div>
       </div>
       {children && (
