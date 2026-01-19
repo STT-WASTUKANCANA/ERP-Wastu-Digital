@@ -22,7 +22,7 @@ export const Topbar: React.FC<TopbarProps> = ({
                 <div
                         className={`
                                 fixed top-0 h-[50px] flex justify-between items-center 
-                                overflow-hidden z-0 py-8 px-4 transition-all duration-300
+                                overflow-hidden z-40 py-8 px-4 transition-all duration-300
                                 ${topbarClass}
                                 ${desktopPaddingClass}
                         `}
