@@ -124,9 +124,6 @@ export default function DecisionForm({
         placeholder="Isi deskripsi surat keputusan..."
         className="col-span-2"
       />
-      {mode === "edit" && formData.attachment && (
-        <PdfPreview attachment={formData.attachment} className="col-span-2" />
-      )}
       <div className="col-span-2">
         <Input
           label="Link Google Drive (URL)"
