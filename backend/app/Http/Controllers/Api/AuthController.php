@@ -96,7 +96,7 @@ class AuthController extends Controller
         ]);
 
         return response()
-            ->json(['message' => 'Successfully logged out'])
+            ->json(['message' => 'Berhasil keluar'])
             ->withoutCookie('refresh_token')
             ->withoutCookie('access_token');
     }
@@ -135,7 +135,7 @@ class AuthController extends Controller
     protected function respondWithTokens($accessToken, $refreshToken)
     {
         $response = [
-            'message'      => 'Signin successful',
+            'message'      => 'Berhasil masuk',
             'access_token' => $accessToken,
             'token_type'   => 'bearer',
             'expires_in'   => auth('api')->factory()->getTTL() * 60
