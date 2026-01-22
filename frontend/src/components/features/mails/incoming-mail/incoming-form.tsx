@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { FileDropzone } from "@/components/ui/file-dropzone";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
+import { MultiSelect } from "@/components/ui/multi-select";
 import {
   createIncomingMail,
   reviewIncomingMail,
@@ -36,7 +37,7 @@ export default function IncomingForm({
     desc: "",
     attachment: "",
     status: 0,
-    division_id: "",
+    division_ids: [] as string[],
     sekum_desc: "",
     division_desc: "",
     follow_status: "",
@@ -56,7 +57,9 @@ export default function IncomingForm({
         desc: initialData.desc || "",
         attachment: initialData.attachment || "",
         status: initialData.status || 0,
-        division_id: initialData.division_id ? String(initialData.division_id) : "",
+        division_ids: initialData.divisions
+          ? initialData.divisions.map((d: any) => String(d.id))
+          : (initialData.division_id ? [String(initialData.division_id)] : []),
         sekum_desc: initialData.sekum_desc || "",
         division_desc: initialData.division_desc || "",
         follow_status: initialData.follow_status || "",
@@ -70,6 +73,10 @@ export default function IncomingForm({
     >
   ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleDivisionChange = (newValues: (string | number)[]) => {
+    setFormData({ ...formData, division_ids: newValues.map(String) });
   };
 
   const actions = {
@@ -90,7 +97,9 @@ export default function IncomingForm({
       data = new FormData();
 
       if (mode === "review") {
-        data.append("division_id", formData.division_id);
+        formData.division_ids.forEach(id => {
+          data.append("division_ids[]", id);
+        });
         data.append("desc", formData.sekum_desc);
         data.append("_method", "PUT");
       } else if (mode === "division_review") {
@@ -98,7 +107,7 @@ export default function IncomingForm({
         data.append("division_desc", formData.division_desc);
         data.append("_method", "PUT");
       } else {
-        const { attachment, division_id, sekum_desc, division_desc, follow_status, ...rest } =
+        const { attachment, division_ids, sekum_desc, division_desc, follow_status, ...rest } =
           formData;
 
         Object.entries(rest).forEach(([key, value]) =>
@@ -242,17 +251,15 @@ export default function IncomingForm({
       {mode === "review" && (
         <FormCard className="mt-4">
           <div className="col-span-2">
-            <Select
+            <MultiSelect
               label="Bagikan ke Bagian"
-              id="division_id"
-              name="division_id"
-              onChange={handleChange}
-              value={formData.division_id}
-              placeholder="Pilih bagian"
               options={divisions.map((division) => ({
                 value: String(division.id),
                 label: division.name,
               }))}
+              value={formData.division_ids}
+              onChange={handleDivisionChange}
+              placeholder="Pilih satu atau lebih bagian"
             />
           </div>
 
@@ -289,33 +296,11 @@ export default function IncomingForm({
 
           <FormCard className="mt-4">
             <div className="col-span-2">
-              <Select
-                label="Status tindak lanjut"
-                id="follow_status"
-                name="follow_status"
-                value={formData.follow_status}
-                onChange={handleChange}
-                placeholder="Pilih status tindak lanjut"
-                options={[
-                  { value: 1, label: "Pending" },
-                  { value: 2, label: "Diproses" },
-                  { value: 3, label: "Selesai" },
-                ]}
-              />
-            </div>
-
-            <TextareaField
-              label="Deskripsi Bidang"
-              id="division_desc"
-              name="division_desc"
-              value={formData.division_desc}
-              onChange={handleChange}
-              placeholder="Tulis deskripsi..."
-              className="col-span-2"
-            />
-
-            <div className="col-span-2">
-              <SubmitButton loading={loading} submitText="Simpan" />
+              <div className="bg-secondary/10 p-4 rounded-md border border-secondary/20">
+                <p className="text-sm text-foreground">
+                  <span className="font-semibold">Info:</span> Anda sedang melihat surat yang didisposisikan ke divisi Anda. Sistem telah mencatat bahwa Anda telah melihat surat ini.
+                </p>
+              </div>
             </div>
           </FormCard>
         </>

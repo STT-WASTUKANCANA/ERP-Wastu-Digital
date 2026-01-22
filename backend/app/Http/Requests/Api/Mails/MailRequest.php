@@ -20,7 +20,8 @@ class MailRequest extends FormRequest
 
         if ($this->routeIs('api.mails.incoming.review')) {
             return [
-                'division_id' => 'nullable|exists:divisions,id',
+                'division_ids' => 'nullable|array',
+                'division_ids.*' => 'exists:divisions,id',
                 'desc' => 'nullable|string',
             ];
         }

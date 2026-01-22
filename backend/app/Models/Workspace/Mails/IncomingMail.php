@@ -21,9 +21,10 @@ class IncomingMail extends Model
         return $this->belongsTo(User::class, 'user_view_id');
     }
     
-    public function division(): BelongsTo
+    public function divisions()
     {
-        return $this->belongsTo(\App\Models\Division::class, 'division_id');
+        return $this->belongsToMany(\App\Models\Division::class, 'incoming_mail_divisions', 'incoming_mail_id', 'division_id')
+                    ->withPivot('user_view_id');
     }
     public static function getTotalForCurrentMonth(): int
     {
