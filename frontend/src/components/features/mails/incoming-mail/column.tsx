@@ -76,7 +76,36 @@ export const getIncomingMailColumns = (
                 {
                         header: 'Divisi',
                         accessorKey: 'division_name',
-                        cell: (row) => row.division_name || <span className="text-gray-400 italic text-xs">Belum ditentukan</span>,
+                        cell: (row) => {
+                                const divisions = row.divisions || [];
+
+                                if (divisions.length === 0) {
+                                        return <span className="text-gray-400 italic text-xs">Belum ditentukan</span>;
+                                }
+
+                                if (divisions.length === 1) {
+                                        return <span>{divisions[0].name}</span>;
+                                }
+
+                                const tooltipContent = (
+                                        <div className="flex flex-col gap-1 min-w-[200px]">
+                                                <p className="font-semibold border-b border-foreground/10 pb-1 mb-1">Daftar Divisi:</p>
+                                                {divisions.map((div, i) => (
+                                                        <div key={i} className="text-xs">
+                                                                • {div.name}
+                                                        </div>
+                                                ))}
+                                        </div>
+                                );
+
+                                return (
+                                        <Tooltip content={tooltipContent}>
+                                                <span className="cursor-help">
+                                                        {divisions.length} Divisi
+                                                </span>
+                                        </Tooltip>
+                                );
+                        },
                 },
                 {
                         header: 'Dilihat',
@@ -94,7 +123,7 @@ export const getIncomingMailColumns = (
                                                 label = "Sudah Dilihat";
                                                 className = "text-green-600 italic text-xs font-medium";
                                         } else if (readCount > 0) {
-                                                label = `Sebagian (${readCount}/${total})`;
+                                                label = `Dilihat ${readCount}/${total}`;
                                                 className = "text-orange-600 italic text-xs font-medium";
                                         }
                                 }
@@ -121,7 +150,7 @@ export const getIncomingMailColumns = (
 
                                 return (
                                         <Tooltip content={tooltipContent}>
-                                                <span className={`${className} cursor-help border-b border-dotted border-current`}>{label}</span>
+                                                <span className={`${className} cursor-help`}>{label}</span>
                                         </Tooltip>
                                 );
                         }
