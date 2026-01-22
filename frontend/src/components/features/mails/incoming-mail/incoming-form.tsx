@@ -107,7 +107,7 @@ export default function IncomingForm({
         data.append("division_desc", formData.division_desc);
         data.append("_method", "PUT");
       } else {
-        const { attachment, division_ids, sekum_desc, division_desc, follow_status, ...rest } =
+        const { division_ids, sekum_desc, division_desc, follow_status, ...rest } =
           formData;
 
         Object.entries(rest).forEach(([key, value]) =>
@@ -115,7 +115,7 @@ export default function IncomingForm({
         );
 
         if (files.length > 0) {
-          data.append("attachment", files[0]);
+          // Legacy file handling removed
         }
 
         if (mode === "edit") {
@@ -224,16 +224,23 @@ export default function IncomingForm({
 
           {showMainFormSubmit && (
             <div className="col-span-2">
-              <FileDropzone
-                label={
-                  mode === "edit"
-                    ? "Upload Lampiran Baru (Opsional, akan menggantikan yang lama)"
-                    : "Lampiran Surat"
-                }
-                name="attachment"
-                onFilesAccepted={(accepted) => setFiles(accepted)}
-                error={errors.attachment?.[0]}
-              />
+              <div className="col-span-2">
+                <Input
+                  label={
+                    mode === "edit"
+                      ? "Link Lampiran Baru (Opsional, akan menggantikan yang lama)"
+                      : "Link Lampiran (Google Drive / Cloud Storage)"
+                  }
+                  id="attachment"
+                  name="attachment"
+                  type="text"
+                  value={formData.attachment}
+                  onChange={handleChange}
+                  placeholder="https://drive.google.com/..."
+                  error={errors.attachment?.[0]}
+                  disabled={isFieldDisabled}
+                />
+              </div>
             </div>
           )}
 

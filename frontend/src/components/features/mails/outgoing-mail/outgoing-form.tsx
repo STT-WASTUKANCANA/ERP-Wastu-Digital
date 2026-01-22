@@ -92,21 +92,14 @@ export default function OutgoingForm({
     setLoading(true);
 
     const data = new FormData();
-    const { attachment, status, ...rest } = formData;
+    const { status, ...rest } = formData;
 
     Object.entries(rest).forEach(([key, value]) => {
       data.append(key, String(value));
     });
 
-    if (roleId === 3) {
-      // Pulahta needs to send Link Drive (String)
-      // attachment is excluded from rest, so append it manually
-      data.append("attachment", formData.attachment);
-    } else {
-      if (files.length > 0) {
-        data.append("attachment", files[0]);
-      }
-    }
+    // Link attachment is already in 'rest' since we removed 'attachment' destructuring exclusion? 
+    // Wait, let's check the destructuring line above. I need to edit that too.
 
     if (mode === "edit") {
       data.append("_method", "PUT");
@@ -275,26 +268,16 @@ export default function OutgoingForm({
           )}
 
           <div className="col-span-2">
-            {roleId === 3 ? (
-              <Input
-                label="Link Google Drive"
-                id="attachment"
-                name="attachment"
-                type="text"
-                value={formData.attachment}
-                onChange={handleChange}
-                placeholder="https://drive.google.com/..."
-                disabled={isReadOnly}
-              />
-            ) : (
-              !isReadOnly && (
-                <FileDropzone
-                  label={mode === "edit" ? "Upload Lampiran Baru (Opsional)" : "Lampiran (PDF)"}
-                  name="attachment"
-                  onFilesAccepted={(accepted) => setFiles(accepted)}
-                />
-              )
-            )}
+            <Input
+              label="Link Lampiran (Google Drive / Cloud Storage)"
+              id="attachment"
+              name="attachment"
+              type="text"
+              value={formData.attachment}
+              onChange={handleChange}
+              placeholder="https://drive.google.com/..."
+              disabled={isReadOnly}
+            />
           </div>
 
 
