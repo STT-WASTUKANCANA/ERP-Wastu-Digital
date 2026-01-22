@@ -224,7 +224,7 @@ export default function OutgoingForm({
 
           <div className="col-span-2 md:col-span-1">
             <Input
-              label="Instansi"
+              label="Tujuan Surat / PIC"
               id="institute"
               name="institute"
               type="text"

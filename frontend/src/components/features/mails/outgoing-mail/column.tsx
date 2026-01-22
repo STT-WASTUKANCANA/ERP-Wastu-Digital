@@ -28,7 +28,7 @@ export const getOutgoingMailColumns = (
                         cell: (row) => formatDate(row.date),
                 },
                 {
-                        header: 'Instansi',
+                        header: 'Tujuan Surat / PIC',
                         accessorKey: 'institute',
                 },
                 {
