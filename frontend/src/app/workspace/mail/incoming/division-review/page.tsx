@@ -21,8 +21,8 @@ export default function Page() {
   return (
     <div className="space-y-8 lg:px-24 xl:px-56">
       <PageHeader
-        title="Tinjau Surat Masuk"
-        description="Tinjau dan ubah detail data surat masuk yang sudah ada."
+        title="Detail Surat Masuk"
+        description="Lihat detail surat masuk yang didisposisikan."
       >
         <Button
           color="bg-background"

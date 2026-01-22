@@ -48,9 +48,9 @@ export const mailConfig = {
 
                         if (showDivisionReview) {
                                 actions.push({
-                                        label: "Division Review",
+                                        label: "View",
                                         onClick: (e) => handler(e, "Division Review", String(mail.id)),
-                                        icon: mail.follow_status == 2 ? FiEdit : BsEye,
+                                        icon: BsEye,
                                         variant: "primary"
                                 });
                         }

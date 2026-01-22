@@ -15,6 +15,11 @@ export type IncomingMail = {
     desc?: string;
     sekum_desc?: string;
     division_desc?: string;
+    divisions?: {
+        id: string | number;
+        name: string;
+        is_read: boolean;
+    }[];
 };
 
 export interface IncomingCreateModalProps {

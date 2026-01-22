@@ -10,6 +10,7 @@ import { StatusBadge } from '@/components/ui/status-badge';
 import { BsEye } from 'react-icons/bs';
 import { FiEdit } from 'react-icons/fi';
 import { ActionButtons } from '@/components/ui/action-buttons';
+import { Tooltip } from '@/components/ui/tooltip';
 
 type HandleActionClickFn = (e: MouseEvent, action: string, mailId: string, roleId?: number) => void;
 
@@ -81,10 +82,48 @@ export const getIncomingMailColumns = (
                         header: 'Dilihat',
                         accessorKey: 'user_view_id',
                         cell: (row) => {
-                                if (row.user_view_id) {
-                                        return <span className="text-green-600 italic text-xs">Sudah Dilihat</span>;
+                                const divisions = row.divisions || [];
+                                const total = divisions.length;
+                                const readCount = divisions.filter(d => d.is_read).length;
+
+                                let label = "Belum Dilihat";
+                                let className = "text-gray-400 italic text-xs";
+
+                                if (total > 0) {
+                                        if (readCount === total) {
+                                                label = "Sudah Dilihat";
+                                                className = "text-green-600 italic text-xs font-medium";
+                                        } else if (readCount > 0) {
+                                                label = `Sebagian (${readCount}/${total})`;
+                                                className = "text-orange-600 italic text-xs font-medium";
+                                        }
                                 }
-                                return <span className="text-gray-400 italic text-xs">Belum Dilihat</span>;
+
+                                const tooltipContent = (
+                                        <div className="flex flex-col gap-1 min-w-[200px]">
+                                                <p className="font-semibold border-b border-foreground/10 pb-1 mb-1">Status Baca per Bagian:</p>
+                                                {divisions.length > 0 ? (
+                                                        divisions.map((div, i) => (
+                                                                <div key={i} className="flex items-center justify-between gap-2">
+                                                                        <span>{div.name}</span>
+                                                                        {div.is_read ? (
+                                                                                <span className="text-green-600 text-[10px] bg-green-100 px-1 rounded">Sudah</span>
+                                                                        ) : (
+                                                                                <span className="text-red-500 text-[10px] bg-red-100 px-1 rounded">Belum</span>
+                                                                        )}
+                                                                </div>
+                                                        ))
+                                                ) : (
+                                                        <span className="text-gray-400 italic">Belum ada bagian</span>
+                                                )}
+                                        </div>
+                                );
+
+                                return (
+                                        <Tooltip content={tooltipContent}>
+                                                <span className={`${className} cursor-help border-b border-dotted border-current`}>{label}</span>
+                                        </Tooltip>
+                                );
                         }
                 },
                 {
