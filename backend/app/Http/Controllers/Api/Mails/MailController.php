@@ -73,36 +73,11 @@ class MailController extends Controller
                         Log::debug('[MAIL] CREATE: Memulai pembuatan surat', [
                                 'type' => $type,
                                 'user_id' => Auth::id(),
-                                'has_attachment' => $request->hasFile('attachment'),
+                                'attachment_link' => $validatedData['attachment'] ?? null,
                         ]);
 
-                        if ($request->hasFile('attachment')) {
-                                $year  = date('Y');
-                                $month = date('m');
-                                $day   = date('d');
-
-                                // Mapping folder berdasarkan tipe
-                                $folder = match ($type) {
-                                        1 => 'incoming',
-                                        2 => 'outgoing',
-                                        3 => 'decision',
-                                };
-
-                                $dynamicPath = "mails/{$folder}/{$year}/{$month}/{$day}";
-
-                                $file = $request->file('attachment');
-                                Log::debug('Mail:store attachment info', [
-                                        'original_name' => $file->getClientOriginalName(),
-                                        'size' => $file->getSize(),
-                                        'mime_type' => $file->getMimeType(),
-                                        'path' => $dynamicPath,
-                                ]);
-
-                                $filePath = $file->store($dynamicPath, 'public');
-                                $validatedData['attachment'] = $filePath;
-
-                                Log::debug('[MAIL] CREATE: Lampiran tersimpan', ['path' => $filePath]);
-                        }
+                        // Logic upload file dihapus, attachment langsung via validatedData['attachment'] sebagai string
+                        // if ($request->hasFile('attachment')) { ... }
 
                         $mail = $this->service->create($validatedData, $type);
 
@@ -150,18 +125,7 @@ class MailController extends Controller
 
                         $validatedData = $request->validated();
 
-                        if ($request->hasFile('attachment')) {
-                                if ($mail->attachment) {
-                                        Storage::disk('public')->delete($mail->attachment);
-                                }
-
-                                $year = date('Y');
-                                $month = date('m');
-                                $day = date('d');
-                                $dynamicPath = "mails/incoming/{$year}/{$month}/{$day}";
-                                $filePath = $request->file('attachment')->store($dynamicPath, 'public');
-                                $validatedData['attachment'] = $filePath;
-                        }
+                        // if ($request->hasFile('attachment')) { ... } - Removed for Link implementation
 
                         $updatedMail = $this->service->update($id, $validatedData, $type);
 

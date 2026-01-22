@@ -39,21 +39,13 @@ class MailRequest extends FormRequest
                     'number' => 'required|string|max:100',
                     'category_id' => 'required|exists:mail_categories,id',
                     'date' => 'required|date',
-                    'attachment' => $isDecision ? 'required|string|url' : [
+                     'attachment' => [
                         'required',
+                        'string',
+                        // 'url', // Optional: enforced if needed, but 'string' allows flexibility if they paste non-standard URIs. Let's stick to user request "Link".
                         function ($attribute, $value, $fail) {
-                             if (request()->hasFile($attribute)) {
-                                  $file = request()->file($attribute);
-                                  if ($file->getMimeType() != 'application/pdf') {
-                                      $fail('File harus berformat PDF.');
-                                  }
-                                  if ($file->getSize() > 10240 * 1024) { // 10MB
-                                      $fail('Ukuran file terlalu besar. Maksimal 10MB.');
-                                  }
-                             } else {
-                                  if (!is_string($value)) {
-                                      $fail('Lampiran harus berupa file PDF atau Link Google Drive.');
-                                  }
+                             if (!is_string($value)) {
+                                  $fail('Lampiran harus berupa Link / URL valid.');
                              }
                         }
                     ],
@@ -82,25 +74,7 @@ class MailRequest extends FormRequest
                     'number' => 'sometimes|string|max:100',
                     'category_id' => 'sometimes|exists:mail_categories,id',
                     'date' => 'sometimes|date',
-                    'attachment' => $isDecision ? 'nullable|string|url' : [
-                        'nullable',
-                        function ($attribute, $value, $fail) {
-                             if (request()->hasFile($attribute)) {
-                                  $file = request()->file($attribute);
-                                  if ($file->getMimeType() != 'application/pdf') {
-                                      $fail('File harus berformat PDF.');
-                                  }
-                                  if ($file->getSize() > 10240 * 1024) { // 10MB
-                                      $fail('Ukuran file terlalu besar. Maksimal 10MB.');
-                                  }
-                             } else {
-                                  // Saat update, value bisa string (URL lama/baru) atau null
-                                  if (!is_null($value) && !is_string($value)) {
-                                      $fail('Lampiran harus berupa file PDF atau Link Google Drive.');
-                                  }
-                             }
-                        }
-                    ],
+                    'attachment' => 'nullable|string',
                     'desc' => 'nullable|string',
                 ];
 
@@ -130,7 +104,7 @@ class MailRequest extends FormRequest
         return [
             'category_id.exists' => 'Kategori surat tidak valid.',
             'date.required' => 'Tanggal surat wajib diisi.',
-            'attachment.required' => 'Lampiran surat wajib diisi (File PDF atau Link Drive).',
+            'attachment.required' => 'Link lampiran surat wajib diisi.',
         ];
     }
 
