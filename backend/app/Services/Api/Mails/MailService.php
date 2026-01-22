@@ -28,7 +28,7 @@ class MailService
         $model = $this->getModel($type);
         $relations = ['mail_category', 'mail_log'];
         if ($type === 1) {
-            $relations[] = 'division';
+            $relations[] = 'divisions';
         }
         $query = $model::with($relations)->latest();
 
@@ -70,9 +70,16 @@ class MailService
             // Incoming - View Status
             if ($type === 1 && !empty($filters['view_status'])) {
                  if ($filters['view_status'] === 'read') {
-                      $query->whereNotNull('user_view_id');
+                      // Read = All assigned divisions have read (user_view_id IS NOT NULL)
+                      // Or strictly: Doesn't have any division with user_view_id NULL
+                      $query->whereDoesntHave('divisions', function($q) {
+                           $q->whereNull('incoming_mail_divisions.user_view_id');
+                      });
                  } elseif ($filters['view_status'] === 'unread') {
-                      $query->whereNull('user_view_id');
+                      // Unread = At least one assigned division has NOT read (user_view_id IS NULL)
+                      $query->whereHas('divisions', function($q) {
+                           $q->whereNull('incoming_mail_divisions.user_view_id');
+                      });
                  }
             }
         }
@@ -196,11 +203,17 @@ class MailService
 
         if ($mail && $type === 1) {
             $user = auth()->user();
-            // Logic: Update Last Read By if user belongs to the target division
-            if ($user && $mail->division_id && $user->division_id == $mail->division_id) {
-                // Always overwrite to track "Last Read By"
-                if ($mail->user_view_id !== $user->id) {
-                     $mail->update(['user_view_id' => $user->id]);
+            if ($user && $user->division_id) {
+                // Check if mail is disposed to this user's division
+                $pivot = DB::table('incoming_mail_divisions')
+                    ->where('incoming_mail_id', $mail->id)
+                    ->where('division_id', $user->division_id)
+                    ->first();
+
+                if ($pivot && is_null($pivot->user_view_id)) {
+                    DB::table('incoming_mail_divisions')
+                        ->where('id', $pivot->id)
+                        ->update(['user_view_id' => $user->id, 'updated_at' => now()]);
                 }
             }
         }
@@ -303,7 +316,7 @@ class MailService
         $mailStatus = null;
         $logStatus = null;
 
-        if (array_key_exists('division_id', $data)) {
+        if (array_key_exists('division_ids', $data)) {
             $mailStatus = 2; // Sekum Review / Edit Disposisi
             $logStatus = 2;
         } elseif (array_key_exists('follow_status', $data)) {
@@ -330,9 +343,10 @@ class MailService
             try {
                 $updateData = ['status' => $mailStatus];
 
-                if ($mailStatus === 2 && isset($data['division_id'])) {
-                    $updateData['division_id'] = $data['division_id'];
-                    $updateData['user_view_id'] = null; // Reset read status on new disposition
+                if ($mailStatus === 2 && isset($data['division_ids'])) {
+                     // Sync divisions
+                     $mail->divisions()->sync($data['division_ids']);
+                     // Note: We don't save single division_id anymore in incoming_mails
                 }
 
                 if (isset($data['follow_status'])) {
@@ -355,9 +369,7 @@ class MailService
                     ]
                 );
 
-                // Log::info('MailService: reviewed successfully', compact('id', 'type'));
-
-                return $mail->load('mail_log');
+                return $mail->load('mail_log', 'divisions');
             } catch (\Throwable $e) {
                 Log::error('[SERVICE] MAIL REVIEW: Gagal review', [
                     'id' => $id,
@@ -369,22 +381,22 @@ class MailService
             }
         });
 
-        // Send Email Notification to Division Leader if Disposition (Status 2)
-        if ($updatedMail && $mailStatus === 2) {
+        // Send Email Notification to Division Leaders if Disposition (Status 2)
+        if ($updatedMail && $mailStatus === 2 && isset($data['division_ids'])) {
             try {
-                $updatedMail->refresh(); // Reload to get new division relation
-                $leader = $updatedMail->division?->leader;
-                
-                if ($leader && $leader->email) {
-                    \Illuminate\Support\Facades\Mail::to($leader->email)
-                        ->send(new \App\Mail\DispositionNotification($updatedMail, $data['sekum_desc'] ?? ''));
-                    Log::info('[MAIL SERVICE] NOTIFIKASI: Email disposisi dikirim', ['email' => $leader->email]);
-                } else {
-                     Log::warning('[MAIL SERVICE] NOTIFIKASI: Gagal kirim email (tidak ada email leader)', ['division_id' => $updatedMail->division_id]);
+                $updatedMail->refresh(); 
+                foreach ($updatedMail->divisions as $division) {
+                    $leader = $division->leader;
+                    if ($leader && $leader->email) {
+                        \Illuminate\Support\Facades\Mail::to($leader->email)
+                            ->send(new \App\Mail\DispositionNotification($updatedMail, $data['sekum_desc'] ?? ''));
+                        Log::info('[MAIL SERVICE] NOTIFIKASI: Email disposisi dikirim', ['email' => $leader->email, 'division' => $division->name]);
+                    } else {
+                         Log::warning('[MAIL SERVICE] NOTIFIKASI: Gagal kirim email (tidak ada email leader)', ['division_id' => $division->id]);
+                    }
                 }
             } catch (\Exception $e) {
                 Log::error('[MAIL SERVICE] NOTIFIKASI: Gagal mengirim email', ['error' => $e->getMessage()]);
-                // Don't throw, just log. Transaction is already committed.
             }
         }
 

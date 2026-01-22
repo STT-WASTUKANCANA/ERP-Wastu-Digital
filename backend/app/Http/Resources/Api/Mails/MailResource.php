@@ -43,9 +43,14 @@ class MailResource extends JsonResource
             'follow_status' => $this->follow_status,
             'date'          => $this->date,
             'attachment'    => $this->attachment,
-            'division_id'   => $this->division_id,
-            'division_name' => $this->division?->name,
-            'user_view_id'  => $this->user_view_id,
+            'division_id'   => $this->divisions->first()?->id, // Legacy compatibility
+            'division_name' => $this->divisions->first()?->name, // Legacy compatibility
+            'divisions'     => $this->divisions->map(fn($d) => [
+                'id' => $d->id,
+                'name' => $d->name,
+                'is_read' => !is_null($d->pivot->user_view_id ?? null)
+            ]),
+            'user_view_id'  => $this->divisions->first()?->pivot->user_view_id ?? null, // Legacy approximation
             'desc'          => $tataLaksanaNotes->desc ?? null,
             'sekum_desc'    => $sekumDesc->desc ?? null,
             'division_desc' => $divisionDesc->desc ?? null,
