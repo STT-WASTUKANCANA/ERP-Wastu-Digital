@@ -14,6 +14,7 @@ import { DataDetailSheet } from "@/components/shared/data-detail-sheet";
 import { FiEdit, FiTrash2, FiCheckCircle, FiXCircle } from "react-icons/fi";
 
 import { ColumnSelectorModal } from "@/components/shared/column-selector-modal";
+import { showConfirm, showToast } from "@/lib/sweetalert";
 
 export default function DivisionTable() {
     const router = useRouter();
@@ -85,58 +86,63 @@ export default function DivisionTable() {
             router.push(`/workspace/manage/division/edit`);
             setSelectedDivision(null);
         } else if (action === "Delete") {
-            const confirmed = window.confirm("Hapus Divisi? Data yang dihapus tidak dapat dikembalikan.");
+            const confirmed = await showConfirm(
+                "Hapus Divisi?",
+                "Data yang dihapus tidak dapat dikembalikan."
+            );
 
-            if (confirmed) {
+            if (confirmed.isConfirmed) {
                 try {
                     const res = await deleteDivision(id);
                     if (res?.data?.status) {
-                        alert("Divisi berhasil dihapus");
+                        showToast("success", "Divisi berhasil dihapus");
                         fetchData();
                         setSelectedDivision(null);
                     } else {
-                        alert(res?.data?.message || "Terjadi kesalahan");
+                        showToast("error", res?.data?.message || "Terjadi kesalahan");
                     }
                 } catch (error) {
-                    alert("Error menghubungi server");
+                    showToast("error", "Error menghubungi server");
                 }
             }
         } else if (action === "Activate" || action === "Deactivate") {
             const isActivate = action === "Activate";
             const confirmMsg = isActivate ? "Aktifkan Divisi ini?" : "Nonaktifkan Divisi ini?";
+            const confirmText = isActivate ? "Divisi akan dapat digunakan kembali." : "Divisi tidak akan muncul dalam pilihan.";
 
-            if (window.confirm(confirmMsg)) {
+            const confirmed = await showConfirm(
+                confirmMsg,
+                confirmText
+            );
+
+            if (confirmed.isConfirmed) {
                 try {
-                    // Prepare data for update. Ideally we should fetch full data first or just send partial if allowed.
-                    // Assuming we need to send full body or at least required fields.
-                    // Since we don't have full data here easily without fetching, 
-                    // and update usually requires full body validation in this app's pattern,
-                    // let's try to find the item in local state first.
+                    // Prepare data for update.
                     const item = originalData.find(d => String(d.id) === id);
                     if (!item) {
-                        alert(`Error: Item with ID ${id} not found in local data.`);
+                        showToast("error", `Error: Item with ID ${id} not found in local data.`);
                         console.error('Item not found', { id, originalDataLength: originalData.length });
                     }
                     if (item) {
-                        // Only send the active field to avoid validation errors on other fields (e.g. leader_id)
+                        // Only send the active field
                         const payload: any = {
                             active: isActivate
                         };
 
-                        // alert(`Debug: Updating ID ${id} to active=${isActivate}`);
-
                         const res = await updateDivision(id, payload);
                         if (res?.data?.status) {
-                            alert(`Divisi berhasil ${isActivate ? 'diaktifkan' : 'dinonaktifkan'}`);
+                            showToast("success", `Divisi berhasil ${isActivate ? 'diaktifkan' : 'dinonaktifkan'}`);
                             fetchData();
+                            // If sidebar/modal is open, close it or re-fetch?
+                            // logic: fetchData updates list.
                         } else {
                             console.error("Update failed:", res);
-                            alert(res?.data?.message || "Gagal memperbarui status");
+                            showToast("error", res?.data?.message || "Gagal memperbarui status");
                         }
                     }
                 } catch (error) {
                     console.error(error);
-                    alert("Error updating status");
+                    showToast("error", "Error updating status");
                 }
             }
         }

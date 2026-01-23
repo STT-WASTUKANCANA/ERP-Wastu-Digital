@@ -17,6 +17,7 @@ import { FiEdit, FiTrash2 } from "react-icons/fi";
 import { ColumnSelectorModal } from "@/components/shared/column-selector-modal";
 import { FilterModal } from "@/components/shared/filter-modal";
 import { Select } from "@/components/ui/select";
+import { showConfirm, showToast } from "@/lib/sweetalert";
 
 const UserTable = ({ users, onUserUpdated, isLoading }: UserTableProps) => {
     const router = useRouter();
@@ -50,14 +51,20 @@ const UserTable = ({ users, onUserUpdated, isLoading }: UserTableProps) => {
         }
 
         if (action === "Delete") {
-            if (confirm("Yakin ingin menghapus user ini?")) {
+            const confirmed = await showConfirm(
+                "Yakin ingin menghapus user ini?",
+                "Tindakan ini tidak dapat dibatalkan."
+            );
+
+            if (confirmed.isConfirmed) {
                 try {
                     await deleteUser(Number(userId));
                     onUserUpdated();
                     setSelectedUser(null);
+                    showToast("success", "User berhasil dihapus");
                 } catch (error) {
                     console.error("Failed to delete user:", error);
-                    alert("Gagal menghapus user");
+                    showToast("error", "Gagal menghapus user");
                 }
             }
         }

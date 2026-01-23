@@ -13,6 +13,7 @@ import { BiLoaderAlt } from "react-icons/bi";
 import { FormWrapper } from "@/components/ui/form-wrapper";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { TextareaField } from "@/components/ui/textarea-field";
+import { showToast, showSuccessDialog, showAlert } from "@/lib/sweetalert";
 
 interface DivisionFormProps {
     id?: string;
@@ -59,7 +60,7 @@ export default function DivisionForm({ id }: DivisionFormProps) {
                 }
             } catch (error) {
                 console.error("Error fetching data:", error);
-                alert("Gagal memuat data");
+                showAlert("error", "Gagal Memuat Data", "Terjadi kesalahan saat memuat data divisi.");
             } finally {
                 setInitialLoading(false);
             }
@@ -79,17 +80,17 @@ export default function DivisionForm({ id }: DivisionFormProps) {
                 : await createDivision(formData);
 
             if (res?.ok) {
-                alert(`Divisi berhasil ${isEdit ? "udiupdate" : "dibuat"}`);
+                await showSuccessDialog("Berhasil", `Divisi berhasil ${isEdit ? "diupdate" : "dibuat"}`);
                 router.push("/workspace/manage/division");
             } else {
                 if (res?.status === 422 && res?.data?.errors) {
                     setErrors(res.data.errors);
                 } else {
-                    alert(res?.data?.message || "Terjadi kesalahan");
+                    showToast("error", res?.data?.message || "Terjadi kesalahan");
                 }
             }
         } catch (error) {
-            alert("Gagal menyimpan data");
+            showToast("error", "Gagal menyimpan data");
         } finally {
             setLoading(false);
         }

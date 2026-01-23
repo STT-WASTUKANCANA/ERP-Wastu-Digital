@@ -8,6 +8,7 @@ import { createUser, updateUser } from "@/lib/api/manage/users";
 import { UserFormData, Role, Division, User } from "@/types/features/user";
 import { FormWrapper } from "@/components/ui/form-wrapper";
 import { SubmitButton } from "@/components/ui/submit-button";
+import { showToast, showSuccessDialog } from "@/lib/sweetalert";
 
 interface UserFormProps {
     roles: Role[];
@@ -78,15 +79,15 @@ export default function UserForm({
                 const message = mode === "create"
                     ? "Pengguna berhasil ditambahkan."
                     : "Pengguna berhasil diperbarui.";
-                alert(message);
+                await showSuccessDialog("Berhasil", message);
                 router.push("/workspace/manage/user");
             } else {
                 const errorMessage = res.data?.error || res.data?.message || "Operasi gagal.";
-                alert(errorMessage);
+                showToast("error", errorMessage);
             }
         } catch (error) {
             console.error("Form submission error:", error);
-            alert("Terjadi kesalahan. Silakan coba lagi.");
+            showToast("error", "Terjadi kesalahan. Silakan coba lagi.");
         } finally {
             setLoading(false);
         }
