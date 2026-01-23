@@ -3,7 +3,9 @@
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { FileDropzone } from "@/components/ui/file-dropzone";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Input } from "@/components/ui/input";
+import { format } from "date-fns";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import { Select } from "@/components/ui/select";
 import { MultiSelect } from "@/components/ui/multi-select";
@@ -201,13 +203,14 @@ export default function IncomingForm({
           </div>
 
           <div>
-            <Input
+            <DatePicker
               label="Tanggal Surat"
-              id="date"
-              name="date"
-              type="date"
-              value={formData.date}
-              onChange={handleChange}
+              // name="date"
+              value={formData.date ? new Date(formData.date) : undefined}
+              onChange={(date) => {
+                const dateStr = date ? format(date, "yyyy-MM-dd") : "";
+                handleChange({ target: { name: 'date', value: dateStr } } as any);
+              }}
               disabled={isFieldDisabled}
               error={errors.date?.[0]}
             />

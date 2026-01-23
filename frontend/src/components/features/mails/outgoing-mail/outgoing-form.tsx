@@ -3,7 +3,9 @@
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { FileDropzone } from "@/components/ui/file-dropzone";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Input } from "@/components/ui/input";
+import { format } from "date-fns";
 import { Select } from "@/components/ui/select";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import { createOutgoingMail, updateOutgoingMail, validateOutgoingMail } from "@/lib/api/mails/outgoing";
@@ -206,20 +208,22 @@ export default function OutgoingForm({
           </div>
 
           <div className="col-span-2 md:col-span-1">
-            <Input
+            <DatePicker
               label="Tanggal Surat"
-              id="date"
-              name="date"
-              type="date"
-              value={formData.date}
-              onChange={handleChange}
+              // id="date"
+              // name="date"
+              value={formData.date ? new Date(formData.date) : undefined}
+              onChange={(date) => {
+                const dateStr = date ? format(date, "yyyy-MM-dd") : "";
+                handleChange({ target: { name: 'date', value: dateStr } } as any);
+              }}
               disabled={isReadOnly}
             />
           </div>
 
           <div className="col-span-2 md:col-span-1">
             <Input
-              label="Tujuan Surat / PIC"
+              label="Instansi"
               id="institute"
               name="institute"
               type="text"
@@ -232,7 +236,7 @@ export default function OutgoingForm({
 
           <div className="col-span-2 md:col-span-1">
             <Input
-              label="Tujuan Surat"
+              label="Tujuan Surat / PIC"
               id="purpose"
               name="purpose"
               type="text"
