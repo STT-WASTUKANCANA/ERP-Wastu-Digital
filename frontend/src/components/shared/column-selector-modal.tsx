@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
+import { showAlert } from "@/lib/sweetalert";
 // Checking if Checkbox exists first is better, but for now I'll use standard input type="checkbox" styled with Tailwind if specific component missing, 
 // OR I check for Checkbox component. 
 // Let's assume standard input for reliability or check first? 
@@ -52,7 +53,7 @@ export const ColumnSelectorModal = ({
     const handleSave = () => {
         // Validation: Ensure at least one column is visible
         if (tempHidden.length === columns.length) {
-            alert("Minimal satu kolom harus ditampilkan.");
+            showAlert("warning", "Minimal satu kolom harus ditampilkan.", "Silakan pilih setidaknya satu kolom untuk ditampilkan pada tabel.");
             return;
         }
         onSave(tempHidden);

@@ -2,21 +2,13 @@
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Toast } from "@/components/ui/toast"
 import { useSignin } from "@/hooks/features/auth/use-signin"
 import Link from "next/link"
-import { useState } from "react"
+import { showSuccessAlert, showToast } from "@/lib/sweetalert"
 
 export default function SigninForm() {
   const router = useRouter()
   const { loading, errors, generalError, success, signin } = useSignin()
-
-  const [showToast, setShowToast] = useState(false)
-  const [toastTitle, setToastTitle] = useState("")
-  const [toastMessage, setToastMessage] = useState("")
-  const [toastVariant, setToastVariant] = useState<"success" | "error">("success")
-
-  const TOAST_DURATION = 1500
 
   // Proses login & tampilkan feedback
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -31,16 +23,8 @@ export default function SigninForm() {
     const hasFieldErrors = result.data?.errors && Object.keys(result.data.errors).length > 0
 
     if (result.ok) {
-      setToastTitle("Berhasil")
-      setToastMessage(result.data?.message || "Berhasil masuk")
-      setToastVariant("success")
-
-      setShowToast(false)
-      setTimeout(() => setShowToast(true), 10)
-
-      setTimeout(() => {
-        router.push("/workspace/overview")
-      }, TOAST_DURATION)
+      await showSuccessAlert("Berhasil", result.data?.message || "Berhasil masuk");
+      router.push("/workspace/overview");
     } else {
       const message =
         result.data?.error?.toLowerCase().includes("unauthorized") ||
@@ -48,12 +32,7 @@ export default function SigninForm() {
           ? "Gagal masuk, silakan coba lagi."
           : generalError || "Terjadi kesalahan, silakan coba lagi."
 
-      setToastTitle("Error")
-      setToastMessage(message)
-      setToastVariant("error")
-
-      setShowToast(false)
-      setTimeout(() => setShowToast(true), 10)
+      showToast("error", message);
     }
   }
 
@@ -116,16 +95,7 @@ export default function SigninForm() {
           </Button>
         </form>
       </div>
-
-      {showToast && (
-        <Toast
-          title={toastTitle}
-          message={toastMessage}
-          variant={toastVariant}
-          duration={TOAST_DURATION}
-          showProgress={toastVariant === "success"}
-        />
-      )}
     </>
   )
 }
+

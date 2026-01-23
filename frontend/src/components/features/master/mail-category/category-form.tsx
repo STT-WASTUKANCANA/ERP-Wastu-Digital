@@ -9,6 +9,7 @@ import { BiLoaderAlt } from "react-icons/bi";
 import { FormWrapper } from "@/components/ui/form-wrapper";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { TextareaField } from "@/components/ui/textarea-field";
+import { showToast, showSuccessDialog, showAlert } from "@/lib/sweetalert";
 
 interface CategoryFormProps {
     id?: string;
@@ -48,7 +49,7 @@ export default function CategoryForm({ id }: CategoryFormProps) {
                         });
                     }
                 } catch (error) {
-                    alert("Gagal memuat data");
+                    showAlert("error", "Gagal Memuat Data", "Terjadi kesalahan saat memuat data kategori.");
                 } finally {
                     setInitialLoading(false);
                 }
@@ -71,17 +72,17 @@ export default function CategoryForm({ id }: CategoryFormProps) {
                 : await createMailCategory(formData);
 
             if (res?.ok) {
-                alert(`Kategori berhasil ${isEdit ? "diupdate" : "dibuat"}`);
+                await showSuccessDialog("Berhasil", `Kategori berhasil ${isEdit ? "diupdate" : "dibuat"}`);
                 router.push("/workspace/master/mail-category");
             } else {
                 if (res?.status === 422 && res?.data?.errors) {
                     setErrors(res.data.errors);
                 } else {
-                    alert(res?.data?.message || "Terjadi kesalahan");
+                    showToast("error", res?.data?.message || "Terjadi kesalahan");
                 }
             }
         } catch (error) {
-            alert("Gagal menyimpan data");
+            showToast("error", "Gagal menyimpan data");
         } finally {
             setLoading(false);
         }

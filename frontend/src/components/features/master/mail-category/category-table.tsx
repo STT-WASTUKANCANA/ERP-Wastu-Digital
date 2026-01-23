@@ -17,6 +17,7 @@ import { HiOutlineUpload } from "react-icons/hi";
 import { ColumnSelectorModal } from "@/components/shared/column-selector-modal";
 import { FilterModal } from "@/components/shared/filter-modal";
 import { Select } from "@/components/ui/select";
+import { showToast, showConfirm } from "@/lib/sweetalert";
 
 export default function CategoryTable() {
     const router = useRouter();
@@ -90,20 +91,23 @@ export default function CategoryTable() {
             router.push(`/workspace/master/mail-category/edit`);
             setSelectedCategory(null);
         } else if (action === "Delete") {
-            const confirmed = window.confirm("Hapus Kategori? Data yang dihapus tidak dapat dikembalikan.");
+            const confirmed = await showConfirm(
+                "Hapus Kategori?",
+                "Data yang dihapus tidak dapat dikembalikan."
+            );
 
-            if (confirmed) {
+            if (confirmed.isConfirmed) {
                 try {
                     const res = await deleteMailCategory(id);
                     if (res?.data?.status) {
-                        alert("Kategori berhasil dihapus");
+                        showToast("success", "Kategori berhasil dihapus");
                         fetchData();
                         setSelectedCategory(null);
                     } else {
-                        alert(res?.data?.message || "Terjadi kesalahan");
+                        showToast("error", res?.data?.message || "Terjadi kesalahan");
                     }
                 } catch (error) {
-                    alert("Error menghubungi server");
+                    showToast("error", "Error menghubungi server");
                 }
             }
         }
