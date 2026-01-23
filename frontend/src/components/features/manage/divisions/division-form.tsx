@@ -8,6 +8,7 @@ import { createDivision, updateDivision, getDivision } from "@/lib/api/manage/di
 import { getUserList } from "@/lib/api/manage/users";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 import { Select } from "@/components/ui/select";
 import { BiLoaderAlt } from "react-icons/bi";
 import { FormWrapper } from "@/components/ui/form-wrapper";
@@ -114,11 +115,11 @@ export default function DivisionForm({ id }: DivisionFormProps) {
             </div>
 
             <div className="col-span-full lg:col-span-1 w-full">
-                <Select
+                <SearchableSelect
                     label="Kepala Bidang (Leader)"
                     options={users}
                     value={formData.leader_id.toString()}
-                    onChange={(e) => setFormData({ ...formData, leader_id: e.target.value })}
+                    onChange={(val) => setFormData({ ...formData, leader_id: val })}
                     placeholder="Pilih Kepala Bidang"
                     error={errors.leader_id?.[0]}
                 />

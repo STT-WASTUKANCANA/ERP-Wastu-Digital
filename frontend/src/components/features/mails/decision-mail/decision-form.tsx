@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 // import { FileDropzone } from "@/components/ui/file-dropzone"; // Removed
 import { Input } from "@/components/ui/input";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 import { Select } from "@/components/ui/select";
 import { createDecisionMail, updateDecisionMail } from "@/lib/api/mails/decision";
 import { FormWrapper } from "@/components/ui/form-wrapper";
@@ -90,11 +91,11 @@ export default function DecisionForm({
         />
       </div>
       <div>
-        <Select
+        <SearchableSelect
           label="Kategori Surat"
-          name="category_id"
+          // name="category_id"
           value={formData.category_id}
-          onChange={handleChange}
+          onChange={(val) => handleChange({ target: { name: 'category_id', value: val } } as any)}
           placeholder="Pilih kategori"
           options={categories.map((cat) => ({ value: cat.id, label: cat.name }))}
         />

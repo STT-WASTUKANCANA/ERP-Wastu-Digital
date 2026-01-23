@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 import { Select } from "@/components/ui/select";
 import { createUser, updateUser } from "@/lib/api/manage/users";
 import { UserFormData, Role, Division, User } from "@/types/features/user";
@@ -122,12 +123,12 @@ export default function UserForm({
             </div>
 
             <div className="col-span-full lg:col-span-1 w-full">
-                <Select
+                <SearchableSelect
                     label="Role"
-                    id="role_id"
-                    name="role_id"
+                    // id="role_id"
+                    // name="role_id"
                     value={formData.role_id?.toString() || ""}
-                    onChange={handleChange}
+                    onChange={(val) => handleChange({ target: { name: 'role_id', value: val } } as any)}
                     placeholder="Pilih role"
                     options={roles.map((role) => ({
                         value: role.id,
@@ -137,12 +138,12 @@ export default function UserForm({
             </div>
 
             <div className="col-span-full lg:col-span-1 w-full">
-                <Select
+                <SearchableSelect
                     label="Divisi"
-                    id="division_id"
-                    name="division_id"
+                    // id="division_id"
+                    // name="division_id"
                     value={formData.division_id?.toString() || ""}
-                    onChange={handleChange}
+                    onChange={(val) => handleChange({ target: { name: 'division_id', value: val } } as any)}
                     placeholder="Pilih divisi"
                     options={divisions.map((division) => ({
                         value: division.id,

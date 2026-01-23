@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { FileDropzone } from "@/components/ui/file-dropzone";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 import { createOutgoingMail, updateOutgoingMail, validateOutgoingMail } from "@/lib/api/mails/outgoing";
 import { FormWrapper } from "@/components/ui/form-wrapper";
 import { TextareaField } from "@/components/ui/textarea-field";
@@ -187,12 +188,12 @@ export default function OutgoingForm({
           </div>
 
           <div className="col-span-2 md:col-span-1">
-            <Select
+            <SearchableSelect
               label="Kategori Surat"
-              id="category_id"
-              name="category_id"
+              // id="category_id"
+              // name="category_id"
               value={formData.category_id}
-              onChange={handleChange}
+              onChange={(val) => handleChange({ target: { name: 'category_id', value: val } } as any)}
               placeholder="Pilih kategori"
               disabled={isReadOnly}
               options={categories
