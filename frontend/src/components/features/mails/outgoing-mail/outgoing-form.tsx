@@ -13,6 +13,7 @@ import { SubmitButton } from "@/components/ui/submit-button";
 import { FormCard } from "@/components/ui/form-card";
 
 import { OutgoingFormProps } from "@/types/features/mail/outgoing";
+import { showToast, showSuccessDialog } from "@/lib/sweetalert";
 
 export default function OutgoingForm({
   categories,
@@ -111,10 +112,10 @@ export default function OutgoingForm({
         : await createOutgoingMail(data);
 
     if (res.ok) {
-      alert(mode === "edit" ? "Surat berhasil diperbarui." : "Surat berhasil dibuat.");
-      router.push("/workspace/mail/outgoing");
+      await showSuccessDialog("Berhasil", mode === "edit" ? "Surat berhasil diperbarui." : "Surat berhasil dibuat.");
+      router.push("/workspace/mails/outgoing");
     } else {
-      alert("Operasi gagal.");
+      showToast("error", "Operasi gagal.");
     }
 
     setLoading(false);
@@ -127,14 +128,14 @@ export default function OutgoingForm({
     setLoading(true);
     const res = await validateOutgoingMail(Number(initialData.id), validationStatus, validationNote);
     if (res.ok) {
-      alert("Status surat berhasil diperbarui.");
-      router.push("/workspace/mail/outgoing");
+      await showSuccessDialog("Berhasil", "Status surat berhasil diperbarui.");
+      router.push("/workspace/mails/outgoing");
     } else {
       try {
         const errorData = res.data;
-        alert(`Gagal memvalidasi surat: ${res.status} - ${errorData?.message || JSON.stringify(errorData)}`);
+        showToast("error", `Gagal memvalidasi surat: ${res.status} - ${errorData?.message || JSON.stringify(errorData)}`);
       } catch (e) {
-        alert(`Gagal memvalidasi surat: ${res.status}`);
+        showToast("error", `Gagal memvalidasi surat: ${res.status}`);
       }
     }
     setLoading(false);

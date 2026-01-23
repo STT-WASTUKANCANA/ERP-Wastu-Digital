@@ -11,6 +11,7 @@ import {
 } from "@/lib/api/mails/outgoing";
 import { detailDecisionMail, getMailCategories as getDecisionCategories } from "@/lib/api/mails/decision";
 import { getDivisionList } from "@/lib/api/manage/division";
+import { showToast, showAlert } from "@/lib/sweetalert";
 
 type MailCategory = any;
 type MailDetail = any;
@@ -46,7 +47,7 @@ export function useMailPageData({
     }
 
     if (!mailId) {
-      alert("No mail selected. Redirecting...");
+      showToast("error", "No mail selected. Redirecting...");
       window.location.href = redirectUrl;
       return;
     }
@@ -91,7 +92,7 @@ export function useMailPageData({
         }
       } catch (error) {
         console.error("Failed to fetch mail data:", error);
-        alert("Unable to load the mail details. Please try again later.");
+        showAlert("error", "Gagal Memuat Data", "Unable to load the mail details. Please try again later.");
       } finally {
         setIsLoading(false);
       }

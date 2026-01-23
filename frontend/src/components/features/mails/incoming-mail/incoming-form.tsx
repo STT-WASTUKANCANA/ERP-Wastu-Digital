@@ -18,6 +18,7 @@ import { SubmitButton } from "@/components/ui/submit-button";
 import { FormCard } from "@/components/ui/form-card";
 
 import { IncomingFormProps } from "@/types/features/mail/incoming";
+import { showToast, showSuccessDialog } from "@/lib/sweetalert";
 
 export default function IncomingForm({
   categories,
@@ -139,18 +140,22 @@ export default function IncomingForm({
           review: "Surat berhasil ditinjau.",
           division_review: "Status berhasil diperbarui.",
         };
-        alert(messages[mode]);
-        router.push("/workspace/mail/incoming");
+        // Use showToast for these as they are redirects, or showSuccessAlert if we want to block until acknowledged?
+        // Usually creation/edit followed by redirect uses toast or a quick alert.
+        // Given user asked for "login berhasil pake sweet alert muncul ditengah", but others "menyesuaikan".
+        // A toast is better for form submission success followed by redirect.
+        await showSuccessDialog("Berhasil", messages[mode]);
+        router.push("/workspace/mails/incoming");
       } else {
         console.error("API Error:", res);
         if (res?.data?.errors) {
           setErrors(res.data.errors);
         }
-        alert(`Operasi gagal: ${res?.data?.message || 'Unknown error'}`);
+        showToast("error", `Operasi gagal: ${res?.data?.message || 'Unknown error'}`);
       }
     } catch (error) {
       console.error("Form submission error:", error);
-      alert(`Terjadi kesalahan: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      showToast("error", `Terjadi kesalahan: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setLoading(false);
     }

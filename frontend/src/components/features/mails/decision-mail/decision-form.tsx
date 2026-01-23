@@ -12,6 +12,7 @@ import { PdfPreview } from "@/components/ui/pdf-preview";
 import { SubmitButton } from "@/components/ui/submit-button";
 
 import { DecisionFormProps } from "@/types/features/mail/decision";
+import { showToast, showSuccessDialog } from "@/lib/sweetalert";
 
 export default function DecisionForm({
   categories,
@@ -68,10 +69,10 @@ export default function DecisionForm({
       : await createDecisionMail(data);
 
     if (res.ok) {
-      alert(mode === "edit" ? "Surat keputusan diperbarui." : "Surat keputusan dibuat.");
-      router.push("/workspace/mail/decision");
+      await showSuccessDialog("Berhasil", mode === "edit" ? "Surat keputusan diperbarui." : "Surat keputusan dibuat.");
+      router.push("/workspace/mails/decision");
     } else {
-      alert("Operasi gagal.");
+      showToast("error", "Operasi gagal.");
     }
 
     setLoading(false);
