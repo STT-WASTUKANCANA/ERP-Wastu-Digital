@@ -148,7 +148,7 @@ export default function IncomingForm({
         // Given user asked for "login berhasil pake sweet alert muncul ditengah", but others "menyesuaikan".
         // A toast is better for form submission success followed by redirect.
         await showSuccessDialog("Berhasil", messages[mode]);
-        router.push("/workspace/mails/incoming");
+        router.push("/workspace/mail/incoming");
       } else {
         console.error("API Error:", res);
         if (res?.data?.errors) {
