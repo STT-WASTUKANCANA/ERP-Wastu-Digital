@@ -55,3 +55,9 @@ export async function deleteDecisionMail(id: number) {
                 method: "DELETE",
         });
 }
+
+export async function getLatestDecisionNumber(date: string) {
+        return await fetchWithAuth(`/mails/decision/latest-number?date=${date}`, {
+                method: "GET",
+        });
+}

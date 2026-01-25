@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { format } from "date-fns";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import { Select } from "@/components/ui/select";
-import { createDecisionMail, updateDecisionMail } from "@/lib/api/mails/decision";
+import { createDecisionMail, updateDecisionMail, getLatestDecisionNumber } from "@/lib/api/mails/decision";
 import { FormWrapper } from "@/components/ui/form-wrapper";
 import { TextareaField } from "@/components/ui/textarea-field";
 import { PdfPreview } from "@/components/ui/pdf-preview";
@@ -53,6 +53,24 @@ export default function DecisionForm({
     }
   }, [initialData, categories]);
 
+  useEffect(() => {
+    const fetchNumber = async () => {
+      if (mode === 'create' && formData.date) {
+        try {
+          const res = await getLatestDecisionNumber(formData.date);
+          // @ts-ignore
+          if (res.ok && res.data?.data?.number) {
+            // @ts-ignore
+            setFormData(prev => ({ ...prev, number: res.data.data.number }));
+          }
+        } catch (e) {
+          console.error("Failed to fetch number", e);
+        }
+      }
+    };
+    fetchNumber();
+  }, [formData.date, mode]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -73,7 +91,7 @@ export default function DecisionForm({
 
     if (res.ok) {
       await showSuccessDialog("Berhasil", mode === "edit" ? "Surat keputusan diperbarui." : "Surat keputusan dibuat.");
-      router.push("/workspace/mails/decision");
+      router.push("/workspace/mail/decision");
     } else {
       showToast("error", "Operasi gagal.");
     }
@@ -83,13 +101,15 @@ export default function DecisionForm({
 
   return (
     <FormWrapper onSubmit={handleSubmit}>
-      <div className="col-span-2">
-        <Input
-          label="Nomor Surat"
-          name="number"
-          value={formData.number}
-          onChange={handleChange}
-          placeholder="Contoh: SK-001/IX/2025"
+      <div>
+        <DatePicker
+          label="Tanggal Surat"
+          // name="date"
+          value={formData.date ? new Date(formData.date) : undefined}
+          onChange={(date) => {
+            const dateStr = date ? format(date, "yyyy-MM-dd") : "";
+            handleChange({ target: { name: 'date', value: dateStr } } as any);
+          }}
         />
       </div>
       <div>
@@ -102,17 +122,17 @@ export default function DecisionForm({
           options={categories.map((cat) => ({ value: cat.id, label: cat.name }))}
         />
       </div>
-      <div>
-        <DatePicker
-          label="Tanggal Surat"
-          // name="date"
-          value={formData.date ? new Date(formData.date) : undefined}
-          onChange={(date) => {
-            const dateStr = date ? format(date, "yyyy-MM-dd") : "";
-            handleChange({ target: { name: 'date', value: dateStr } } as any);
-          }}
+      <div className="col-span-2">
+        <Input
+          label="Nomor Surat"
+          name="number"
+          value={formData.number}
+          onChange={handleChange}
+          placeholder="Contoh: SK-001/IX/2025"
         />
       </div>
+
+
       <div className="col-span-2">
         <Input
           label="Judul Surat"

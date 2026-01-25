@@ -69,3 +69,9 @@ export async function validateOutgoingMail(id: number, status: string, note?: st
                 body: JSON.stringify({ status, note }),
         });
 }
+
+export async function getLatestOutgoingNumber(date: string) {
+        return await fetchWithAuth(`/mails/outgoing/latest-number?date=${date}`, {
+                method: "GET",
+        });
+}

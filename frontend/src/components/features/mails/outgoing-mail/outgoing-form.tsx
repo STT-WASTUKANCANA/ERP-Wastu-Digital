@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { format } from "date-fns";
 import { Select } from "@/components/ui/select";
 import { SearchableSelect } from "@/components/ui/searchable-select";
-import { createOutgoingMail, updateOutgoingMail, validateOutgoingMail } from "@/lib/api/mails/outgoing";
+import { createOutgoingMail, updateOutgoingMail, validateOutgoingMail, getLatestOutgoingNumber } from "@/lib/api/mails/outgoing";
 import { FormWrapper } from "@/components/ui/form-wrapper";
 import { TextareaField } from "@/components/ui/textarea-field";
 import { PdfPreview } from "@/components/ui/pdf-preview";
@@ -80,9 +80,29 @@ export default function OutgoingForm({
         setValidationNote(initialData.validation_note);
       }
 
+
       // If approved, we might want to fill validation fields from log if available, but for now just Read Only form
     }
   }, [initialData, categories]);
+
+  useEffect(() => {
+    const fetchNumber = async () => {
+      if (mode === 'create' && formData.date) {
+        try {
+          const res = await getLatestOutgoingNumber(formData.date);
+          // @ts-ignore
+          if (res.ok && res.data?.data?.number) {
+            // @ts-ignore
+            setFormData(prev => ({ ...prev, number: res.data.data.number }));
+          }
+        } catch (error) {
+          console.error("Failed to fetch number", error);
+        }
+      }
+    };
+
+    fetchNumber();
+  }, [formData.date, mode]);
 
 
   const handleChange = (
@@ -116,7 +136,7 @@ export default function OutgoingForm({
 
     if (res.ok) {
       await showSuccessDialog("Berhasil", mode === "edit" ? "Surat berhasil diperbarui." : "Surat berhasil dibuat.");
-      router.push("/workspace/mails/outgoing");
+      router.push("/workspace/mail/outgoing");
     } else {
       showToast("error", "Operasi gagal.");
     }
@@ -132,7 +152,7 @@ export default function OutgoingForm({
     const res = await validateOutgoingMail(Number(initialData.id), validationStatus, validationNote);
     if (res.ok) {
       await showSuccessDialog("Berhasil", "Status surat berhasil diperbarui.");
-      router.push("/workspace/mails/outgoing");
+      router.push("/workspace/mail/outgoing");
     } else {
       try {
         const errorData = res.data;
@@ -176,15 +196,14 @@ export default function OutgoingForm({
 
       <FormCard>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 gap-y-8">
-          <div className="col-span-2">
-            <Input
-              label="Nomor Surat"
-              id="number"
-              name="number"
-              type="text"
-              value={formData.number}
-              onChange={handleChange}
-              placeholder="Contoh: OUT-001/STT/2025"
+          <div className="col-span-2 md:col-span-1">
+            <DatePicker
+              label="Tanggal Surat"
+              value={formData.date ? new Date(formData.date) : undefined}
+              onChange={(date) => {
+                const dateStr = date ? format(date, "yyyy-MM-dd") : "";
+                handleChange({ target: { name: 'date', value: dateStr } } as any);
+              }}
               disabled={isReadOnly}
             />
           </div>
@@ -192,8 +211,6 @@ export default function OutgoingForm({
           <div className="col-span-2 md:col-span-1">
             <SearchableSelect
               label="Kategori Surat"
-              // id="category_id"
-              // name="category_id"
               value={formData.category_id}
               onChange={(val) => handleChange({ target: { name: 'category_id', value: val } } as any)}
               placeholder="Pilih kategori"
@@ -207,16 +224,15 @@ export default function OutgoingForm({
             />
           </div>
 
-          <div className="col-span-2 md:col-span-1">
-            <DatePicker
-              label="Tanggal Surat"
-              // id="date"
-              // name="date"
-              value={formData.date ? new Date(formData.date) : undefined}
-              onChange={(date) => {
-                const dateStr = date ? format(date, "yyyy-MM-dd") : "";
-                handleChange({ target: { name: 'date', value: dateStr } } as any);
-              }}
+          <div className="col-span-2">
+            <Input
+              label="Nomor Surat"
+              id="number"
+              name="number"
+              type="text"
+              value={formData.number}
+              onChange={handleChange}
+              placeholder="Contoh: OUT-001/STT/2025"
               disabled={isReadOnly}
             />
           </div>
@@ -286,7 +302,6 @@ export default function OutgoingForm({
             />
           </div>
 
-
           {!isSekumVerification && !isCreatorReadOnly && (
             <div className="col-span-2">
               <SubmitButton
@@ -298,50 +313,48 @@ export default function OutgoingForm({
         </div>
       </FormCard>
 
-      {
-        isSekumVerification && (
-          <FormCard className="mt-4">
-            <div className="space-y-8">
-              <div>
-                <Select
-                  label="Validasi Sekum"
-                  options={[
-                    { value: '4', label: 'Ditolak' },
-                    { value: '2', label: 'Perlu Perbaikan' },
-                    { value: '3', label: 'Disetujui' },
-                  ]}
-                  value={validationStatus}
-                  onChange={(e) => setValidationStatus(e.target.value)}
-                  placeholder="Pilih Status Validasi"
-                />
-              </div>
-
-              <TextareaField
-                label="Catatan Sekretaris Umum"
-                id="validationNote"
-                name="validationNote"
-                value={validationNote}
-                onChange={(e) => setValidationNote(e.target.value)}
-                placeholder="Tulis catatan atau alasan validasi..."
+      {isSekumVerification && (
+        <FormCard className="mt-4">
+          <div className="space-y-8">
+            <div>
+              <Select
+                label="Validasi Sekum"
+                options={[
+                  { value: '4', label: 'Ditolak' },
+                  { value: '2', label: 'Perlu Perbaikan' },
+                  { value: '3', label: 'Disetujui' },
+                ]}
+                value={validationStatus}
+                onChange={(e) => setValidationStatus(e.target.value)}
+                placeholder="Pilih Status Validasi"
               />
-
-              <div className="col-span-2">
-                {/* Only show Save button if status is 1 (Verifikasi Sekum/Pending) */}
-                {(initialData?.status === 1 || initialData?.status === '1') && (
-                  <button
-                    type="button"
-                    onClick={handleValidation}
-                    disabled={!validationStatus || loading}
-                    className="bg-primary text-white hover:bg-primary/90 px-6 py-2 rounded-md h-10 disabled:opacity-50 w-full"
-                  >
-                    {loading ? 'Processing...' : 'Simpan Status'}
-                  </button>
-                )}
-              </div>
             </div>
-          </FormCard>
-        )
-      }
+
+            <TextareaField
+              label="Catatan Sekretaris Umum"
+              id="validationNote"
+              name="validationNote"
+              value={validationNote}
+              onChange={(e) => setValidationNote(e.target.value)}
+              placeholder="Tulis catatan atau alasan validasi..."
+            />
+
+            <div className="col-span-2">
+              {/* Only show Save button if status is 1 (Verifikasi Sekum/Pending) */}
+              {(initialData?.status === 1 || initialData?.status === '1') && (
+                <button
+                  type="button"
+                  onClick={handleValidation}
+                  disabled={!validationStatus || loading}
+                  className="bg-primary text-white hover:bg-primary/90 px-6 py-2 rounded-md h-10 disabled:opacity-50 w-full"
+                >
+                  {loading ? 'Processing...' : 'Simpan Status'}
+                </button>
+              )}
+            </div>
+          </div>
+        </FormCard>
+      )}
 
     </form >
   );
