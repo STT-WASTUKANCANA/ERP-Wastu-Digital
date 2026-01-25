@@ -48,6 +48,8 @@ export default function OutgoingForm({
     status: 0,
   });
 
+  const [protectedPrefix, setProtectedPrefix] = useState<string>("");
+
   useEffect(() => {
     if (initialData) {
       const matchedCategoryId =
@@ -93,7 +95,9 @@ export default function OutgoingForm({
           // @ts-ignore
           if (res.ok && res.data?.data?.number) {
             // @ts-ignore
-            setFormData(prev => ({ ...prev, number: res.data.data.number }));
+            const num = res.data.data.number;
+            setFormData(prev => ({ ...prev, number: num }));
+            setProtectedPrefix(num); // Set the prefix to protect
           }
         } catch (error) {
           console.error("Failed to fetch number", error);
@@ -109,6 +113,21 @@ export default function OutgoingForm({
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newVal = e.target.value;
+    if (mode === 'create' && protectedPrefix) {
+      // If user tries to delete part of the prefix, ignore the change or reset to prefix
+      if (!newVal.startsWith(protectedPrefix)) {
+        // If the new value is shorter than prefix but matches the start, it means they are deleting.
+        // We force it back to protectedPrefix.
+        // Or if they try to change the prefix characters.
+        setFormData({ ...formData, number: protectedPrefix });
+        return;
+      }
+    }
+    setFormData({ ...formData, number: newVal });
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -216,7 +235,6 @@ export default function OutgoingForm({
               placeholder="Pilih kategori"
               disabled={isReadOnly}
               options={categories
-                .filter((cat) => roleId === 3 ? cat.type === '3' : true)
                 .map((cat) => ({
                   value: cat.id,
                   label: cat.name,
@@ -231,9 +249,8 @@ export default function OutgoingForm({
               name="number"
               type="text"
               value={formData.number}
-              onChange={handleChange}
+              onChange={handleNumberChange}
               placeholder="Contoh: OUT-001/STT/2025"
-              disabled={isReadOnly}
             />
           </div>
 
