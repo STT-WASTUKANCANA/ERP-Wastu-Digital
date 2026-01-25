@@ -46,10 +46,42 @@ export const Sidebar: React.FC<SidebarProps> = ({
   // They should only see "Dasbor" and "Surat".
   // Admin (roleId null/undefined) sees everything.
   const filteredNavLinks = React.useMemo(() => {
-    if (roleId === 1 || roleId === 2 || roleId === 3 || roleId === 4) {
-      return navLinks.filter((section) =>
+    // Pulahta (3): Outgoing & Decision, No Incoming
+    // Tata Laksana (1) & Pegawai (4) & Others: Incoming & Outgoing, No Decision
+    if (roleId) {
+      // 1. Filter Sections (Only Dasbor & Surat for restricted roles)
+      const allowedSections = navLinks.filter((section) =>
         section.title === "Dasbor" || section.title === "Surat"
       );
+
+      // 2. Filter Links inside "Surat" section based on Role
+      return allowedSections.map(section => {
+        if (section.title === "Surat") {
+          let allowedLinks = section.links;
+
+          if (roleId === 3) {
+            // Pulahta: Hide 'Surat Masuk'
+            allowedLinks = section.links.filter(link => link.name !== "Surat Masuk");
+          } else {
+            // Tata Laksana (1), Pegawai (4), assuming Sekum (2) sees all or has different logic? 
+            // The prompt implies 1 & 4. Let's assume non-Pulahta restricted users hide "Surat Keputusan"
+            // Wait, existing logic was (roleId === 1 || roleId === 2 || roleId === 3 || roleId === 4).
+            // Sekum (2) usually needs to see Decision? Prompt didn't specify Sekum. 
+            // Let's stick to the explicit request:
+            // "pulahta hanya bisa akses ... surat keluar dan keputusan"
+            // "tata laksana dan pegawai ... surat masuk dan keluar"
+
+            if (roleId === 1 || roleId === 4) {
+              allowedLinks = section.links.filter(link => link.name !== "Surat Keputusan");
+            }
+            // For Sekum (2), we leave it as is (sees all 3) or filter? 
+            // Usually Sekum needs to see all. Let's start with this.
+          }
+
+          return { ...section, links: allowedLinks };
+        }
+        return section;
+      });
     }
     return navLinks;
   }, [roleId]);
@@ -149,8 +181,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   key={linkIdx}
                   href={link.href || "#"}
                   className={`h-11 px-3 rounded-md flex items-center gap-3 text-sm font-medium transition ${pathname.startsWith(link.href)
-                      ? "text-primary bg-primary/20"
-                      : "text-foreground/60 hover:text-primary hover:bg-primary/10"
+                    ? "text-primary bg-primary/20"
+                    : "text-foreground/60 hover:text-primary hover:bg-primary/10"
                     }`}
                 >
                   {Icon && <Icon className="w-4 h-4" />}
