@@ -36,6 +36,8 @@ export default function DecisionForm({
     status: 0,
   });
 
+  const [protectedPrefix, setProtectedPrefix] = useState<string>("");
+
   useEffect(() => {
     if (initialData) {
       const matchedCategoryId =
@@ -61,7 +63,9 @@ export default function DecisionForm({
           // @ts-ignore
           if (res.ok && res.data?.data?.number) {
             // @ts-ignore
-            setFormData(prev => ({ ...prev, number: res.data.data.number }));
+            const num = res.data.data.number;
+            setFormData(prev => ({ ...prev, number: num }));
+            setProtectedPrefix(num);
           }
         } catch (e) {
           console.error("Failed to fetch number", e);
@@ -73,6 +77,17 @@ export default function DecisionForm({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newVal = e.target.value;
+    if (mode === 'create' && protectedPrefix) {
+      if (!newVal.startsWith(protectedPrefix)) {
+        setFormData({ ...formData, number: protectedPrefix });
+        return;
+      }
+    }
+    setFormData({ ...formData, number: newVal });
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -127,7 +142,7 @@ export default function DecisionForm({
           label="Nomor Surat"
           name="number"
           value={formData.number}
-          onChange={handleChange}
+          onChange={handleNumberChange}
           placeholder="Contoh: SK-001/IX/2025"
         />
       </div>

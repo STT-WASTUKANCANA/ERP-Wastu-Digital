@@ -11,8 +11,8 @@ export default async function Page() {
         return (
                 <div className="space-y-8 lg:px-24 xl:px-56">
                         <PageHeader
-                                title="Buat Surat Keluar"
-                                description="Lengkapi formulir berikut untuk menambah data surat keluar baru."
+                                title="Buat Surat Keputusan"
+                                description="Lengkapi formulir berikut untuk menambah data surat keputusan baru."
                         >
                                 <Button
                                         color="bg-background"
