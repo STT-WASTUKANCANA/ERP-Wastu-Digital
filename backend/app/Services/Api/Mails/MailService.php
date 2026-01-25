@@ -138,23 +138,21 @@ class MailService
                     }
                 }
 
-                // --- SEQUENCE LOGIC START ---
-                // Calculate and assign 'sequence' for Outgoing (2) and Decision (3)
+                // Shared Sequence Logic for Outgoing (2) & Decision (3)
                 if ($type === 2 || $type === 3) {
                      $inputDate = strtotime($data['date']);
-                     $today = strtotime(date('Y-m-d')); // Compare with simple date (no time)
+                     $today = strtotime(date('Y-m-d'));
 
                      if ($inputDate < $today) {
-                         // Backdate: Do NOT assign new sequence (NULL) to preserve global counter.
+                         // Backdate: Sequence is NULL to preserve global counter.
                          $data['sequence'] = null;
                      } else {
-                         // Today or Future: Increment global sequence.
+                         // Regular: Increment global sequence based on Year.
                          $year = date('Y', $inputDate);
                          $latestSeq = $this->getLatestSequenceInteger($type, $year);
                          $data['sequence'] = $latestSeq + 1;
                      }
                 }
-                // --- SEQUENCE LOGIC END ---
 
                 // Log::info('Mail: Created Data', ['type' => $type, 'data' => $data]);
                 $model = $this->getModel($type);
@@ -187,7 +185,7 @@ class MailService
         });
     }
 
-    // New helper to get the raw integer sequence
+    // Get raw integer sequence for calculating next number
     private function getLatestSequenceInteger(int $type, string $year): int
     {
         $typesToCheck = ($type === 2 || $type === 3) ? [2, 3] : [$type];
@@ -196,7 +194,7 @@ class MailService
         foreach ($typesToCheck as $t) {
             $model = $this->getModel($t);
             if ($model) {
-                // Try getting Max Sequence from DB
+                // Primary: Try getting Max Sequence from DB
                 $max = $model::whereYear('date', $year)->max('sequence');
                 if ($max > $maxSeq) {
                     $maxSeq = $max;
@@ -204,8 +202,7 @@ class MailService
             }
         }
         
-        // If maxSeq is still 0, it means either empty DB OR legacy data (null sequence).
-        // Fallback: Check for legacy data using string parsing
+        // Fallback: If sequence is missing (legacy data), check string number.
         if ($maxSeq === 0) {
              $legacyMax = 0;
              foreach ($typesToCheck as $t) {
@@ -236,9 +233,7 @@ class MailService
         $year = date('Y', $inputDate);
 
         if ($inputDate < $today) {
-            // BACKDATE LOGIC:
-            // Find the latest mail (merged types) where date <= $inputDate AND year == $year
-            // Return its number AS IS (without +1).
+            // Backdate Logic: Find latest number <= date, do NOT increment.
             $typesToCheck = ($type === 2 || $type === 3) ? [2, 3] : [$type];
             $latestNumber = null;
             $latestDate = null;
@@ -246,39 +241,27 @@ class MailService
             foreach ($typesToCheck as $t) {
                 $model = $this->getModel($t);
                 if ($model) {
-                    // Get latest item on or before the date
+                    // Get latest mail on or before the target date
                     $item = $model::whereDate('date', '<=', $dateString)
                         ->whereYear('date', $year)
                         ->orderBy('date', 'desc')
-                        // For same date, order by ID (creation time) or number desc
                         ->orderBy('id', 'desc') 
                         ->first();
                     
                     if ($item) {
-                        // Compare dates to find the absolute latest across types
-                        if (!$latestDate || strtotime($item->date) > $latestDate) {
+                         // Find the most recent among checked types
+                        if (!$latestDate || strtotime($item->date) >= $latestDate) {
                             $latestDate = strtotime($item->date);
                             $latestNumber = $item->number;
-                        } elseif (strtotime($item->date) == $latestDate) {
-                             $latestNumber = $item->number; 
                         }
                     }
                 }
             }
             
-            // Best Practice: Prefer 'sequence' column if available (Clean Integer Source)
+            // Prefer clean sequence if available
             if ($latestNumber) {
-                // If the found item has a sequence number, use it directly (Most Robust)
-                // Note: We need to fetch 'sequence' in the query above first.
-                // Re-fetch object or ensure $item contains sequence. 
-                // Since we used ->first(), $item is an object.
-                
-                if (isset($item->sequence) && $item->sequence > 0) {
-                     return str_pad($item->sequence, 4, '0', STR_PAD_LEFT);
-                }
-
-                // Fallback (Pragmatic): If sequence is NULL (e.g. it was a backdate itself), 
-                // parse the string 'number' using Regex.
+                // Re-find object to check sequence if needed, but for now relying on regex fallback is fine for simple display
+                // Or simplified regex extraction
                 if (preg_match('/^(\d{4})/', $latestNumber, $matches)) {
                     return $matches[1];
                 }
@@ -287,8 +270,7 @@ class MailService
             return '0000';
             
         } else {
-            // TODAY/FUTURE LOGIC: 
-            // Standard Global Sequence (Max + 1)
+             // Standard Logic: Max Sequence + 1
             $maxSeq = $this->getLatestSequenceInteger($type, $year);
             return str_pad($maxSeq + 1, 4, '0', STR_PAD_LEFT);
         }
