@@ -242,8 +242,9 @@ class MailController extends Controller
                 return response()->json(['status' => false, 'message' => 'Date is required'], 400);
             }
 
+            // We pass the full date string to the service to handle backdate logic
+            $number = $this->service->getLatestNumber($type, $date);
             $year = date('Y', strtotime($date));
-            $number = $this->service->getLatestNumber($type, $year);
 
             return response()->json([
                 'status' => true,
