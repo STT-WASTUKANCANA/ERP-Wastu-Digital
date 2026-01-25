@@ -402,4 +402,25 @@ class MailService
 
         return $updatedMail;
     }
+
+    public function getLatestNumber(int $type, string $year): string
+    {
+        $model = $this->getModel($type);
+        if (!$model) return '0001';
+
+        // Ambil semua nomor surat pada tahun yang dipilih
+        // Asumsi kolom 'date' ada dan valid
+        $numbers = $model::whereYear('date', $year)->pluck('number');
+
+        $max = 0;
+        foreach ($numbers as $num) {
+            // Ambil 4 digit pertama sebagai nomor urut
+            if (preg_match('/^(\d{4})/', $num, $matches)) {
+                $val = intval($matches[1]);
+                if ($val > $max) $max = $val;
+            }
+        }
+
+        return str_pad($max + 1, 4, '0', STR_PAD_LEFT);
+    }
 }

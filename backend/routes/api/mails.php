@@ -36,6 +36,7 @@ Route::middleware('auth:api')
 
                         Route::get('/', 'index')->name('index');
                         Route::get('/summary', 'summary')->name('summary');
+                        Route::get('/latest-number', 'latestNumber')->name('latestNumber');
                         Route::post('/', 'store')->name('store');
                         Route::get('/{id}', 'show')->name('show');
                         Route::put('/{id}', 'update')->name('update');

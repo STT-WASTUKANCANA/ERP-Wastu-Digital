@@ -232,5 +232,31 @@ class MailController extends Controller
                 }
         }
 
-        public function progress() {}
+    public function latestNumber(Request $request)
+    {
+        try {
+            $type = $this->getTypeFromRoute($request);
+            $date = $request->input('date');
+
+            if (!$date) {
+                return response()->json(['status' => false, 'message' => 'Date is required'], 400);
+            }
+
+            $year = date('Y', strtotime($date));
+            $number = $this->service->getLatestNumber($type, $year);
+
+            return response()->json([
+                'status' => true,
+                'data' => [
+                    'number' => $number,
+                    'year' => $year
+                ]
+            ]);
+        } catch (Throwable $e) {
+            Log::error('[MAIL] LATEST NUMBER: Error generating number', ['msg' => $e->getMessage()]);
+            return response()->json(['status' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function progress() {}
 }
