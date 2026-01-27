@@ -8,4 +8,5 @@ Route::middleware('auth:api')
     ->name('master.')
     ->group(function () {
         Route::apiResource('mail-category', MailCategoryController::class);
+        Route::post('mail-category/export', [MailCategoryController::class, 'export'])->name('mail-category.export');
     });
