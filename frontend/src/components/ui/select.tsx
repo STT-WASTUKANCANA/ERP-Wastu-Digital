@@ -12,9 +12,10 @@ export interface SelectProps
         label?: string;
         width?: string;
         border?: string;
-        options: SelectOption[];
+        options?: SelectOption[];
         placeholder?: string;
         error?: string;
+        children?: React.ReactNode;
 }
 
 export const Select: React.FC<SelectProps> = ({
@@ -26,6 +27,7 @@ export const Select: React.FC<SelectProps> = ({
         border = "border border-secondary/20",
         id,
         error,
+        children,
         ...props
 }) => {
         const selectId = id || React.useId();
@@ -51,7 +53,7 @@ export const Select: React.FC<SelectProps> = ({
                                                         {placeholder}
                                                 </option>
                                         )}
-                                        {options.map((option) => (
+                                        {children || options.map((option) => (
                                                 <option
                                                         key={option.value}
                                                         value={option.value}
