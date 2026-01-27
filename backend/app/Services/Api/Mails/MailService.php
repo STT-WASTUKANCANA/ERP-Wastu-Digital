@@ -275,4 +275,33 @@ class MailService
             return str_pad($maxSeq + 1, 4, '0', STR_PAD_LEFT);
         }
     }
+    public function getMonthlySummary(int $type): array
+    {
+        $model = $this->getModel($type);
+        if (!$model) {
+            return [
+                'current_month_total' => 0,
+                'percentage_change' => 0,
+                'status' => 'increase'
+            ];
+        }
+
+        $currentCount = $model::getTotalForCurrentMonth();
+        $lastCount = $model::getTotalForPreviousMonth();
+
+        $percentage = 0;
+        if ($lastCount > 0) {
+            $percentage = (($currentCount - $lastCount) / $lastCount) * 100;
+        } elseif ($currentCount > 0) {
+            $percentage = 100;
+        }
+
+        $status = $currentCount >= $lastCount ? 'increase' : 'decrease';
+
+        return [
+            'current_month_total' => $currentCount,
+            'percentage_change' => round(abs($percentage), 1),
+            'status' => $status
+        ];
+    }
 }
