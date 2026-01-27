@@ -26,6 +26,7 @@ import { outgoingStatusMap } from "@/lib/constants/mail";
 import { useMailFilter } from "@/hooks/features/mail/use-mail-filter";
 import { exportIncomingMail, exportOutgoingMail, exportDecisionLetter } from "@/lib/actions/mail-export";
 import { showToast } from "@/lib/sweetalert";
+import { MailExportModal } from "@/components/shared/mail-export-modal";
 
 type MailTypes = IncomingMail | OutgoingMail | DecisionMail;
 
@@ -115,6 +116,7 @@ const MailTable = <T extends MailTypes>({
 
   const [hiddenColumns, setHiddenColumns] = useState<string[]>([]);
   const [showColumnModal, setShowColumnModal] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
 
   const columns = useMemo(
     () => config.getColumns(handleActionClick, roleId, userId),
@@ -192,6 +194,13 @@ const MailTable = <T extends MailTypes>({
   return (
     <>
       <PageHeader title={config.title} description={config.description}>
+        <Button
+          className="text-foreground/70 text-sm cursor-pointer px-8 py-2 flex justify-center items-center gap-2 border border-secondary/20 bg-background"
+          onClick={() => setShowExportModal(true)}
+        >
+          <HiOutlineUpload />
+          <span>Ekspor</span>
+        </Button>
 
         {canCreate && (
           <Button
@@ -233,8 +242,7 @@ const MailTable = <T extends MailTypes>({
         onClose={() => setShowFilterModal(false)}
         onApply={handleApplyFilter}
         onReset={handleResetFilter}
-        onExport={handleExport}
-        title={`Filter & Export ${config.title}`}
+        title={`Filter ${config.title}`}
       >
         <div className="grid grid-cols-1 gap-4">
           <div className="grid grid-cols-2 gap-2">
@@ -378,6 +386,13 @@ const MailTable = <T extends MailTypes>({
           />
         );
       })()}
+
+      <MailExportModal
+        isOpen={showExportModal}
+        onClose={() => setShowExportModal(false)}
+        onExport={handleExport}
+        title={`Export ${config.title}`}
+      />
     </>
   );
 };
