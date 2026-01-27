@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { IoChevronDown, IoChevronForward } from "react-icons/io5";
 import { Button } from "../ui/button";
@@ -40,42 +41,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
       }
     }
   };
-
-  // Filter logic:
-  // If roleId exists (is set and not null), it is a restricted user (Sekum, Pulahta, Bidang, Tata Laksana).
-  // They should only see "Dasbor" and "Surat".
-  // Admin (roleId null/undefined) sees everything.
+  
   const filteredNavLinks = React.useMemo(() => {
-    // Pulahta (3): Outgoing & Decision, No Incoming
-    // Tata Laksana (1) & Pegawai (4) & Others: Incoming & Outgoing, No Decision
     if (roleId) {
-      // 1. Filter Sections (Only Dasbor & Surat for restricted roles)
       const allowedSections = navLinks.filter((section) =>
         section.title === "Dasbor" || section.title === "Surat"
       );
 
-      // 2. Filter Links inside "Surat" section based on Role
       return allowedSections.map(section => {
         if (section.title === "Surat") {
           let allowedLinks = section.links;
 
           if (roleId === 3) {
-            // Pulahta: Hide 'Surat Masuk'
             allowedLinks = section.links.filter(link => link.name !== "Surat Masuk");
           } else {
-            // Tata Laksana (1), Pegawai (4), assuming Sekum (2) sees all or has different logic? 
-            // The prompt implies 1 & 4. Let's assume non-Pulahta restricted users hide "Surat Keputusan"
-            // Wait, existing logic was (roleId === 1 || roleId === 2 || roleId === 3 || roleId === 4).
-            // Sekum (2) usually needs to see Decision? Prompt didn't specify Sekum. 
-            // Let's stick to the explicit request:
-            // "pulahta hanya bisa akses ... surat keluar dan keputusan"
-            // "tata laksana dan pegawai ... surat masuk dan keluar"
 
             if (roleId === 1 || roleId === 4) {
               allowedLinks = section.links.filter(link => link.name !== "Surat Keputusan");
             }
-            // For Sekum (2), we leave it as is (sees all 3) or filter? 
-            // Usually Sekum needs to see all. Let's start with this.
           }
 
           return { ...section, links: allowedLinks };
@@ -105,7 +88,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
       }}
     >
       <div className={`flex justify-between items-center`}>
-        <div className={`w-10 h-10 bg-foreground rounded-full transition-all duration-300 ${!sidebarShow ? "mx-auto" : ""}`}></div>
+        <div className={`flex items-center gap-3 ${!sidebarShow ? "mx-auto" : ""}`}>
+          <div className={`relative w-8 h-8 transition-all duration-300`}>
+            <Image
+              src="/images/logo/stt-wastukancana.png"
+              alt="Logo STT Wastukancana"
+              fill
+              className="rounded-full object-cover"
+              priority
+            />
+          </div>
+          {sidebarShow && (
+            <span className="font-normal text-2xl tracking-[5px] text-foreground">ERP</span>
+          )}
+        </div>
         <Button
           color=""
           size="w-[28px] h-[28px]"
@@ -134,7 +130,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               if (link.children) {
                 const isOpen = openDropdown === link.name;
                 const hasActiveChild = link.children?.some(
-                  (child) => pathname.startsWith(child.href)
+                  (child) => child.href && pathname.startsWith(child.href)
                 ) || false;
 
 
@@ -180,7 +176,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <Link
                   key={linkIdx}
                   href={link.href || "#"}
-                  className={`h-11 px-3 rounded-md flex items-center gap-3 text-sm font-medium transition ${pathname.startsWith(link.href)
+                  className={`h-11 px-3 rounded-md flex items-center gap-3 text-sm font-medium transition ${link.href && pathname.startsWith(link.href)
                     ? "text-primary bg-primary/20"
                     : "text-foreground/60 hover:text-primary hover:bg-primary/10"
                     }`}

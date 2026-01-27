@@ -6,7 +6,21 @@ import { RiMailCheckLine } from "react-icons/ri";
 import { TbLayoutGrid } from "react-icons/tb";
 import { VscGraphLine } from "react-icons/vsc";
 
-export const navLinks = [
+import { IconType } from "react-icons";
+
+export interface NavLinkItem {
+    name: string;
+    href?: string;
+    icon: IconType;
+    children?: { name: string; href: string }[];
+}
+
+export interface NavSection {
+    title: string;
+    links: NavLinkItem[];
+}
+
+export const navLinks: NavSection[] = [
         {
                 title: "Dasbor",
                 links: [
