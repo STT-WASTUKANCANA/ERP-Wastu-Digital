@@ -21,7 +21,7 @@ class MailController extends Controller
                 $this->service = $service;
         }
 
-        // Helper untuk mendapatkan tipe surat dari nama rute
+
     private function getTypeFromRoute(Request $request): int
         {
                 $name = $request->route()->getName();
@@ -35,7 +35,7 @@ class MailController extends Controller
         }
 
 
-    // Menampilkan daftar surat berdasarkan filter
+
     public function index(Request $request)
         {
                 try {
@@ -59,10 +59,8 @@ class MailController extends Controller
                         $validatedData = $request->validated();
                         $validatedData['user_id'] = Auth::id();
 
-                        // Ambil tipe surat dari rute (1=masuk, 2=keluar, 3=keputusan)
                         $type = $this->getTypeFromRoute($request);
 
-                        // Batasan Surat Keputusan (Tipe 3): Hanya Role Pulahta
                         if ($type === 3 && Auth::user()->role_id !== 3) {
                             return response()->json([
                                 'status' => false,
@@ -76,8 +74,7 @@ class MailController extends Controller
                                 'attachment_link' => $validatedData['attachment'] ?? null,
                         ]);
 
-                        // Logic upload file dihapus, attachment langsung via validatedData['attachment'] sebagai string
-                        // if ($request->hasFile('attachment')) { ... }
+
 
                         $mail = $this->service->create($validatedData, $type);
 
@@ -125,7 +122,7 @@ class MailController extends Controller
 
                         $validatedData = $request->validated();
 
-                        // if ($request->hasFile('attachment')) { ... } - Removed for Link implementation
+
 
                         $updatedMail = $this->service->update($id, $validatedData, $type);
 
@@ -170,7 +167,6 @@ class MailController extends Controller
                 }
         }
 
-    // Menangani proses review surat masuk
     public function review(MailRequest $request, $id)
         {
                 try {
@@ -203,7 +199,6 @@ class MailController extends Controller
         }
 
 
-    // Menangani proses validasi surat keluar
     public function validateOutgoing(Request $request, $id)
         {
                 try {
@@ -242,7 +237,6 @@ class MailController extends Controller
                 return response()->json(['status' => false, 'message' => 'Date is required'], 400);
             }
 
-            // We pass the full date string to the service to handle backdate logic
             $number = $this->service->getLatestNumber($type, $date);
             $year = date('Y', strtotime($date));
 

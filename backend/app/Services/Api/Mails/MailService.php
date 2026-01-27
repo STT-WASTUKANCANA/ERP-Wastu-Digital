@@ -32,27 +32,23 @@ class MailService
         }
         $query = $model::with($relations)->latest();
 
-        // Apply Search Filter
+
         if (!empty($search)) {
             $query->where(function ($q) use ($search, $type) {
-                // Universal search on 'number'
-                $q->where('number', 'like', "%{$search}%");
-
-                if ($type === 1) { // Incoming
-                     // Search by Category Name via relation
+                if ($type === 1) {
                      $q->orWhereHas('mail_category', function($subQ) use ($search) {
                          $subQ->where('name', 'like', "%{$search}%");
                      });
-                } elseif ($type === 2) { // Outgoing
+                } elseif ($type === 2) {
                      $q->orWhere('institute', 'like', "%{$search}%")
                        ->orWhere('purpose', 'like', "%{$search}%");
-                } elseif ($type === 3) { // Decision
+                } elseif ($type === 3) {
                      $q->orWhere('title', 'like', "%{$search}%");
                 }
             });
         }
 
-        // Apply Advanced Filters
+
         if (is_array($filters)) {
             if (!empty($filters['start_date']) && !empty($filters['end_date'])) {
                  $query->whereBetween('date', [$filters['start_date'], $filters['end_date']]);
@@ -63,20 +59,16 @@ class MailService
             if (!empty($filters['status'])) {
                  $query->where('status', (string) $filters['status']);
             }
-            // Outgoing - Destination
+
             if ($type === 2 && !empty($filters['destination'])) {
                  $query->where('institute', 'like', "%{$filters['destination']}%");
             }
-            // Incoming - View Status
             if ($type === 1 && !empty($filters['view_status'])) {
                  if ($filters['view_status'] === 'read') {
-                      // Read = All assigned divisions have read (user_view_id IS NOT NULL)
-                      // Or strictly: Doesn't have any division with user_view_id NULL
                       $query->whereDoesntHave('divisions', function($q) {
                            $q->whereNull('incoming_mail_divisions.user_view_id');
                       });
                  } elseif ($filters['view_status'] === 'unread') {
-                      // Unread = At least one assigned division has NOT read (user_view_id IS NULL)
                       $query->whereHas('divisions', function($q) {
                            $q->whereNull('incoming_mail_divisions.user_view_id');
                       });
@@ -84,11 +76,10 @@ class MailService
             }
         }
 
-        if ($type === 2) { // Outgoing Mail Logic
+        if ($type === 2) {
             $user = auth()->user();
             if (!$user) return [];
 
-            // Role IDs: 1=TataLaksana, 2=Sekum, 3=Pulahta, 4=Kabid, 5=Admin
             if (in_array($user->role_id, [2, 5])) {
                 // Admin & Sekum: View All
                 return $query->get();
@@ -114,47 +105,27 @@ class MailService
             try {
                 $user = auth()->user();
 
-                // Logic for Outgoing Mail (Type 2)
                 if ($type === 2) {
-                    // Restriction for Pulahta (3) creating non-SK mails removed/commented out 
-                    // to allow creating Outgoing Mails if needed.
-                    /* 
-                    if ($user->role_id === 3) {
-                         $category = \App\Models\MailCategory::find($data['category_id']);
-                         // 3 = Surat Keputusan
-                         if (!$category || $category->type != '3') {
-                             throw new \Exception("Pulahta hanya dapat membuat Surat Keputusan (SK).");
-                         }
-                    }
-                    */
-
-                    // Set Status
-                    // Sekum (2) & Admin (5) => Approved (3)
                     if (in_array($user->role_id, [2, 5])) {
                         $data['status'] = '3';
                     } else {
-                        // Others (Tata Laksana/Kabid/Pulahta) => Verifikasi Sekum (1)
                         $data['status'] = '1';
                     }
                 }
 
-                // Shared Sequence Logic for Outgoing (2) & Decision (3)
                 if ($type === 2 || $type === 3) {
                      $inputDate = strtotime($data['date']);
                      $today = strtotime(date('Y-m-d'));
 
                      if ($inputDate < $today) {
-                         // Backdate: Sequence is NULL to preserve global counter.
                          $data['sequence'] = null;
                      } else {
-                         // Regular: Increment global sequence based on Year.
                          $year = date('Y', $inputDate);
                          $latestSeq = $this->getLatestSequenceInteger($type, $year);
                          $data['sequence'] = $latestSeq + 1;
                      }
                 }
 
-                // Log::info('Mail: Created Data', ['type' => $type, 'data' => $data]);
                 $model = $this->getModel($type);
                 $mail = $model::create($data);
 
@@ -233,7 +204,6 @@ class MailService
         $year = date('Y', $inputDate);
 
         if ($inputDate < $today) {
-            // Backdate Logic: Find latest number <= date, do NOT increment.
             $typesToCheck = ($type === 2 || $type === 3) ? [2, 3] : [$type];
             $latestNumber = null;
             $latestDate = null;
@@ -241,7 +211,6 @@ class MailService
             foreach ($typesToCheck as $t) {
                 $model = $this->getModel($t);
                 if ($model) {
-                    // Get latest mail on or before the target date
                     $item = $model::whereDate('date', '<=', $dateString)
                         ->whereYear('date', $year)
                         ->orderBy('date', 'desc')
@@ -249,7 +218,6 @@ class MailService
                         ->first();
                     
                     if ($item) {
-                         // Find the most recent among checked types
                         if (!$latestDate || strtotime($item->date) >= $latestDate) {
                             $latestDate = strtotime($item->date);
                             $latestNumber = $item->number;
@@ -258,10 +226,7 @@ class MailService
                 }
             }
             
-            // Prefer clean sequence if available
             if ($latestNumber) {
-                // Re-find object to check sequence if needed, but for now relying on regex fallback is fine for simple display
-                // Or simplified regex extraction
                 if (preg_match('/^(\d{4})/', $latestNumber, $matches)) {
                     return $matches[1];
                 }
@@ -270,7 +235,6 @@ class MailService
             return '0000';
             
         } else {
-             // Standard Logic: Max Sequence + 1
             $maxSeq = $this->getLatestSequenceInteger($type, $year);
             return str_pad($maxSeq + 1, 4, '0', STR_PAD_LEFT);
         }
