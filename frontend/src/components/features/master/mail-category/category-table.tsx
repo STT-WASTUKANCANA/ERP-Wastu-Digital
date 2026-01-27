@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { getMailCategoryList, deleteMailCategory, MailCategory } from "@/lib/api/master/mail-category";
+import { getMailCategoryList, deleteMailCategory, MailCategory, exportCategories } from "@/lib/api/master/mail-category";
 import { getMailCategoryColumns } from "./column";
 import { DataTable } from "@/components/shared/datatable";
 import { PageHeader } from "@/components/shared/page-header";
@@ -11,13 +11,12 @@ import { Button } from "@/components/ui/button";
 import { DataDetailSheet } from "@/components/shared/data-detail-sheet";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
 import { formatDate } from "@/lib/utils";
-
 import { HiOutlineUpload } from "react-icons/hi";
-
 import { ColumnSelectorModal } from "@/components/shared/column-selector-modal";
 import { FilterModal } from "@/components/shared/filter-modal";
 import { Select } from "@/components/ui/select";
 import { showToast, showConfirm } from "@/lib/sweetalert";
+import { ExportModal } from "@/components/shared/export-modal";
 
 export default function CategoryTable() {
     const router = useRouter();
@@ -36,6 +35,9 @@ export default function CategoryTable() {
     const [debouncedTerm, setDebouncedTerm] = useState("");
     const [selectedType, setSelectedType] = useState(""); // Active filter
     const [modalType, setModalType] = useState(""); // Temp modal state
+
+    // Export State
+    const [showExportModal, setShowExportModal] = useState(false);
 
     // Debounce Search
     useEffect(() => {
@@ -162,12 +164,52 @@ export default function CategoryTable() {
         setShowFilterModal(false);
     };
 
+    // Export Handler
+    const handleExport = async (type: 'excel' | 'pdf', mailType?: string) => {
+        console.log('[EXPORT] Starting export with:', { type, mailType });
+        try {
+            console.log('[EXPORT] Calling exportCategories...');
+            const result = await exportCategories(type, mailType);
+            console.log('[EXPORT] Export response received');
+
+            // Convert base64 to blob
+            const binaryString = atob(result.data);
+            const bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            const blob = new Blob([bytes], { type: result.contentType });
+            console.log('[EXPORT] Blob created:', blob.size, 'bytes');
+
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = result.filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+            console.log('[EXPORT] Download triggered');
+            showToast("success", "Data berhasil diexport");
+        } catch (error: any) {
+            console.error('[EXPORT] Export failed:', error);
+            console.error('[EXPORT] Error details:', {
+                message: error.message,
+                stack: error.stack
+            });
+            showToast("error", `Export gagal: ${error.message || 'Unknown error'}`);
+        }
+    };
+
     return (
         <>
             <PageHeader title="Kategori Surat" description="Kelola kategori surat masuk, keluar, dan keputusan.">
-                <Button className="text-foreground/70 text-sm cursor-pointer px-8 py-2 flex justify-center items-center gap-2 border border-secondary/20 bg-background">
+                <Button
+                    className="text-foreground/70 text-sm cursor-pointer px-6 py-2 flex justify-center items-center gap-2 border border-secondary/20 bg-background"
+                    onClick={() => setShowExportModal(true)}
+                >
                     <HiOutlineUpload />
-                    <span>Ekspor</span>
+                    <span>Export</span>
                 </Button>
                 <Button
                     className="bg-primary text-background text-sm px-4 py-2"
@@ -237,6 +279,13 @@ export default function CategoryTable() {
                     ]}
                 />
             )}
+
+            <ExportModal
+                isOpen={showExportModal}
+                onClose={() => setShowExportModal(false)}
+                onExport={handleExport}
+                title="Export Kategori Surat"
+            />
         </>
     );
 }

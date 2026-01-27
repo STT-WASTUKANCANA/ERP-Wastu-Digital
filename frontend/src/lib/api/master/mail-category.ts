@@ -3,45 +3,38 @@ import { fetchWithAuth } from "../api";
 export interface MailCategory {
     id: number;
     name: string;
-    type: number; // 1: Incoming, 2: Outgoing, 3: Decision
-    type_label: string;
-    description: string | null;
+    description: string;
+    type: number;
+    type_label?: string;
     created_at: string;
     updated_at: string;
 }
 
-export interface MailCategoryFormData {
-    name: string;
-    type: string; // Form handling usually uses string for Select
-    description: string;
-}
+export const getCategories = () => fetchWithAuth("/master/mail-category", { method: "GET" });
 
-export async function getMailCategoryList(type?: number | string, search?: string) {
+export const getMailCategoryList = async (type?: string, search?: string) => {
     const params = new URLSearchParams();
-    if (type) params.append('type', String(type));
+    if (type) params.append('type', type);
     if (search) params.append('search', search);
-
+    
     return await fetchWithAuth(`/master/mail-category?${params.toString()}`, { method: "GET" });
-}
+};
 
-export async function getMailCategory(id: string) {
-    return await fetchWithAuth(`/master/mail-category/${id}`, { method: "GET" });
-}
-
-export async function createMailCategory(data: MailCategoryFormData) {
-    return await fetchWithAuth('/master/mail-category', {
+export const createCategory = (data: { name: string; description: string; type: number }) =>
+    fetchWithAuth("/master/mail-category", {
         method: "POST",
-        body: JSON.stringify(data),
+        body: JSON.stringify(data)
     });
-}
 
-export async function updateMailCategory(id: string, data: MailCategoryFormData) {
-    return await fetchWithAuth(`/master/mail-category/${id}`, {
+export const updateCategory = (id: number, data: { name: string; description: string; type: number }) =>
+    fetchWithAuth(`/master/mail-category/${id}`, {
         method: "PUT",
-        body: JSON.stringify(data),
+        body: JSON.stringify(data)
     });
-}
 
-export async function deleteMailCategory(id: string) {
-    return await fetchWithAuth(`/master/mail-category/${id}`, { method: "DELETE" });
-}
+export const deleteCategory = (id: number) => fetchWithAuth(`/master/mail-category/${id}`, { method: "DELETE" });
+export const deleteMailCategory = (id: string) => fetchWithAuth(`/master/mail-category/${id}`, { method: "DELETE" });
+
+// Export is handled by server action
+// See /lib/actions/export.ts
+export { exportMailCategories as exportCategories } from '@/lib/actions/export';
