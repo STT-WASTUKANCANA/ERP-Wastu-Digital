@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { Modal } from "../ui/modal";
 import { Button } from "../ui/button";
-import { Select } from "../ui/select";
+import { SearchableSelect } from "../ui/searchable-select";
 
 interface ExportModalProps {
     isOpen: boolean;
@@ -22,6 +22,18 @@ export const ExportModal: React.FC<ExportModalProps> = ({
     const [mailType, setMailType] = useState<string>('');
     const [loading, setLoading] = useState(false);
 
+    const mailTypeOptions = [
+        { value: '', label: 'Semua Jenis' },
+        { value: '1', label: 'Surat Masuk' },
+        { value: '2', label: 'Surat Keluar' },
+        { value: '3', label: 'Surat Keputusan' }
+    ];
+
+    const exportTypeOptions = [
+        { value: 'excel', label: 'Excel (.xlsx)' },
+        { value: 'pdf', label: 'PDF (.pdf)' }
+    ];
+
     const handleSubmit = async () => {
         setLoading(true);
         try {
@@ -35,32 +47,26 @@ export const ExportModal: React.FC<ExportModalProps> = ({
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title={title}>
+        <Modal isOpen={isOpen} onClose={onClose} title={title} size="lg">
             <div className="space-y-4">
                 <div>
-                    <Select
+                    <SearchableSelect
                         label="Jenis Surat"
-                        name="mailType"
+                        options={mailTypeOptions}
                         value={mailType}
-                        onChange={(e) => setMailType(e.target.value)}
-                    >
-                        <option value="">Semua Jenis</option>
-                        <option value="1">Surat Masuk</option>
-                        <option value="2">Surat Keluar</option>
-                        <option value="3">Surat Keputusan</option>
-                    </Select>
+                        onChange={(value) => setMailType(value)}
+                        placeholder="Pilih jenis surat"
+                    />
                 </div>
 
                 <div>
-                    <Select
+                    <SearchableSelect
                         label="Pilih Format Export"
-                        name="exportType"
+                        options={exportTypeOptions}
                         value={exportType}
-                        onChange={(e) => setExportType(e.target.value as 'excel' | 'pdf')}
-                    >
-                        <option value="excel">Excel (.xlsx)</option>
-                        <option value="pdf">PDF (.pdf)</option>
-                    </Select>
+                        onChange={(value) => setExportType(value as 'excel' | 'pdf')}
+                        placeholder="Pilih format"
+                    />
                 </div>
 
                 <div className="flex justify-end gap-2 pt-4">
