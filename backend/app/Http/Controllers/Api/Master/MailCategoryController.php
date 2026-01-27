@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Throwable;
+use App\Exports\CategoryExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class MailCategoryController extends Controller
 {
@@ -95,6 +97,37 @@ class MailCategoryController extends Controller
             return response()->json(['status' => true, 'message' => 'Category deleted']);
         } catch (Throwable $e) {
             return response()->json(['status' => false, 'message' => 'Delete failed'], 500);
+        }
+    }
+
+    public function export(Request $request)
+    {
+        $request->validate([
+            'type' => 'required|in:excel,pdf',
+            'mail_type' => 'nullable|in:1,2,3'
+        ]);
+
+        try {
+            $type = $request->type;
+            $mailType = $request->mail_type;
+            $filename = 'kategori_surat_' . date('Y-m-d_His');
+
+            Log::info('[MASTER] MAIL KATEGORI EXPORT: Export dimulai', [
+                'user_id' => Auth::id(),
+                'type' => $type,
+                'mail_type' => $mailType
+            ]);
+
+            $export = new CategoryExport($mailType);
+
+            if ($type === 'pdf') {
+                return Excel::download($export, $filename . '.pdf', \Maatwebsite\Excel\Excel::DOMPDF);
+            }
+
+            return Excel::download($export, $filename . '.xlsx');
+        } catch (Throwable $e) {
+            Log::error('[MASTER] MAIL KATEGORI EXPORT: Export gagal', ['user_id' => Auth::id(), 'error' => $e->getMessage()]);
+            return response()->json(['status' => false, 'message' => 'Export failed'], 500);
         }
     }
 }
