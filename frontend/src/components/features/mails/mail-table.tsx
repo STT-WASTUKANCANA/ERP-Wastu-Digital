@@ -24,6 +24,8 @@ import { Input } from "@/components/ui/input";
 import { getMailDetailItems } from "@/lib/helpers/detail-helpers";
 import { outgoingStatusMap } from "@/lib/constants/mail";
 import { useMailFilter } from "@/hooks/features/mail/use-mail-filter";
+import { exportIncomingMail, exportOutgoingMail, exportDecisionLetter } from "@/lib/actions/mail-export";
+import { showToast } from "@/lib/sweetalert";
 
 type MailTypes = IncomingMail | OutgoingMail | DecisionMail;
 
@@ -142,13 +144,54 @@ const MailTable = <T extends MailTypes>({
     (type === "outgoing") ||
     (roleId === 3 && type === "decision");
 
+  // Export handler
+  const handleExport = async (exportType: 'excel' | 'pdf') => {
+    try {
+      const filters = {
+        category_id: selectedCategory || undefined,
+        start_date: startDate || undefined,
+        end_date: endDate || undefined,
+        status: status || undefined,
+        view_status: viewStatus || undefined,
+        destination: destination || undefined,
+      };
+
+      let result;
+      if (type === 'incoming') {
+        result = await exportIncomingMail(exportType, filters);
+      } else if (type === 'outgoing') {
+        result = await exportOutgoingMail(exportType, filters);
+      } else {
+        result = await exportDecisionLetter(exportType, filters);
+      }
+
+      // Convert base64 to blob and download
+      const binaryString = atob(result.data);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      const blob = new Blob([bytes], { type: result.contentType });
+
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = result.filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      showToast('success', 'Data berhasil diexport');
+    } catch (error: any) {
+      console.error('Export failed:', error);
+      showToast('error', `Export gagal: ${error.message || 'Unknown error'}`);
+    }
+  };
+
   return (
     <>
       <PageHeader title={config.title} description={config.description}>
-        <Button className="text-foreground/70 text-sm cursor-pointer px-8 py-2 flex justify-center items-center gap-2 border border-secondary/20 bg-background">
-          <HiOutlineUpload />
-          <span>Ekspor</span>
-        </Button>
 
         {canCreate && (
           <Button
@@ -190,7 +233,8 @@ const MailTable = <T extends MailTypes>({
         onClose={() => setShowFilterModal(false)}
         onApply={handleApplyFilter}
         onReset={handleResetFilter}
-        title={`Filter ${config.title}`}
+        onExport={handleExport}
+        title={`Filter & Export ${config.title}`}
       >
         <div className="grid grid-cols-1 gap-4">
           <div className="grid grid-cols-2 gap-2">
