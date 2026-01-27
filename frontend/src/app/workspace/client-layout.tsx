@@ -10,10 +10,10 @@ import { RoleProvider } from "@/contexts/role";
 
 export default function ClientLayout({
     children,
-    roleId
+    user
 }: {
     children: React.ReactNode,
-    roleId: number | null
+    user: any // Typed as any to avoid complex import cycles for now, or define interface inline
 }) {
     const [sidebarShow, setSidebarShow] = useState(false);
     const [isPinned, setIsPinned] = useState(false);
@@ -33,7 +33,7 @@ export default function ClientLayout({
     }, []);
 
     return (
-        <RoleProvider roleId={roleId}>
+        <RoleProvider roleId={user?.role_id || null} userId={user?.sub || null}>
             {!isHydrated ? (
                 <div className="min-h-screen bg-accent p-6">
                     <div className="mt-[60px] space-y-6 opacity-0">{children}</div>
@@ -56,6 +56,7 @@ export default function ClientLayout({
                             setProfileDropdownShow={setProfileDropdownShow}
                             notificationDropdownShow={notificationDropdownShow}
                             setNotificationDropdownShow={setNotificationDropdownShow}
+                            user={user}
                         />
 
                         {profileDropdownShow && <ProfileDropdown />}
@@ -83,7 +84,7 @@ export default function ClientLayout({
                         setSidebarShow={setSidebarShow}
                         isPinned={isPinned}
                         setIsPinned={setIsPinned}
-                        roleId={roleId}
+                        roleId={user?.role_id || null}
                     />
                 </div>
             )}

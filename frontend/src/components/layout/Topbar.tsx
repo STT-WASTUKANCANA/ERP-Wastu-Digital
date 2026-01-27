@@ -13,6 +13,7 @@ export const Topbar: React.FC<TopbarProps> = ({
         setProfileDropdownShow,
         notificationDropdownShow,
         setNotificationDropdownShow,
+        user
 }) => {
         const topbarClass = scroll > 0 ? "bg-background rounded-b-2xl mx-4 w-[calc(100%-2rem)] lg:w-full lg:mx-0 lg:rounded-none shadow-sm" : "bg-accent w-full";
 
@@ -57,13 +58,45 @@ export const Topbar: React.FC<TopbarProps> = ({
                                         <FaRegBell className="w-full h-full text-foreground" />
                                 </Button>
 
-                                <div
-                                        className="bg-primary w-[30px] h-[30px] rounded-full cursor-pointer"
-                                        onClick={() => {
-                                                setProfileDropdownShow(!profileDropdownShow);
-                                                setNotificationDropdownShow(false);
-                                        }}
-                                />
+                                {user && (
+                                    <div className="flex items-center gap-3 cursor-pointer" onClick={() => {
+                                        setProfileDropdownShow(!profileDropdownShow);
+                                        setNotificationDropdownShow(false);
+                                    }}>
+                                        <div className="text-right hidden sm:block">
+                                            <p className="text-sm font-semibold text-foreground">{user.name}</p>
+                                            <p className="text-xs text-foreground/60 font-medium capitalize">
+                                                {(() => {
+                                                    const roleMap: Record<number, string> = {
+                                                        1: "Tata Laksana",
+                                                        2: "Sekum",
+                                                        3: "Pulahta",
+                                                        4: "Pegawai",
+                                                        5: "Admin"
+                                                    };
+                                                    return roleMap[user.role_id] || "User";
+                                                })()}
+                                            </p>
+                                        </div>
+                                        <div className="relative w-[35px] h-[35px] rounded-full overflow-hidden border border-secondary/20">
+                                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                                            <img
+                                                src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=random`}
+                                                alt="Profile"
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+                                {!user && (
+                                    <div
+                                            className="bg-primary w-[30px] h-[30px] rounded-full cursor-pointer"
+                                            onClick={() => {
+                                                    setProfileDropdownShow(!profileDropdownShow);
+                                                    setNotificationDropdownShow(false);
+                                            }}
+                                    />
+                                )}
                         </div>
                 </div>
         );

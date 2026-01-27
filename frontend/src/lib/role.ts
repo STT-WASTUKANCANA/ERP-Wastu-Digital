@@ -35,3 +35,15 @@ export async function getUserId(): Promise<string | null> {
         return null;
     }
 }
+
+export async function getUserData(): Promise<DecodedToken | null> {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("access_token");
+    if (!token) return null;
+
+    try {
+        return jwtDecode<DecodedToken>(token.value);
+    } catch {
+        return null;
+    }
+}

@@ -48,6 +48,7 @@ export type TopbarProps = {
   setProfileDropdownShow: React.Dispatch<React.SetStateAction<boolean>>;
   notificationDropdownShow: boolean;
   setNotificationDropdownShow: React.Dispatch<React.SetStateAction<boolean>>;
+  user?: any;
 };
 export interface SidebarProps {
   sidebarShow: boolean;
