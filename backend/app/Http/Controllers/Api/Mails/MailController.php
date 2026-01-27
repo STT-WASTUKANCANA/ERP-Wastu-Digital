@@ -6,10 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Mails\MailRequest;
 use App\Http\Resources\Api\Mails\MailResource;
 use App\Services\Api\Mails\MailService;
+use App\Exports\IncomingMailExport;
+use App\Exports\OutgoingMailExport;
+use App\Exports\DecisionLetterExport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Throwable;
 
 class MailController extends Controller
@@ -249,6 +254,68 @@ class MailController extends Controller
                         ]);
                 } catch (Throwable $e) {
                         Log::error('[MAIL] LATEST NUMBER: Error generating number', ['msg' => $e->getMessage()]);
+                        return response()->json(['status' => false, 'message' => $e->getMessage()], 500);
+                }
+        }
+
+        public function export(Request $request)
+        {
+                try {
+                        $type = $this->getTypeFromRoute($request);
+
+                        $validated = $request->validate([
+                                'type' => 'required|in:excel,pdf',
+                                'category_id' => 'nullable|integer',
+                                'start_date' => 'nullable|date',
+                                'end_date' => 'nullable|date',
+                                'status' => 'nullable|string',
+                                'view_status' => 'nullable|string',
+                                'destination' => 'nullable|string',
+                        ]);
+
+                        $filters = array_filter($validated, fn($v, $k) => $k !== 'type' && $v !== null, ARRAY_FILTER_USE_BOTH);
+                        $exportType = $validated['type'];
+
+                        // Select the appropriate export class based on mail type
+                        $exportClass = match ($type) {
+                                1 => new IncomingMailExport($filters),
+                                2 => new OutgoingMailExport($filters),
+                                3 => new DecisionLetterExport($filters),
+                                default => throw new \Exception('Invalid mail type'),
+                        };
+
+                        $typeNames = [1 => 'surat_masuk', 2 => 'surat_keluar', 3 => 'surat_keputusan'];
+                        $filename = $typeNames[$type] . '_' . now()->format('Y-m-d_H-i-s');
+
+                        Log::info('[MAIL] EXPORT: Memulai export surat', [
+                                'type' => $type,
+                                'format' => $exportType,
+                                'filters' => $filters,
+                                'user_id' => Auth::id()
+                        ]);
+
+                        if ($exportType === 'excel') {
+                                return Excel::download($exportClass, $filename . '.xlsx');
+                        } else {
+                                // Generate PDF using DomPDF
+                                $data = $exportClass->collection();
+                                $headings = $exportClass->headings();
+
+                                $pdf = Pdf::loadView('exports.mail-pdf', [
+                                        'data' => $data,
+                                        'headings' => $headings,
+                                        'title' => ucwords(str_replace('_', ' ', $typeNames[$type])),
+                                        'date' => now()->format('d/m/Y H:i:s')
+                                ]);
+
+                                return $pdf->download($filename . '.pdf');
+                        }
+                } catch (Throwable $e) {
+                        Log::error('[MAIL] EXPORT: Gagal export surat', [
+                                'message' => $e->getMessage(),
+                                'trace' => $e->getTraceAsString(),
+                                'user_id' => Auth::id()
+                        ]);
                         return response()->json(['status' => false, 'message' => $e->getMessage()], 500);
                 }
         }

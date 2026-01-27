@@ -38,6 +38,7 @@ Route::middleware('auth:api')
                         Route::get('/summary', 'summary')->name('summary');
                         Route::get('/latest-number', 'latestNumber')->name('latestNumber');
                         Route::post('/', 'store')->name('store');
+                        Route::post('/export', 'export')->name('export');
                         Route::get('/{id}', 'show')->name('show');
                         Route::put('/{id}', 'update')->name('update');
                         Route::delete('/{id}', 'destroy')->name('destroy');
@@ -47,7 +48,7 @@ Route::middleware('auth:api')
                             Route::put('/review/{id}', 'review')->name('review');
                             Route::put('/division-review/{id}', 'review')->name('divisionReview');
                         }
-                        
+
                         if ($type === 'outgoing') {
                             // Rute validasi surat keluar
                             Route::put('/validate/{id}', 'validateOutgoing')->name('validate');
