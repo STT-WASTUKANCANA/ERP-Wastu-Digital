@@ -45,7 +45,7 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ user }) => {
 
         return (
                 <Dropdown
-                        position={`top-18 ${scrollY > 0 ? "right-7" : "right-5"}`}
+                        position={`top-18 ${scrollY > 0 ? "right-7" : "right-15"}`}
                         padding="p-0"
                         backgroundColor="bg-background"
                         textColor="text-foreground"
