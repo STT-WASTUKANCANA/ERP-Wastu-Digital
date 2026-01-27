@@ -59,7 +59,7 @@ export default function ClientLayout({
                             user={user}
                         />
 
-                        {profileDropdownShow && <ProfileDropdown />}
+                        {profileDropdownShow && <ProfileDropdown user={user} />}
                         {notificationDropdownShow && (
                             <NotificationDropdown
                                 notificationDropdownShow={notificationDropdownShow}
