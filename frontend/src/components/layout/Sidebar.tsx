@@ -41,9 +41,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
       }
     }
   };
-  
+
   const filteredNavLinks = React.useMemo(() => {
+    console.log('[Sidebar] roleId:', roleId);
+    console.log('[Sidebar] All navLinks:', navLinks);
+
+    // Admin (roleId 5) sees all menus
+    if (roleId === 5) {
+      console.log('[Sidebar] Admin detected, showing all menus');
+      return navLinks;
+    }
+
+    // Other roles get filtered menus
     if (roleId) {
+      console.log('[Sidebar] Non-admin role detected, filtering menus');
       const allowedSections = navLinks.filter((section) =>
         section.title === "Dasbor" || section.title === "Surat"
       );
@@ -56,7 +67,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             allowedLinks = section.links.filter(link => link.name !== "Surat Masuk");
           } else {
 
-            if (roleId === 1 || roleId === 4) {
+            if (roleId === 4) {
               allowedLinks = section.links.filter(link => link.name !== "Surat Keputusan");
             }
           }
@@ -66,6 +77,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         return section;
       });
     }
+    console.log('[Sidebar] No roleId, showing all menus');
     return navLinks;
   }, [roleId]);
 
