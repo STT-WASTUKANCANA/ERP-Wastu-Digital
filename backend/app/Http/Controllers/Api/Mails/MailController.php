@@ -22,7 +22,7 @@ class MailController extends Controller
         }
 
 
-    private function getTypeFromRoute(Request $request): int
+        private function getTypeFromRoute(Request $request): int
         {
                 $name = $request->route()->getName();
 
@@ -36,7 +36,7 @@ class MailController extends Controller
 
 
 
-    public function index(Request $request)
+        public function index(Request $request)
         {
                 try {
                         $type = $this->getTypeFromRoute($request);
@@ -62,10 +62,10 @@ class MailController extends Controller
                         $type = $this->getTypeFromRoute($request);
 
                         if ($type === 3 && Auth::user()->role_id !== 3) {
-                            return response()->json([
-                                'status' => false,
-                                'message' => 'Hanya Role Pulahta yang diizinkan membuat Surat Keputusan.'
-                            ], 403);
+                                return response()->json([
+                                        'status' => false,
+                                        'message' => 'Hanya Role Pulahta yang diizinkan membuat Surat Keputusan.'
+                                ], 403);
                         }
 
                         Log::debug('[MAIL] CREATE: Memulai pembuatan surat', [
@@ -82,7 +82,7 @@ class MailController extends Controller
 
                         return response()->json([
                                 'status' => true,
-                                'data'   => new MailResource($mail)
+                                'data' => new MailResource($mail)
                         ], 201);
                 } catch (Throwable $e) {
                         Log::error('[MAIL] CREATE: Gagal membuat surat', [
@@ -167,7 +167,7 @@ class MailController extends Controller
                 }
         }
 
-    public function review(MailRequest $request, $id)
+        public function review(MailRequest $request, $id)
         {
                 try {
                         $type = $this->getTypeFromRoute($request);
@@ -199,7 +199,7 @@ class MailController extends Controller
         }
 
 
-    public function validateOutgoing(Request $request, $id)
+        public function validateOutgoing(Request $request, $id)
         {
                 try {
                         $type = $this->getTypeFromRoute($request);
@@ -209,8 +209,8 @@ class MailController extends Controller
 
 
                         $data = $request->validate([
-                            'status' => ['required', \Illuminate\Validation\Rule::in(['approved', 'rejected', '1', '2', '3', '4', 1, 2, 3, 4])],
-                            'note'   => 'nullable|string'
+                                'status' => ['required', \Illuminate\Validation\Rule::in(['approved', 'rejected', '1', '2', '3', '4', 1, 2, 3, 4])],
+                                'note' => 'nullable|string'
                         ]);
 
                         $mail = $this->service->validateOutgoingMail($id, $data);
@@ -227,31 +227,29 @@ class MailController extends Controller
                 }
         }
 
-    public function latestNumber(Request $request)
-    {
-        try {
-            $type = $this->getTypeFromRoute($request);
-            $date = $request->input('date');
+        public function latestNumber(Request $request)
+        {
+                try {
+                        $type = $this->getTypeFromRoute($request);
+                        $date = $request->input('date');
 
-            if (!$date) {
-                return response()->json(['status' => false, 'message' => 'Date is required'], 400);
-            }
+                        if (!$date) {
+                                return response()->json(['status' => false, 'message' => 'Date is required'], 400);
+                        }
 
-            $number = $this->service->getLatestNumber($type, $date);
-            $year = date('Y', strtotime($date));
+                        $number = $this->service->getLatestNumber($type, $date);
+                        $year = date('Y', strtotime($date));
 
-            return response()->json([
-                'status' => true,
-                'data' => [
-                    'number' => $number,
-                    'year' => $year
-                ]
-            ]);
-        } catch (Throwable $e) {
-            Log::error('[MAIL] LATEST NUMBER: Error generating number', ['msg' => $e->getMessage()]);
-            return response()->json(['status' => false, 'message' => $e->getMessage()], 500);
+                        return response()->json([
+                                'status' => true,
+                                'data' => [
+                                        'number' => $number,
+                                        'year' => $year
+                                ]
+                        ]);
+                } catch (Throwable $e) {
+                        Log::error('[MAIL] LATEST NUMBER: Error generating number', ['msg' => $e->getMessage()]);
+                        return response()->json(['status' => false, 'message' => $e->getMessage()], 500);
+                }
         }
-    }
-
-    public function progress() {}
 }
