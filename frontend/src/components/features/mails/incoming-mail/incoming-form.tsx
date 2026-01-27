@@ -225,6 +225,7 @@ export default function IncomingForm({
             placeholder="Tulis perihal surat..."
             disabled={isFieldDisabled}
             className="col-span-2"
+            error={errors.desc?.[0]}
           />
 
           {showAttachmentPreview && (

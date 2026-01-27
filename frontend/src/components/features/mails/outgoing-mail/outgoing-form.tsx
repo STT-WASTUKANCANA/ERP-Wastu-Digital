@@ -130,9 +130,12 @@ export default function OutgoingForm({
     setFormData({ ...formData, number: newVal });
   };
 
+  const [errors, setErrors] = useState<Record<string, string[]>>({});
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
+    setErrors({});
 
     const data = new FormData();
     const { status, ...rest } = formData;
@@ -140,9 +143,6 @@ export default function OutgoingForm({
     Object.entries(rest).forEach(([key, value]) => {
       data.append(key, String(value));
     });
-
-    // Link attachment is already in 'rest' since we removed 'attachment' destructuring exclusion? 
-    // Wait, let's check the destructuring line above. I need to edit that too.
 
     if (mode === "edit") {
       data.append("_method", "PUT");
@@ -157,7 +157,12 @@ export default function OutgoingForm({
       await showSuccessDialog("Berhasil", mode === "edit" ? "Surat berhasil diperbarui." : "Surat berhasil dibuat.");
       router.push("/workspace/mail/outgoing");
     } else {
-      showToast("error", "Operasi gagal.");
+      if (res.status === 422 && res.data?.errors) {
+        setErrors(res.data.errors);
+        showToast("error", "Validasi gagal. Mohon periksa kembali inputan anda.");
+      } else {
+        showToast("error", res.data?.message || "Operasi gagal.");
+      }
     }
 
     setLoading(false);
@@ -224,6 +229,7 @@ export default function OutgoingForm({
                 handleChange({ target: { name: 'date', value: dateStr } } as any);
               }}
               disabled={isReadOnly}
+              error={errors.date?.[0]}
             />
           </div>
 
@@ -239,6 +245,7 @@ export default function OutgoingForm({
                   value: cat.id,
                   label: cat.name,
                 }))}
+              error={errors.category_id?.[0]}
             />
           </div>
 
@@ -251,6 +258,7 @@ export default function OutgoingForm({
               value={formData.number}
               onChange={handleNumberChange}
               placeholder="Contoh: OUT-001/STT/2025"
+              error={errors.number?.[0]}
             />
           </div>
 
@@ -264,6 +272,7 @@ export default function OutgoingForm({
               onChange={handleChange}
               placeholder="Nama instansi"
               disabled={isReadOnly}
+              error={errors.institute?.[0]}
             />
           </div>
 
@@ -277,6 +286,7 @@ export default function OutgoingForm({
               onChange={handleChange}
               placeholder="Contoh: Undangan rapat kerja"
               disabled={isReadOnly}
+              error={errors.purpose?.[0]}
             />
           </div>
 
@@ -289,6 +299,7 @@ export default function OutgoingForm({
             placeholder="Alamat lengkap instansi"
             className="col-span-2"
             disabled={isReadOnly}
+            error={errors.address?.[0]}
           />
 
           <TextareaField
@@ -300,6 +311,7 @@ export default function OutgoingForm({
             placeholder="Isi deskripsi surat..."
             className="col-span-2"
             disabled={isReadOnly}
+            error={errors.desc?.[0]}
           />
 
           {mode === "edit" && formData.attachment && (
@@ -316,6 +328,7 @@ export default function OutgoingForm({
               onChange={handleChange}
               placeholder="https://drive.google.com/..."
               disabled={isReadOnly}
+              error={errors.attachment?.[0]}
             />
           </div>
 

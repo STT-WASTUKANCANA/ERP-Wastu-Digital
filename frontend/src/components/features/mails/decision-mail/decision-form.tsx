@@ -90,9 +90,12 @@ export default function DecisionForm({
     setFormData({ ...formData, number: newVal });
   };
 
+  const [errors, setErrors] = useState<Record<string, string[]>>({});
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
+    setErrors({});
 
     const data = new FormData();
     // const { attachment, ...rest } = formData;
@@ -108,7 +111,12 @@ export default function DecisionForm({
       await showSuccessDialog("Berhasil", mode === "edit" ? "Surat keputusan diperbarui." : "Surat keputusan dibuat.");
       router.push("/workspace/mail/decision");
     } else {
-      showToast("error", "Operasi gagal.");
+      if (res.status === 422 && res.data?.errors) {
+        setErrors(res.data.errors);
+        showToast("error", "Validasi gagal. Mohon periksa kembali inputan anda.");
+      } else {
+        showToast("error", res.data?.message || "Operasi gagal.");
+      }
     }
 
     setLoading(false);
@@ -125,6 +133,7 @@ export default function DecisionForm({
             const dateStr = date ? format(date, "yyyy-MM-dd") : "";
             handleChange({ target: { name: 'date', value: dateStr } } as any);
           }}
+          error={errors.date?.[0]}
         />
       </div>
       <div>
@@ -135,6 +144,7 @@ export default function DecisionForm({
           onChange={(val) => handleChange({ target: { name: 'category_id', value: val } } as any)}
           placeholder="Pilih kategori"
           options={categories.map((cat) => ({ value: cat.id, label: cat.name }))}
+          error={errors.category_id?.[0]}
         />
       </div>
       <div className="col-span-2">
@@ -144,6 +154,7 @@ export default function DecisionForm({
           value={formData.number}
           onChange={handleNumberChange}
           placeholder="Contoh: SK-001/IX/2025"
+          error={errors.number?.[0]}
         />
       </div>
 
@@ -155,6 +166,7 @@ export default function DecisionForm({
           value={formData.title}
           onChange={handleChange}
           placeholder="Judul surat keputusan"
+          error={errors.title?.[0]}
         />
       </div>
       <TextareaField
@@ -164,6 +176,7 @@ export default function DecisionForm({
         onChange={handleChange}
         placeholder="Isi deskripsi surat keputusan..."
         className="col-span-2"
+        error={errors.desc?.[0]}
       />
       <div className="col-span-2">
         <Input
@@ -172,6 +185,7 @@ export default function DecisionForm({
           value={formData.attachment}
           onChange={handleChange}
           placeholder="https://drive.google.com/..."
+          error={errors.attachment?.[0]}
         />
         {/* <FileDropzone ... /> Removed */}
       </div>
