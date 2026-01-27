@@ -51,6 +51,7 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ user }) => {
                         textColor="text-foreground"
                         shadow="shadow-xl"
                         size="w-[280px]"
+                        zIndex="z-[9999]"
                 >
                         <div className="flex flex-col">
                                 {/* Header Section */}
