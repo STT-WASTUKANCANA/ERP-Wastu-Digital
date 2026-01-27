@@ -24,9 +24,10 @@ import { Input } from "@/components/ui/input";
 import { getMailDetailItems } from "@/lib/helpers/detail-helpers";
 import { outgoingStatusMap } from "@/lib/constants/mail";
 import { useMailFilter } from "@/hooks/features/mail/use-mail-filter";
+import { useMailFilter } from "@/hooks/features/mail/use-mail-filter";
 import { exportIncomingMail, exportOutgoingMail, exportDecisionLetter } from "@/lib/actions/mail-export";
 import { showToast } from "@/lib/sweetalert";
-import { MailExportModal } from "@/components/shared/mail-export-modal";
+import { MailExportModal, MailExportFilters } from "@/components/shared/mail-export-modal";
 
 type MailTypes = IncomingMail | OutgoingMail | DecisionMail;
 
@@ -147,17 +148,8 @@ const MailTable = <T extends MailTypes>({
     (roleId === 3 && type === "decision");
 
   // Export handler
-  const handleExport = async (exportType: 'excel' | 'pdf') => {
+  const handleExport = async (exportType: 'excel' | 'pdf', filters: MailExportFilters) => {
     try {
-      const filters = {
-        category_id: selectedCategory || undefined,
-        start_date: startDate || undefined,
-        end_date: endDate || undefined,
-        status: status || undefined,
-        view_status: viewStatus || undefined,
-        destination: destination || undefined,
-      };
-
       let result;
       if (type === 'incoming') {
         result = await exportIncomingMail(exportType, filters);
@@ -392,6 +384,8 @@ const MailTable = <T extends MailTypes>({
         onClose={() => setShowExportModal(false)}
         onExport={handleExport}
         title={`Export ${config.title}`}
+        type={type as "incoming" | "outgoing" | "decision"}
+        categories={categories}
       />
     </>
   );
