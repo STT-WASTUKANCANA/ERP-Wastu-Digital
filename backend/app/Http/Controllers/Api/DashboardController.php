@@ -48,7 +48,30 @@ class DashboardController extends Controller
                     'outgoing' => $formatTrend($outgoingTrend),
                     'decision' => $formatTrend($decisionTrend),
                 ],
-                'mail_status' => [],
+            // 2. Mail Status Distribution
+            // Incoming Mail Status
+            $incomingStatus = \App\Models\Workspace\Mails\IncomingMail::selectRaw('status, COUNT(*) as count')
+                ->whereYear('date', $year)
+                ->groupBy('status')
+                ->pluck('count', 'status');
+
+            // Outgoing Mail Status
+            $outgoingStatus = \App\Models\Workspace\Mails\OutgoingMail::selectRaw('status, COUNT(*) as count')
+                ->whereYear('date', $year)
+                ->groupBy('status')
+                ->pluck('count', 'status');
+
+            $data = [
+                'mail_trend' => [
+                    'labels' => ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
+                    'incoming' => $formatTrend($incomingTrend),
+                    'outgoing' => $formatTrend($outgoingTrend),
+                    'decision' => $formatTrend($decisionTrend),
+                ],
+                'mail_status' => [
+                    'incoming' => $incomingStatus,
+                    'outgoing' => $outgoingStatus,
+                ],
                 'mail_category' => [],
                 'entity_counts' => [
                     'users' => 0,

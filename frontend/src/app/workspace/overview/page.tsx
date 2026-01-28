@@ -6,6 +6,7 @@ import { getDashboardStats } from "@/lib/api/dashboard";
 import React from "react";
 import { BsInbox, BsSend, BsFileText } from "react-icons/bs";
 import { MailTrendChart } from "@/components/features/dashboard/mail-trend-chart";
+import { MailStatusChart } from "@/components/features/dashboard/mail-status-chart";
 
 const Page = async () => {
   const incomingResponse = await getIncomingMailSummary();
@@ -52,6 +53,10 @@ const Page = async () => {
     ? dashboardStatsResponse.data.data.mail_trend
     : { labels: [], incoming: [], outgoing: [], decision: [] };
 
+  const statusData = dashboardStatsResponse.ok && dashboardStatsResponse.data?.data?.mail_status
+    ? dashboardStatsResponse.data.data.mail_status
+    : { incoming: {}, outgoing: {} };
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -72,11 +77,11 @@ const Page = async () => {
           value={decisionMailValue.toString()}
           percent={decisionMailPercent}
           icon={BsFileText}
-          className="md:col-span-1"
         />
       </div>
 
       <MailTrendChart data={trendData} />
+      <MailStatusChart data={statusData} />
     </div>
   );
 };
