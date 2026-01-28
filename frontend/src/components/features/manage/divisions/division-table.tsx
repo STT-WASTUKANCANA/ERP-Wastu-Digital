@@ -15,6 +15,8 @@ import { FiEdit, FiTrash2, FiCheckCircle, FiXCircle } from "react-icons/fi";
 
 import { ColumnSelectorModal } from "@/components/shared/column-selector-modal";
 import { showConfirm, showToast } from "@/lib/sweetalert";
+import { DivisionExportModal, DivisionExportFilters } from "./division-export-modal";
+import { exportDivision } from "@/lib/actions/manage-export";
 
 export default function DivisionTable() {
     const router = useRouter();
@@ -28,6 +30,7 @@ export default function DivisionTable() {
 
     const [hiddenColumns, setHiddenColumns] = useState<string[]>([]);
     const [showColumnModal, setShowColumnModal] = useState(false);
+    const [showExportModal, setShowExportModal] = useState(false);
 
     // Ambil data divisi dari API
     const fetchData = async () => {
@@ -174,10 +177,40 @@ export default function DivisionTable() {
         setHiddenColumns(newHidden);
     };
 
+    const handleExport = async (format: 'excel', filters: DivisionExportFilters) => {
+        try {
+            const result = await exportDivision(format, filters);
+
+            const binaryString = atob(result.data);
+            const bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            const blob = new Blob([bytes], { type: result.contentType });
+
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = result.filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+
+            showToast('success', 'Data berhasil diexport');
+        } catch (error: any) {
+            console.error('Export failed:', error);
+            showToast('error', `Export gagal: ${error.message || 'Unknown error'}`);
+        }
+    };
+
     return (
         <>
             <PageHeader title="Manajemen Divisi" description="Kelola data divisi dan kepala bidang dengan efisien.">
-                <Button className="text-foreground/70 text-sm cursor-pointer px-8 py-2 flex justify-center items-center gap-2 border border-secondary/20 bg-background">
+                <Button
+                    onClick={() => setShowExportModal(true)}
+                    className="text-foreground/70 text-sm cursor-pointer px-8 py-2 flex justify-center items-center gap-2 border border-secondary/20 bg-background"
+                >
                     <HiOutlineUpload />
                     <span>Ekspor</span>
                 </Button>
@@ -258,6 +291,12 @@ export default function DivisionTable() {
                     ]}
                 />
             )}
+
+            <DivisionExportModal
+                isOpen={showExportModal}
+                onClose={() => setShowExportModal(false)}
+                onExport={handleExport}
+            />
         </>
     );
 }

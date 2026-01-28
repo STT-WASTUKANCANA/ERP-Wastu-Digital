@@ -18,6 +18,8 @@ import { ColumnSelectorModal } from "@/components/shared/column-selector-modal";
 import { FilterModal } from "@/components/shared/filter-modal";
 import { Select } from "@/components/ui/select";
 import { showConfirm, showToast } from "@/lib/sweetalert";
+import { UserExportModal, UserExportFilters } from "./user-export-modal";
+import { exportUsers } from "@/lib/actions/manage-export";
 
 const UserTable = ({ users, onUserUpdated, isLoading }: UserTableProps) => {
     const router = useRouter();
@@ -29,6 +31,7 @@ const UserTable = ({ users, onUserUpdated, isLoading }: UserTableProps) => {
 
     const [hiddenColumns, setHiddenColumns] = useState<string[]>([]);
     const [showColumnModal, setShowColumnModal] = useState(false);
+    const [showExportModal, setShowExportModal] = useState(false);
 
     // State untuk filter
     const [selectedRole, setSelectedRole] = useState("");
@@ -175,13 +178,46 @@ const UserTable = ({ users, onUserUpdated, isLoading }: UserTableProps) => {
         setCurrentPage(1);
     };
 
+
+
+    const handleExport = async (format: 'excel', filters: UserExportFilters) => {
+        try {
+            const result = await exportUsers(format, filters);
+
+            const binaryString = atob(result.data);
+            const bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            const blob = new Blob([bytes], { type: result.contentType });
+
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = result.filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+
+            showToast('success', 'Data berhasil diexport');
+        } catch (error: any) {
+            console.error('Export failed:', error);
+            showToast('error', `Export gagal: ${error.message || 'Unknown error'}`);
+        }
+    };
+
     return (
         <>
             <PageHeader
                 title="Manajemen Pengguna"
                 description="Kelola semua pengguna sistem dengan efisien."
             >
-                <Button className="text-foreground/70 text-sm cursor-pointer px-8 py-2 flex justify-center items-center gap-2 border border-secondary/20 bg-background">
+
+                <Button
+                    onClick={() => setShowExportModal(true)}
+                    className="text-foreground/70 text-sm cursor-pointer px-8 py-2 flex justify-center items-center gap-2 border border-secondary/20 bg-background"
+                >
                     <HiOutlineUpload />
                     <span>Ekspor</span>
                 </Button>
@@ -262,6 +298,15 @@ const UserTable = ({ users, onUserUpdated, isLoading }: UserTableProps) => {
                     ]}
                 />
             )}
+
+
+            <UserExportModal
+                isOpen={showExportModal}
+                onClose={() => setShowExportModal(false)}
+                onExport={handleExport}
+                roles={roleOptions}
+                divisions={divisionOptions}
+            />
         </>
     );
 };
