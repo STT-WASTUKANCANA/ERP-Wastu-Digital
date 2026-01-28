@@ -7,6 +7,7 @@ import React from "react";
 import { BsInbox, BsSend, BsFileText } from "react-icons/bs";
 import { MailTrendChart } from "@/components/features/dashboard/mail-trend-chart";
 import { MailStatusChart } from "@/components/features/dashboard/mail-status-chart";
+import { MailCategoryChart } from "@/components/features/dashboard/mail-category-chart";
 
 const Page = async () => {
   const incomingResponse = await getIncomingMailSummary();
@@ -57,6 +58,10 @@ const Page = async () => {
     ? dashboardStatsResponse.data.data.mail_status
     : { incoming: {}, outgoing: {} };
 
+  const categoryData = dashboardStatsResponse.ok && dashboardStatsResponse.data?.data?.mail_category
+    ? dashboardStatsResponse.data.data.mail_category
+    : {};
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -82,6 +87,7 @@ const Page = async () => {
 
       <MailTrendChart data={trendData} />
       <MailStatusChart data={statusData} />
+      <MailCategoryChart data={categoryData} />
     </div>
   );
 };

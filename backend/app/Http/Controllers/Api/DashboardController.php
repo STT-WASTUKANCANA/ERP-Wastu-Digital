@@ -72,7 +72,27 @@ class DashboardController extends Controller
                     'incoming' => $incomingStatus,
                     'outgoing' => $outgoingStatus,
                 ],
-                'mail_category' => [],
+            // 3. Top 5 Mail Categories (Incoming)
+            $topCategories = \App\Models\Workspace\Mails\IncomingMail::selectRaw('mail_categories.name, COUNT(*) as count')
+                ->join('mail_categories', 'incoming_mails.category_id', '=', 'mail_categories.id')
+                ->whereYear('incoming_mails.date', $year)
+                ->groupBy('mail_categories.name')
+                ->orderByDesc('count')
+                ->limit(5)
+                ->pluck('count', 'name');
+
+            $data = [
+                'mail_trend' => [
+                    'labels' => ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
+                    'incoming' => $formatTrend($incomingTrend),
+                    'outgoing' => $formatTrend($outgoingTrend),
+                    'decision' => $formatTrend($decisionTrend),
+                ],
+                'mail_status' => [
+                    'incoming' => $incomingStatus,
+                    'outgoing' => $outgoingStatus,
+                ],
+                'mail_category' => $topCategories,
                 'entity_counts' => [
                     'users' => 0,
                     'divisions' => 0
