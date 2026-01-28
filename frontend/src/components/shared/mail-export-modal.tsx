@@ -4,8 +4,9 @@ import React, { useState } from "react";
 import { Modal } from "../ui/modal";
 import { Button } from "../ui/button";
 import { SearchableSelect } from "../ui/searchable-select";
+import { DatePicker } from "../ui/date-picker";
 import { Input } from "../ui/input";
-import { Select } from "../ui/select";
+import { format } from "date-fns";
 import { showToast } from "@/lib/sweetalert";
 
 export interface MailExportFilters {
@@ -38,8 +39,9 @@ export const MailExportModal: React.FC<MailExportModalProps> = ({
     const [loading, setLoading] = useState(false);
 
     // Filter States
-    const [startDate, setStartDate] = useState("");
-    const [endDate, setEndDate] = useState("");
+    // Filter States
+    const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+    const [endDate, setEndDate] = useState<Date | undefined>(undefined);
     const [selectedCategory, setSelectedCategory] = useState("");
     const [status, setStatus] = useState("");
     const [viewStatus, setViewStatus] = useState("");
@@ -55,8 +57,8 @@ export const MailExportModal: React.FC<MailExportModalProps> = ({
         try {
             const filters: MailExportFilters = {
                 category_id: selectedCategory || undefined,
-                start_date: startDate || undefined,
-                end_date: endDate || undefined,
+                start_date: startDate ? format(startDate, "yyyy-MM-dd") : undefined,
+                end_date: endDate ? format(endDate, "yyyy-MM-dd") : undefined,
                 status: status || undefined,
                 view_status: viewStatus || undefined,
                 destination: destination || undefined,
@@ -72,8 +74,8 @@ export const MailExportModal: React.FC<MailExportModalProps> = ({
     };
 
     const handleReset = () => {
-        setStartDate("");
-        setEndDate("");
+        setStartDate(undefined);
+        setEndDate(undefined);
         setSelectedCategory("");
         setStatus("");
         setViewStatus("");
@@ -85,27 +87,31 @@ export const MailExportModal: React.FC<MailExportModalProps> = ({
         <Modal isOpen={isOpen} onClose={onClose} title={title} size="lg">
             <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
-                    <div className="flex flex-col gap-2">
-                        <label className="text-sm font-medium">Tanggal Awal</label>
-                        <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
-                    </div>
-                    <div className="flex flex-col gap-2">
-                        <label className="text-sm font-medium">Tanggal Akhir</label>
-                        <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
-                    </div>
+                    <DatePicker
+                        label="Tanggal Awal"
+                        value={startDate}
+                        onChange={setStartDate}
+                        placeholder="Pilih tanggal awal"
+                    />
+                    <DatePicker
+                        label="Tanggal Akhir"
+                        value={endDate}
+                        onChange={setEndDate}
+                        placeholder="Pilih tanggal akhir"
+                    />
                 </div>
 
-                <Select
+                <SearchableSelect
                     label="Kategori"
                     options={categories}
                     value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    onChange={(val) => setSelectedCategory(val)}
                     placeholder="Semua Kategori"
                 />
 
                 {type === 'incoming' && (
                     <div className="grid grid-cols-2 gap-4">
-                        <Select
+                        <SearchableSelect
                             label="Status"
                             options={[
                                 { label: 'Peninjauan', value: '1' },
@@ -113,17 +119,17 @@ export const MailExportModal: React.FC<MailExportModalProps> = ({
                                 { label: 'Selesai', value: '3' },
                             ]}
                             value={status}
-                            onChange={(e) => setStatus(e.target.value)}
+                            onChange={(val) => setStatus(val)}
                             placeholder="Semua Status"
                         />
-                        <Select
+                        <SearchableSelect
                             label="Status Dilihat"
                             options={[
                                 { label: 'Sudah Dilihat', value: '1' },
                                 { label: 'Belum Dilihat', value: '0' },
                             ]}
                             value={viewStatus}
-                            onChange={(e) => setViewStatus(e.target.value)}
+                            onChange={(val) => setViewStatus(val)}
                             placeholder="Semua Status Dilihat"
                         />
                     </div>
@@ -139,7 +145,7 @@ export const MailExportModal: React.FC<MailExportModalProps> = ({
                                 onChange={(e) => setDestination(e.target.value)}
                             />
                         </div>
-                        <Select
+                        <SearchableSelect
                             label="Status"
                             options={[
                                 { label: 'Verifikasi Sekum', value: '1' },
@@ -148,7 +154,7 @@ export const MailExportModal: React.FC<MailExportModalProps> = ({
                                 { label: 'Ditolak', value: '4' },
                             ]}
                             value={status}
-                            onChange={(e) => setStatus(e.target.value)}
+                            onChange={(val) => setStatus(val)}
                             placeholder="Semua Status"
                         />
                     </div>
