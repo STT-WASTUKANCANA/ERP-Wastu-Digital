@@ -21,18 +21,18 @@ class DashboardController extends Controller
             // Initialize months array with 0
             $months = collect(range(1, 12))->mapWithKeys(fn($m) => [$m => 0]);
 
-            $incomingTrend = \App\Models\Workspace\Mails\IncomingMail::selectRaw('MONTH(date) as month, COUNT(*) as count')
-                ->whereYear('date', $year)
+            $incomingTrend = \App\Models\Workspace\Mails\IncomingMail::selectRaw('MONTH(created_at) as month, COUNT(*) as count')
+                ->whereYear('created_at', $year)
                 ->groupBy('month')
                 ->pluck('count', 'month');
 
-            $outgoingTrend = \App\Models\Workspace\Mails\OutgoingMail::selectRaw('MONTH(date) as month, COUNT(*) as count')
-                ->whereYear('date', $year)
+            $outgoingTrend = \App\Models\Workspace\Mails\OutgoingMail::selectRaw('MONTH(created_at) as month, COUNT(*) as count')
+                ->whereYear('created_at', $year)
                 ->groupBy('month')
                 ->pluck('count', 'month');
 
-            $decisionTrend = \App\Models\Workspace\Mails\DecisionLetter::selectRaw('MONTH(date) as month, COUNT(*) as count')
-                ->whereYear('date', $year)
+            $decisionTrend = \App\Models\Workspace\Mails\DecisionLetter::selectRaw('MONTH(created_at) as month, COUNT(*) as count')
+                ->whereYear('created_at', $year)
                 ->groupBy('month')
                 ->pluck('count', 'month');
 
@@ -51,13 +51,13 @@ class DashboardController extends Controller
             // 2. Mail Status Distribution
             // Incoming Mail Status
             $incomingStatus = \App\Models\Workspace\Mails\IncomingMail::selectRaw('status, COUNT(*) as count')
-                ->whereYear('date', $year)
+                ->whereYear('created_at', $year)
                 ->groupBy('status')
                 ->pluck('count', 'status');
 
             // Outgoing Mail Status
             $outgoingStatus = \App\Models\Workspace\Mails\OutgoingMail::selectRaw('status, COUNT(*) as count')
-                ->whereYear('date', $year)
+                ->whereYear('created_at', $year)
                 ->groupBy('status')
                 ->pluck('count', 'status');
 
@@ -75,7 +75,7 @@ class DashboardController extends Controller
             // 3. Top 5 Mail Categories (Incoming)
             $topCategories = \App\Models\Workspace\Mails\IncomingMail::selectRaw('mail_categories.name, COUNT(*) as count')
                 ->join('mail_categories', 'incoming_mails.category_id', '=', 'mail_categories.id')
-                ->whereYear('incoming_mails.date', $year)
+                ->whereYear('incoming_mails.created_at', $year)
                 ->groupBy('mail_categories.name')
                 ->orderByDesc('count')
                 ->limit(5)
