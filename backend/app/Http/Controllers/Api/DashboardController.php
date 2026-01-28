@@ -15,9 +15,39 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         try {
-            // Placeholder for data
+            $year = $request->input('year', date('Y'));
+
+            // 1. Mail Trend (Monthly)
+            // Initialize months array with 0
+            $months = collect(range(1, 12))->mapWithKeys(fn($m) => [$m => 0]);
+
+            $incomingTrend = \App\Models\Workspace\Mails\IncomingMail::selectRaw('MONTH(date) as month, COUNT(*) as count')
+                ->whereYear('date', $year)
+                ->groupBy('month')
+                ->pluck('count', 'month');
+
+            $outgoingTrend = \App\Models\Workspace\Mails\OutgoingMail::selectRaw('MONTH(date) as month, COUNT(*) as count')
+                ->whereYear('date', $year)
+                ->groupBy('month')
+                ->pluck('count', 'month');
+
+            $decisionTrend = \App\Models\Workspace\Mails\DecisionLetter::selectRaw('MONTH(date) as month, COUNT(*) as count')
+                ->whereYear('date', $year)
+                ->groupBy('month')
+                ->pluck('count', 'month');
+
+            // Merge with defaults to ensure all months exist
+            $formatTrend = function ($trend) use ($months) {
+                return $months->replace($trend)->values()->toArray();
+            };
+
             $data = [
-                'mail_trend' => [],
+                'mail_trend' => [
+                    'labels' => ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
+                    'incoming' => $formatTrend($incomingTrend),
+                    'outgoing' => $formatTrend($outgoingTrend),
+                    'decision' => $formatTrend($decisionTrend),
+                ],
                 'mail_status' => [],
                 'mail_category' => [],
                 'entity_counts' => [
