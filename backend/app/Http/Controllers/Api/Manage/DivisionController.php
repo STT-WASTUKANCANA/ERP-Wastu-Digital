@@ -10,6 +10,8 @@ use App\Services\Api\Master\DivisionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Throwable;
+use App\Exports\DivisionExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class DivisionController extends Controller
 {
@@ -71,7 +73,7 @@ class DivisionController extends Controller
     {
         try {
             $division = Division::findOrFail($id);
-            
+
             $updatedDivision = $this->service->update($division, $request->validated());
 
             Log::info('[MANAGE] DIVISI UPDATE: Divisi berhasil diperbarui', ['division_id' => $updatedDivision->id, 'user_id' => auth()->id()]);
@@ -100,5 +102,13 @@ class DivisionController extends Controller
             Log::error('[MANAGE] DIVISI DELETE: Gagal menghapus divisi', ['division_id' => $id, 'error' => $e->getMessage()]);
             return response()->json(['status' => false, 'message' => 'Delete failed or division not found.'], 500);
         }
+    }
+
+    // Export Data Divisi
+    public function export(Request $request)
+    {
+        $filters = $request->all();
+        $date = now()->format('Y-m-d');
+        return Excel::download(new DivisionExport($filters), "divisi_$date.xlsx");
     }
 }

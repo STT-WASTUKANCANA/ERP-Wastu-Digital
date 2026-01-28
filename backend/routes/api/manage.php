@@ -21,12 +21,13 @@ Route::middleware('auth:api')
             ->controller(DivisionController::class)
             ->group(function () {
 
-                Route::get('/', 'index')->name('index');
-                Route::post('/', 'store')->name('store');
-                Route::get('/{id}', 'show')->name('show');
-                Route::put('/{id}', 'update')->name('update');
-                Route::delete('/{id}', 'destroy')->name('destroy');
-            });
+            Route::get('/export', 'export')->name('export');
+            Route::get('/', 'index')->name('index');
+            Route::post('/', 'store')->name('store');
+            Route::get('/{id}', 'show')->name('show');
+            Route::put('/{id}', 'update')->name('update');
+            Route::delete('/{id}', 'destroy')->name('destroy');
+        });
 
         // Manajemen Pengguna
         Route::prefix('users')
@@ -34,10 +35,11 @@ Route::middleware('auth:api')
             ->controller(UserController::class)
             ->group(function () {
 
-                Route::get('/', 'index')->name('index');
-                Route::post('/', 'store')->name('store');
-                Route::get('/{id}', 'show')->name('show');
-                Route::put('/{id}', 'update')->name('update');
-                Route::delete('/{id}', 'destroy')->name('destroy');
-            });
+            Route::get('/export', 'export')->name('export');
+            Route::get('/', 'index')->name('index');
+            Route::post('/', 'store')->name('store');
+            Route::get('/{id}', 'show')->name('show');
+            Route::put('/{id}', 'update')->name('update');
+            Route::delete('/{id}', 'destroy')->name('destroy');
+        });
     });

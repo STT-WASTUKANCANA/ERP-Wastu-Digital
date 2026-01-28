@@ -9,6 +9,8 @@ use App\Services\Api\Master\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Throwable;
+use App\Exports\UserExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class UserController extends Controller
 {
@@ -46,7 +48,7 @@ class UserController extends Controller
             $user = $this->service->create($data);
 
             Log::info('[MANAGE] USER CREATE: Pengguna baru berhasil dibuat', ['new_user_id' => $user->id, 'creator_id' => auth()->id()]);
-            
+
             return response()->json([
                 'message' => 'User created successfully',
                 'data' => new UserResource($user)
@@ -62,13 +64,13 @@ class UserController extends Controller
     {
         try {
             $user = $this->service->find($id);
-            
+
             if (!$user) {
                 return response()->json(['error' => 'User not found'], 404);
             }
 
             Log::info('[MANAGE] USER SHOW: Menampilkan detail pengguna', ['user_id' => $id, 'viewer_id' => auth()->id()]);
-            
+
             return new UserResource($user);
         } catch (Throwable $e) {
             Log::error('[MANAGE] USER SHOW: Gagal menampilkan detail pengguna', ['id' => $id, 'error' => $e->getMessage()]);
@@ -82,13 +84,13 @@ class UserController extends Controller
         try {
             $data = $request->validated();
             $user = $this->service->update($id, $data);
-            
+
             if (!$user) {
                 return response()->json(['error' => 'User not found'], 404);
             }
 
             Log::info('[MANAGE] USER UPDATE: Pengguna berhasil diperbarui', ['user_id' => $id, 'updater_id' => auth()->id()]);
-            
+
             return response()->json([
                 'message' => 'User updated successfully',
                 'data' => new UserResource($user)
@@ -104,17 +106,25 @@ class UserController extends Controller
     {
         try {
             $result = $this->service->delete($id);
-            
+
             if (!$result) {
                 return response()->json(['error' => 'User not found'], 404);
             }
 
             Log::info('[MANAGE] USER DELETE: Pengguna berhasil dihapus', ['user_id' => $id, 'deleter_id' => auth()->id()]);
-            
+
             return response()->json(['message' => 'User deleted successfully'], 200);
         } catch (Throwable $e) {
             Log::error('[MANAGE] USER DELETE: Gagal menghapus pengguna', ['id' => $id, 'error' => $e->getMessage()]);
             return response()->json(['error' => 'Failed to delete user'], 500);
         }
+    }
+
+    // Export Users
+    public function export(Request $request)
+    {
+        $filters = $request->all();
+        $date = now()->format('Y-m-d');
+        return Excel::download(new UserExport($filters), "users_$date.xlsx");
     }
 }
