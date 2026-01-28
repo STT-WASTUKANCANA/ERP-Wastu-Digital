@@ -56,7 +56,7 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ user }) => {
                         <div className="flex flex-col">
                                 {/* Header Section */}
                                 <div className="flex items-center gap-3 p-5">
-                                        <div className="w-10 h-10 rounded-full bg-[#8c5cf5] flex items-center justify-center text-white font-bold text-sm shrink-0">
+                                        <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold text-sm shrink-0">
                                                 {getInitials(user?.name)}
                                         </div>
                                         <div className="flex flex-col overflow-hidden">
