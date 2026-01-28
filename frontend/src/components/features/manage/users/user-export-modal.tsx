@@ -16,7 +16,7 @@ export interface UserExportFilters {
 interface UserExportModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onExport: (format: 'excel', filters: UserExportFilters) => Promise<void>;
+    onExport: (format: 'excel' | 'pdf', filters: UserExportFilters) => Promise<void>;
     roles: { label: string; value: string }[];
     divisions: { label: string; value: string }[];
     title?: string;
@@ -36,8 +36,12 @@ export const UserExportModal: React.FC<UserExportModalProps> = ({
 
     const [selectedRole, setSelectedRole] = useState("");
     const [selectedDivision, setSelectedDivision] = useState("");
+    const [exportType, setExportType] = useState<'excel' | 'pdf'>('excel');
 
-    const exportFormat = 'excel';
+    const exportTypeOptions = [
+        { value: 'excel', label: 'Excel (.xlsx)' },
+        { value: 'pdf', label: 'PDF (.pdf)' }
+    ];
 
     const handleSubmit = async () => {
         setLoading(true);
@@ -47,7 +51,7 @@ export const UserExportModal: React.FC<UserExportModalProps> = ({
                 division: selectedDivision || undefined,
             };
 
-            await onExport(exportFormat, filters);
+            await onExport(exportType, filters);
             onClose();
         } catch (error) {
             console.error("Export error:", error);
@@ -57,13 +61,13 @@ export const UserExportModal: React.FC<UserExportModalProps> = ({
     };
 
     const handleReset = () => {
-
         setSelectedRole("");
         setSelectedDivision("");
+        setExportType("excel");
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title={title} size="md">
+        <Modal isOpen={isOpen} onClose={onClose} title={title} size="lg">
             <div className="space-y-4">
 
 
@@ -82,6 +86,16 @@ export const UserExportModal: React.FC<UserExportModalProps> = ({
                     onChange={(val) => setSelectedDivision(val)}
                     placeholder="Semua Divisi"
                 />
+
+                <div className="pt-4 border-t border-secondary/20">
+                    <SearchableSelect
+                        label="Pilih Format Export"
+                        options={exportTypeOptions}
+                        value={exportType}
+                        onChange={(value) => setExportType(value as 'excel' | 'pdf')}
+                        placeholder="Pilih format"
+                    />
+                </div>
 
                 <div className="flex justify-end gap-2 pt-4 border-t border-secondary/20">
                     <Button

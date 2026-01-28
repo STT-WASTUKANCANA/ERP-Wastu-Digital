@@ -180,7 +180,7 @@ const UserTable = ({ users, onUserUpdated, isLoading }: UserTableProps) => {
 
 
 
-    const handleExport = async (format: 'excel', filters: UserExportFilters) => {
+    const handleExport = async (format: 'excel' | 'pdf', filters: UserExportFilters) => {
         try {
             const result = await exportUsers(format, filters);
 
