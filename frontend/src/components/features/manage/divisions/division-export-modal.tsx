@@ -13,7 +13,7 @@ export interface DivisionExportFilters {
 interface DivisionExportModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onExport: (format: 'excel', filters: DivisionExportFilters) => Promise<void>;
+    onExport: (format: 'excel' | 'pdf', filters: DivisionExportFilters) => Promise<void>;
     title?: string;
 }
 
@@ -28,10 +28,12 @@ export const DivisionExportModal: React.FC<DivisionExportModalProps> = ({
     // Filter States
 
     const [status, setStatus] = useState("");
+    const [exportType, setExportType] = useState<'excel' | 'pdf'>('excel');
 
-    // Format is always excel for now based on Backend implementation using Maatwebsite
-    // Only Excel is implemented in the backend controller (Excel::download)
-    const exportFormat = 'excel';
+    const exportTypeOptions = [
+        { value: 'excel', label: 'Excel (.xlsx)' },
+        { value: 'pdf', label: 'PDF (.pdf)' }
+    ];
 
     const handleSubmit = async () => {
         setLoading(true);
@@ -40,7 +42,7 @@ export const DivisionExportModal: React.FC<DivisionExportModalProps> = ({
                 status: status || undefined,
             };
 
-            await onExport(exportFormat, filters);
+            await onExport(exportType, filters);
             onClose();
         } catch (error) {
             console.error("Export error:", error);
@@ -50,12 +52,12 @@ export const DivisionExportModal: React.FC<DivisionExportModalProps> = ({
     };
 
     const handleReset = () => {
-
         setStatus("");
+        setExportType("excel");
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title={title} size="md">
+        <Modal isOpen={isOpen} onClose={onClose} title={title} size="lg">
             <div className="space-y-4">
 
 
@@ -69,6 +71,16 @@ export const DivisionExportModal: React.FC<DivisionExportModalProps> = ({
                     onChange={(val) => setStatus(val)}
                     placeholder="Semua Status"
                 />
+
+                <div className="pt-4 border-t border-secondary/20">
+                    <SearchableSelect
+                        label="Pilih Format Export"
+                        options={exportTypeOptions}
+                        value={exportType}
+                        onChange={(value) => setExportType(value as 'excel' | 'pdf')}
+                        placeholder="Pilih format"
+                    />
+                </div>
 
                 <div className="flex justify-end gap-2 pt-4 border-t border-secondary/20">
                     <Button

@@ -177,7 +177,7 @@ export default function DivisionTable() {
         setHiddenColumns(newHidden);
     };
 
-    const handleExport = async (format: 'excel', filters: DivisionExportFilters) => {
+    const handleExport = async (format: 'excel' | 'pdf', filters: DivisionExportFilters) => {
         try {
             const result = await exportDivision(format, filters);
 
