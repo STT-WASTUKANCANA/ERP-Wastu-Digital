@@ -72,15 +72,13 @@ export const DivisionExportModal: React.FC<DivisionExportModalProps> = ({
                     placeholder="Semua Status"
                 />
 
-                <div className="pt-4 border-t border-secondary/20">
-                    <SearchableSelect
-                        label="Pilih Format Export"
-                        options={exportTypeOptions}
-                        value={exportType}
-                        onChange={(value) => setExportType(value as 'excel' | 'pdf')}
-                        placeholder="Pilih format"
-                    />
-                </div>
+                <SearchableSelect
+                    label="Pilih Format Export"
+                    options={exportTypeOptions}
+                    value={exportType}
+                    onChange={(value) => setExportType(value as 'excel' | 'pdf')}
+                    placeholder="Pilih format"
+                />
 
                 <div className="flex justify-end gap-2 pt-4 border-t border-secondary/20">
                     <Button
