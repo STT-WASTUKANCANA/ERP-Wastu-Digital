@@ -160,7 +160,7 @@ export const MailExportModal: React.FC<MailExportModalProps> = ({
                     </div>
                 )}
 
-                <div className="pt-4 border-t border-secondary/20">
+                <div className="border-secondary/20">
                     <SearchableSelect
                         label="Pilih Format Export"
                         options={exportTypeOptions}
