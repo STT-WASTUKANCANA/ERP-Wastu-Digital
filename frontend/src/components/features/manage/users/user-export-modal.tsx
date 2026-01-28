@@ -5,7 +5,7 @@ import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import { Input } from "@/components/ui/input";
-import { Select } from "@/components/ui/select";
+
 
 export interface UserExportFilters {
 
@@ -67,11 +67,11 @@ export const UserExportModal: React.FC<UserExportModalProps> = ({
             <div className="space-y-4">
 
 
-                <Select
+                <SearchableSelect
                     label="Role"
                     options={roles}
                     value={selectedRole}
-                    onChange={(e) => setSelectedRole(e.target.value)}
+                    onChange={(val) => setSelectedRole(val)}
                     placeholder="Semua Role"
                 />
 
