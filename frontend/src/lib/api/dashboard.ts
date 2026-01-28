@@ -1,4 +1,4 @@
-import { fetchWithAuth } from "@/lib/utils/fetch-with-auth";
+import { fetchWithAuth } from "./api";
 
 export interface DashboardStats {
     mail_trend: {
