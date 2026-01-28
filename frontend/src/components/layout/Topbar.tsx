@@ -44,7 +44,7 @@ export const Topbar: React.FC<TopbarProps> = ({
                         </div>
 
                         <div className="flex items-center gap-4">
-                                <Button
+                                {/* <Button
                                         size="w-[35px] h-[35px]"
                                         rounded="rounded-full"
                                         color="bg-accent"
@@ -58,20 +58,15 @@ export const Topbar: React.FC<TopbarProps> = ({
                                                 5
                                         </span>
                                         <FaRegBell className="w-full h-full text-foreground" />
-                                </Button>
+                                </Button> */}
 
                                 {user && (
                                         <div className="flex items-center gap-2 cursor-pointer" onClick={() => {
                                                 setProfileDropdownShow(!profileDropdownShow);
                                                 setNotificationDropdownShow(false);
                                         }}>
-                                                <div className="relative w-[35px] h-[35px] rounded-full overflow-hidden border border-secondary/20">
-                                                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                                                        <img
-                                                                src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=random`}
-                                                                alt="Profile"
-                                                                className="w-full h-full object-cover"
-                                                        />
+                                                <div className="relative w-[35px] h-[35px] rounded-full overflow-hidden border border-secondary/20 bg-primary flex items-center justify-center text-white font-bold text-xs min-w-[35px]">
+                                                        {user.name ? user.name.substring(0, 2).toUpperCase() : 'U'}
                                                 </div>
                                                 <div className="text-left hidden sm:flex flex-col justify-center gap-1">
                                                         <span className="text-xs font-bold text-primary capitalize leading-none">
@@ -87,7 +82,7 @@ export const Topbar: React.FC<TopbarProps> = ({
                                                                 })()}
                                                         </span>
                                                         <div className="flex items-center gap-2">
-                                                                <span className="text-sm font-semibold text-foreground leading-none">{user.name}</span>
+                                                                <span className="text-sm font-[550] text-foreground leading-none">{user.name}</span>
                                                                 <FaChevronDown className="text-[10px] text-foreground/70" />
                                                         </div>
                                                 </div>
