@@ -94,8 +94,8 @@ class DashboardController extends Controller
                 ],
                 'mail_category' => $topCategories,
                 'entity_counts' => [
-                    'users' => 0,
-                    'divisions' => 0
+                    'users' => \App\Models\User::count(),
+                    'divisions' => \App\Models\Division::count()
                 ]
             ];
 

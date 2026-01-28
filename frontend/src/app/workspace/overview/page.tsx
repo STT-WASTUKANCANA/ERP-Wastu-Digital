@@ -62,8 +62,15 @@ const Page = async () => {
     ? dashboardStatsResponse.data.data.mail_category
     : {};
 
+  const entityCounts = dashboardStatsResponse.ok && dashboardStatsResponse.data?.data?.entity_counts
+    ? dashboardStatsResponse.data.data.entity_counts
+    : { users: 0, divisions: 0 };
+
+  // Users (redundant var removed)
+
   return (
     <div className="space-y-6">
+      {/* Mail Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card
           title="Surat Masuk"
@@ -85,9 +92,25 @@ const Page = async () => {
         />
       </div>
 
+      {/* Entity Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card
+          title="Total Pengguna"
+          value={entityCounts.users.toString()}
+          icon={LuUsers}
+        />
+        <Card
+          title="Total Divisi"
+          value={entityCounts.divisions.toString()}
+          icon={BsFileText} // Need a better icon for Division. Maybe BsBuilding?
+        />
+      </div>
+
       <MailTrendChart data={trendData} />
-      <MailStatusChart data={statusData} />
-      <MailCategoryChart data={categoryData} />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <MailStatusChart data={statusData} />
+        <MailCategoryChart data={categoryData} />
+      </div>
     </div>
   );
 };
