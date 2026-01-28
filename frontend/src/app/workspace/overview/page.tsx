@@ -4,7 +4,8 @@ import { getOutgoingMailSummary } from "@/lib/api/mails/outgoing";
 import { getDecisionMailSummary } from "@/lib/api/mails/decision";
 import { getDashboardStats } from "@/lib/api/dashboard";
 import React from "react";
-import { BsInbox, BsSend, BsFileText } from "react-icons/bs";
+import { BsInbox, BsSend, BsFileText, BsBuilding } from "react-icons/bs";
+import { LuUsers } from "react-icons/lu";
 import { MailTrendChart } from "@/components/features/dashboard/mail-trend-chart";
 import { MailStatusChart } from "@/components/features/dashboard/mail-status-chart";
 import { MailCategoryChart } from "@/components/features/dashboard/mail-category-chart";
@@ -102,7 +103,7 @@ const Page = async () => {
         <Card
           title="Total Divisi"
           value={entityCounts.divisions.toString()}
-          icon={BsFileText} // Need a better icon for Division. Maybe BsBuilding?
+          icon={BsBuilding}
         />
       </div>
 
