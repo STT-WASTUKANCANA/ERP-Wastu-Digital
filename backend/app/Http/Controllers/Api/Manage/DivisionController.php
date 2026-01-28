@@ -109,6 +109,13 @@ class DivisionController extends Controller
     {
         $filters = $request->all();
         $date = now()->format('Y-m-d');
+
+        $format = $request->input('format', 'excel');
+
+        if ($format === 'pdf') {
+            return Excel::download(new DivisionExport($filters), "divisi_$date.pdf", \Maatwebsite\Excel\Excel::DOMPDF);
+        }
+
         return Excel::download(new DivisionExport($filters), "divisi_$date.xlsx");
     }
 }

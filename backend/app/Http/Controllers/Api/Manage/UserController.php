@@ -125,6 +125,13 @@ class UserController extends Controller
     {
         $filters = $request->all();
         $date = now()->format('Y-m-d');
+
+        $format = $request->input('format', 'excel');
+
+        if ($format === 'pdf') {
+            return Excel::download(new UserExport($filters), "users_$date.pdf", \Maatwebsite\Excel\Excel::DOMPDF);
+        }
+
         return Excel::download(new UserExport($filters), "users_$date.xlsx");
     }
 }
