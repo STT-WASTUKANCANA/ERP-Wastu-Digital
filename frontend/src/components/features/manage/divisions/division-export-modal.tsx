@@ -4,8 +4,6 @@ import React, { useState } from "react";
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { SearchableSelect } from "@/components/ui/searchable-select";
-import { Input } from "@/components/ui/input";
-import { Select } from "@/components/ui/select";
 
 export interface DivisionExportFilters {
 
@@ -61,14 +59,14 @@ export const DivisionExportModal: React.FC<DivisionExportModalProps> = ({
             <div className="space-y-4">
 
 
-                <Select
+                <SearchableSelect
                     label="Status"
                     options={[
                         { label: 'Aktif', value: '1' },
                         { label: 'Nonaktif', value: '0' },
                     ]}
                     value={status}
-                    onChange={(e) => setStatus(e.target.value)}
+                    onChange={(val) => setStatus(val)}
                     placeholder="Semua Status"
                 />
 
